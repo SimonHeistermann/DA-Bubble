@@ -1,0 +1,132 @@
+<div class="auth__container">
+    <div class="auth__form__container">
+      <div class="auth__form__header">
+        <h1>Anmeldung</h1>
+        <p>Wir empfehlen dir, die E-Mail-Adresse zu nutzen, die du bei der Arbeit verwendest.</p>
+      </div>
+      <div class="auth__form__content">
+        <form
+          class="auth__form"
+          [formGroup]="loginForm"
+          (ngSubmit)="onSubmit()"
+          [ngClass]="{ submitting: loading }"
+          novalidate
+          aria-labelledby="login-form-title"
+        >
+          <h2 id="login-form-title" class="visually__hidden">Anmeldeformular</h2>
+          <div class="form__fields">
+            <div class="form__field">
+              <div
+                class="form__group"
+                [ngClass]="{
+                  error__state: isFieldInvalid('email'),
+                  has__content: hasFieldContent('email')
+                }"
+              >
+                <div class="input__wrapper">
+                  <label for="email">
+                    <img class="input__icon" src="/icons/mail_icon_black.png" draggable="false" />
+                  </label>
+                  <input
+                    type="email"
+                    id="email"
+                    formControlName="email"
+                    placeholder="beispielname@email.com"
+                    class="form__input"
+                    autocomplete="email"
+                    [attr.aria-invalid]="isFieldInvalid('email')"
+                    [attr.aria-describedby]="isFieldInvalid('email') ? 'email-error' : null"
+                  />
+                </div>
+                <div class="error" *ngIf="getFieldError('email')" id="email-error">
+                  <small>{{ getFieldError('email') }}</small>
+                </div>
+              </div>
+            </div>
+            <div class="form__field">
+              <div
+                class="form__group"
+                [ngClass]="{
+                  error__state: isFieldInvalid('password'),
+                  has__content: hasFieldContent('password')
+                }"
+              >
+                <div class="input__wrapper">
+                  <img class="input__icon" src="/icons/lock_icon_black.png" draggable="false" />
+                  <input
+                    [type]="showPassword ? 'text' : 'password'"
+                    id="password"
+                    formControlName="password"
+                    placeholder="Passwort"
+                    class="form__input"
+                    autocomplete="current-password"
+                    [attr.aria-invalid]="isFieldInvalid('password')"
+                    [attr.aria-describedby]="isFieldInvalid('password') ? 'password-error' : null"
+                  />
+                </div>
+                <div class="error" *ngIf="getFieldError('password')" id="password-error">
+                  <small>{{ getFieldError('password') }}</small>
+                </div>
+              </div>
+            </div>
+          </div>
+          <div class="form-buttons">
+            <button
+              type="submit"
+              class="btn btn-primary"
+              [disabled]="loginForm.invalid || loading"
+              [attr.aria-busy]="loading"
+            >
+              <span *ngIf="!loading">
+                <span class="button-icon">🚀</span>
+                Anmelden
+              </span>
+              <span *ngIf="loading">
+                Wird angemeldet...
+                <div class="loading-spinner"></div>
+              </span>
+            </button>
+          </div>
+  
+          <!-- Divider -->
+          <div class="divider">
+            <span>ODER</span>
+          </div>
+  
+          <!-- Google Sign In -->
+          <div class="form-buttons">
+            <button
+              type="button"
+              class="btn btn-google"
+              (click)="onGoogleSignIn()"
+              [disabled]="loading"
+            >
+              <span class="button-icon">🔍</span>
+              Mit Google anmelden
+            </button>
+          </div>
+  
+          <!-- Form Links -->
+          <div class="form-links">
+            <a
+              class="link link-secondary"
+              (click)="navigateToForgotPassword()"
+              role="button"
+              tabindex="0"
+            >
+              Passwort vergessen?
+            </a>
+            <a
+              class="link link-primary"
+              (click)="navigateToRegister()"
+              role="button"
+              tabindex="0"
+            >
+              Noch kein Konto? Registrieren
+            </a>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
+  

@@ -1,0 +1,35 @@
+@use './../../../../../styles.scss' as *;
+
+.container {
+    width: 100%;
+    padding-inline: $standardInlinePadding;
+    height: 60px;
+    @include displayFlex($ai: flex-start, $jc: center, $g: 16px);
+}
+
+a {
+    @include fontFigtree();
+    display: inline-block;
+    color: var(--purple-2);
+    text-decoration: none;
+    transition: border-color 125ms ease-in, color 125ms ease-in, font-weight 125ms ease-in;
+    border-radius: 30px;
+    padding: 10px 15px;
+    border: 1px solid transparent;
+    position: relative;
+
+    &::after {
+        content: attr(data-label);
+        font-weight: 500;
+        visibility: hidden;
+        height: 0;
+        overflow: hidden;
+        display: block;
+    }
+
+    &:hover {
+        @include fontFigtree($fw: 500);
+        color: var(--purple-1);
+        border: 1px solid var(--light-purple);
+    }
+}

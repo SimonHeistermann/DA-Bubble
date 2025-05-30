@@ -1,0 +1,33 @@
+@use './../../../styles.scss' as *;
+
+.auth-layout {
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+}
+
+app-auth-header {
+    width: 100%;
+}
+  
+main {
+    flex: 1;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: $standardWidth;
+}
+  
+.auth-container {
+    max-width: 700px;
+    background: white;
+    border-radius: 30px;
+    box-shadow: 0 2px 10px 0px #00000014;
+    overflow: hidden;
+}
+
+app-auth-footer {
+    width: 100%;
+}

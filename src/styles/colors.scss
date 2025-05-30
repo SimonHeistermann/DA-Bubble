@@ -1,0 +1,157 @@
+@use 'sass:map';
+@use '@angular/material' as mat;
+
+$purple-1: #444DF2;
+$purple-2: #797EF3;
+$purple-3: #535AF1;
+$green: #92C83E;
+$pink: #ED1E79;
+$grey: #686868;
+$black: #000000;
+$light-purple: #ADB0D9;
+$bg-color: #ECEEFE;
+$white: #FFFFFF;
+
+$_palettes: (
+  primary: (
+    0: #000000,
+    10: #00006e,
+    20: #0100ac,
+    25: #0303cc,
+    30: #1d23d5,
+    35: #2e35e0,
+    40: #3c45eb,
+    50: #5a64ff,
+    60: #7c84ff,
+    70: #9da3ff,
+    80: #bfc2ff,
+    90: #e0e0ff,
+    95: #f1efff,
+    98: #fbf8ff,
+    99: #fffbff,
+    100: #ffffff,
+  ),
+  secondary: (
+    0: #000000,
+    10: #04006d,
+    20: #181895,
+    25: #26289f,
+    30: #3336aa,
+    35: #3f43b6,
+    40: #4c50c3,
+    50: #656ade,
+    60: #8085fa,
+    70: #9fa3ff,
+    80: #c0c1ff,
+    90: #e1e0ff,
+    95: #f1efff,
+    98: #fcf8ff,
+    99: #fffbff,
+    100: #ffffff,
+  ),
+  tertiary: (
+    0: #000000,
+    10: #02006d,
+    20: #0600ab,
+    25: #1413bf,
+    30: #2629c9,
+    35: #3439d5,
+    40: #4248e1,
+    50: #5d64fb,
+    60: #7d84ff,
+    70: #9ea3ff,
+    80: #bfc2ff,
+    90: #e0e0ff,
+    95: #f1efff,
+    98: #fbf8ff,
+    99: #fffbff,
+    100: #ffffff,
+  ),
+  neutral: (
+    0: #000000,
+    10: #181b26,
+    20: #2d303c,
+    25: #383b47,
+    30: #434653,
+    35: #4f525f,
+    40: #5b5e6b,
+    50: #737684,
+    60: #8d909e,
+    70: #a8aab9,
+    80: #c3c6d5,
+    90: #dfe2f1,
+    95: #eef0ff,
+    98: #faf8ff,
+    99: #fefbff,
+    100: #ffffff,
+    4: #0a0e18,
+    6: #0f131e,
+    12: #1c1f2a,
+    17: #262a35,
+    22: #313440,
+    24: #353945,
+    87: #d7d9e9,
+    92: #e5e7f7,
+    94: #ebedfd,
+    96: #f2f3ff,
+  ),
+  neutral-variant: (
+    0: #000000,
+    10: #1a1a29,
+    20: #2e2f3e,
+    25: #3a3a4a,
+    30: #454556,
+    35: #515162,
+    40: #5d5d6e,
+    50: #767587,
+    60: #8f8fa2,
+    70: #aaa9bd,
+    80: #c6c5d8,
+    90: #e2e0f5,
+    95: #f1efff,
+    98: #fbf8ff,
+    99: #fffbff,
+    100: #ffffff,
+  ),
+  error: (
+    0: #000000,
+    10: #3f001a,
+    20: #65002f,
+    25: #7a0039,
+    30: #8f0044,
+    35: #a40050,
+    40: #ba005b,
+    50: #e51373,
+    60: #ff4a8d,
+    70: #ff84a9,
+    80: #ffb1c5,
+    90: #ffd9e1,
+    95: #ffecef,
+    98: #fff8f8,
+    99: #fffbff,
+    100: #ffffff,
+  ),
+);
+
+$_rest: (
+  secondary: map.get($_palettes, secondary),
+  neutral: map.get($_palettes, neutral),
+  neutral-variant: map.get($_palettes,  neutral-variant),
+  error: map.get($_palettes, error),
+);
+
+$primary-palette: map.merge(map.get($_palettes, primary), $_rest);
+$tertiary-palette: map.merge(map.get($_palettes, tertiary), $_rest);
+
+:root {
+  --purple-1: #444DF2;
+  --purple-2: #797EF3;
+  --purple-3: #535AF1;
+  --green: #92C83E;
+  --pink: #ED1E79;
+  --grey: #686868;
+  --black: #000000;
+  --light-purple: #ADB0D9;
+  --bg-color: #ECEEFE;
+  --white: #FFFFFF;
+}

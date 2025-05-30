@@ -1,0 +1,67 @@
+@use "sass:string";
+
+$font-path: './../../public/fonts/';
+$font-family-nunito: Nunito;
+$font-family-figtree: Figtree;
+
+@mixin font-face($family, $weight, $style: normal, $filename) {
+  @font-face {
+    font-display: swap;
+    font-family: $family;
+    font-style: $style;
+    font-weight: $weight;
+    src: url('#{$font-path}#{$filename}.woff2') format('woff2');
+  }
+}
+
+$nunito-fonts: (
+  200: 'nunito-v26-cyrillic_cyrillic-ext_latin_latin-ext_vietnamese-200',
+  '200 italic': 'nunito-v26-cyrillic_cyrillic-ext_latin_latin-ext_vietnamese-200italic',
+  300: 'nunito-v26-cyrillic_cyrillic-ext_latin_latin-ext_vietnamese-300',
+  '300 italic': 'nunito-v26-cyrillic_cyrillic-ext_latin_latin-ext_vietnamese-300italic',
+  400: 'nunito-v26-cyrillic_cyrillic-ext_latin_latin-ext_vietnamese-regular',
+  '400 italic': 'nunito-v26-cyrillic_cyrillic-ext_latin_latin-ext_vietnamese-italic',
+  500: 'nunito-v26-cyrillic_cyrillic-ext_latin_latin-ext_vietnamese-500',
+  '500 italic': 'nunito-v26-cyrillic_cyrillic-ext_latin_latin-ext_vietnamese-500italic',
+  600: 'nunito-v26-cyrillic_cyrillic-ext_latin_latin-ext_vietnamese-600',
+  '600 italic': 'nunito-v26-cyrillic_cyrillic-ext_latin_latin-ext_vietnamese-600italic',
+  700: 'nunito-v26-cyrillic_cyrillic-ext_latin_latin-ext_vietnamese-700',
+  '700 italic': 'nunito-v26-cyrillic_cyrillic-ext_latin_latin-ext_vietnamese-700italic',
+  800: 'nunito-v26-cyrillic_cyrillic-ext_latin_latin-ext_vietnamese-800',
+  '800 italic': 'nunito-v26-cyrillic_cyrillic-ext_latin_latin-ext_vietnamese-800italic',
+  900: 'nunito-v26-cyrillic_cyrillic-ext_latin_latin-ext_vietnamese-900',
+  '900 italic': 'nunito-v26-cyrillic_cyrillic-ext_latin_latin-ext_vietnamese-900italic',
+);
+
+@each $key, $filename in $nunito-fonts {
+  $key-str: string.unquote(#{$key});
+  $style: if(string.index($key-str, 'italic'), italic, normal);
+  $space-pos: string.index($key-str, ' ');
+  $weight: if($space-pos, string.slice($key-str, 1, $space-pos - 1), $key-str);
+  @include font-face($font-family-nunito, $weight, $style, $filename);
+}
+
+$figtree-fonts: (
+  300: 'figtree-v8-latin_latin-ext-300',
+  '300 italic': 'figtree-v8-latin_latin-ext-300italic',
+  400: 'figtree-v8-latin_latin-ext-regular',
+  '400 italic': 'figtree-v8-latin_latin-ext-italic',
+  500: 'figtree-v8-latin_latin-ext-500',
+  '500 italic': 'figtree-v8-latin_latin-ext-500italic',
+  600: 'figtree-v8-latin_latin-ext-600',
+  '600 italic': 'figtree-v8-latin_latin-ext-600italic',
+  700: 'figtree-v8-latin_latin-ext-700',
+  '700 italic': 'figtree-v8-latin_latin-ext-700italic',
+  800: 'figtree-v8-latin_latin-ext-800',
+  '800 italic': 'figtree-v8-latin_latin-ext-800italic',
+  900: 'figtree-v8-latin_latin-ext-900',
+  '900 italic': 'figtree-v8-latin_latin-ext-900italic',
+);
+
+@each $key, $filename in $figtree-fonts {
+  $key-str: string.unquote(#{$key});
+  $style: if(string.index($key-str, 'italic'), italic, normal);
+  $space-pos: string.index($key-str, ' ');
+  $weight: if($space-pos, string.slice($key-str, 1, $space-pos - 1), $key-str);
+  @include font-face($font-family-figtree, $weight, $style, $filename);
+}
