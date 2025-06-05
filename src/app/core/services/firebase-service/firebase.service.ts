@@ -21,15 +21,14 @@ export class FirebaseService {
     private googleProvider = new GoogleAuthProvider();
   
     constructor() {
-      this.googleProvider.setCustomParameters({
-        prompt: 'select_account'
-      });
-      console.log('🔥 Firebase Service initialized');
+        this.googleProvider.setCustomParameters({
+            prompt: 'select_account'
+        });
+        console.log('🔥 Firebase Core Service initialized');
     }
 
-    /**
-    * Google Sign-In
-    */
+    // ==================== AUTH METHODS ====================
+    
     async signInWithGoogle(): Promise<FirebaseUser | null> {
         try {
             const result = await signInWithPopup(this.auth, this.googleProvider);
@@ -42,17 +41,14 @@ export class FirebaseService {
 
     async createUserWithEmail(email: string, password: string): Promise<FirebaseUser | null> {
         try {
-        const userCredential = await createUserWithEmailAndPassword(this.auth, email, password);
-        return userCredential.user;
+            const userCredential = await createUserWithEmailAndPassword(this.auth, email, password);
+            return userCredential.user;
         } catch (error) {
-        console.error('Email Registration Error:', error);
-        throw error;
+            console.error('Email Registration Error:', error);
+            throw error;
         }
     }
 
-    /**
-    * E-Mail/Passwort Anmeldung
-    */
     async signInWithEmail(email: string, password: string): Promise<FirebaseUser | null> {
         try {
             const userCredential = await signInWithEmailAndPassword(this.auth, email, password);
@@ -63,9 +59,6 @@ export class FirebaseService {
         }
     }
 
-    /**
-    * Benutzer abmelden
-    */
     async signOut(): Promise<void> {
         try {
             await signOut(this.auth);
@@ -75,9 +68,6 @@ export class FirebaseService {
         }
     }
 
-    /**
-    * Passwort zurücksetzen
-    */
     async sendPasswordReset(email: string): Promise<void> {
         try {
             await sendPasswordResetEmail(this.auth, email);
@@ -87,9 +77,6 @@ export class FirebaseService {
         }
     }
 
-    /**
-    * Profil aktualisieren
-    */
     async updateUserProfile(displayName?: string, photoURL?: string): Promise<void> {
         if (!this.auth.currentUser) {
             throw new Error('No authenticated user');
@@ -98,54 +85,56 @@ export class FirebaseService {
             await updateProfile(this.auth.currentUser, {
                 displayName: displayName || undefined,
                 photoURL: photoURL || undefined
-        });
+            });
         } catch (error) {
             console.error('Update Profile Error:', error);
             throw error;
         }
     }
 
-    /**
-    * Auth State Observer - Überwacht Anmeldestatus
-    */
+    async confirmPasswordReset(oobCode: string, newPassword: string): Promise<void> {
+        try {
+            await confirmPasswordReset(this.auth, oobCode, newPassword);
+        } catch (error) {
+            console.error('Confirm Password Reset Error:', error);
+            throw error;
+        }
+    }
+
+    async verifyPasswordResetCode(oobCode: string): Promise<string> {
+        try {
+            const email = await verifyPasswordResetCode(this.auth, oobCode);
+            return email;
+        } catch (error) {
+            console.error('Verify Password Reset Code Error:', error);
+            throw error;
+        }   
+    }
+
     onAuthStateChanged(callback: (user: FirebaseUser | null) => void): Unsubscribe {
         return onAuthStateChanged(this.auth, callback);
     }
 
-    /**
-    * Aktueller Benutzer
-    */
     get currentUser(): FirebaseUser | null {
         return this.auth.currentUser;
     }
 
-    /**
-    * Dokument erstellen/überschreiben
-    */
+    // ==================== FIRESTORE METHODS ====================
+
     async setDocument(collectionName: string, docId: string, data: any): Promise<void> {
         try {
-        const docRef = doc(this.firestore, collectionName, docId);
-        await setDoc(docRef, {
-            ...data,
-            updatedAt: Timestamp.now()
-        });
+            const docRef = doc(this.firestore, collectionName, docId);
+            await setDoc(docRef, data);
         } catch (error) {
             console.error(`Error setting document in ${collectionName}:`, error);
             throw error;
         }
     }
 
-    /**
-    * Dokument hinzufügen (Auto-ID)
-    */
     async addDocument(collectionName: string, data: any): Promise<string> {
         try {
             const colRef = collection(this.firestore, collectionName);
-            const docRef = await addDoc(colRef, {
-                ...data,
-                createdAt: Timestamp.now(),
-                updatedAt: Timestamp.now()
-            });
+            const docRef = await addDoc(colRef, data);
             return docRef.id;
         } catch (error) {
             console.error(`Error adding document to ${collectionName}:`, error);
@@ -153,43 +142,31 @@ export class FirebaseService {
         }
     }
 
-    /**
-    * Dokument lesen
-    */
     async getDocument(collectionName: string, docId: string): Promise<any | null> {
         try {
             const docRef = doc(this.firestore, collectionName, docId);
             const docSnap = await getDoc(docRef);
-        if (docSnap.exists()) {
-            return { id: docSnap.id, ...docSnap.data() };
-        } else {
-            return null;
-        }
+            if (docSnap.exists()) {
+                return { id: docSnap.id, ...docSnap.data() };
+            } else {
+                return null;
+            }
         } catch (error) {
             console.error(`Error getting document from ${collectionName}:`, error);
             throw error;
         }
     }
 
-    /**
-    * Dokument aktualisieren
-    */
     async updateDocument(collectionName: string, docId: string, data: any): Promise<void> {
         try {
             const docRef = doc(this.firestore, collectionName, docId);
-            await updateDoc(docRef, {
-                ...data,
-                updatedAt: Timestamp.now()
-            });
+            await updateDoc(docRef, data);
         } catch (error) {
             console.error(`Error updating document in ${collectionName}:`, error);
             throw error;
         }
     }
 
-    /**
-    * Dokument löschen
-    */
     async deleteDocument(collectionName: string, docId: string): Promise<void> {
         try {
             const docRef = doc(this.firestore, collectionName, docId);
@@ -200,22 +177,19 @@ export class FirebaseService {
         }
     }
 
-    /**
-    * Collection mit Query überwachen
-    */
     subscribeToCollection(
         collectionName: string,
         callback: (data: any[]) => void,
         ...queryConstraints: QueryConstraint[]
-        ): Unsubscribe {
+    ): Unsubscribe {
         try {
             const colRef = collection(this.firestore, collectionName);
             const q = query(colRef, ...queryConstraints);
       
             return onSnapshot(q, (snapshot) => {
                 const data = snapshot.docs.map(doc => ({
-                id: doc.id,
-                ...doc.data()
+                    id: doc.id,
+                    ...doc.data()
                 }));
                 callback(data);
             }, (error) => {
@@ -227,9 +201,6 @@ export class FirebaseService {
         }
     }
 
-    /**
-    * Einzelnes Dokument überwachen
-    */
     subscribeToDocument(
         collectionName: string,
         docId: string,
@@ -252,57 +223,22 @@ export class FirebaseService {
         }
     }
 
-    /**
-    * Timestamp erstellen
-    */
+    // ==================== UTILITY METHODS ====================
+
     createTimestamp(): Timestamp {
         return Timestamp.now();
     }
 
-    /**
-     * Collection Reference erstellen
-    */
     getCollectionRef(collectionName: string): CollectionReference {
         return collection(this.firestore, collectionName);
     }
 
-    /**
-    * Document Reference erstellen
-    */
     getDocRef(collectionName: string, docId: string): DocumentReference {
         return doc(this.firestore, collectionName, docId);
     }
 
-    /**
-    * Firestore Query Constraints Helper
-    */
     createQuery(collectionName: string, ...constraints: QueryConstraint[]) {
         const colRef = collection(this.firestore, collectionName);
         return query(colRef, ...constraints);
-    }
-
-    /**
-    * Passwort mit Reset-Code zurücksetzen
-    */
-    async confirmPasswordReset(oobCode: string, newPassword: string): Promise<void> {
-        try {
-            await confirmPasswordReset(this.auth, oobCode, newPassword);
-        } catch (error) {
-            console.error('Confirm Password Reset Error:', error);
-            throw error;
-        }
-    }
-
-    /**
-     * Reset-Code validieren und E-Mail zurückgeben
-    */
-    async verifyPasswordResetCode(oobCode: string): Promise<string> {
-        try {
-            const email = await verifyPasswordResetCode(this.auth, oobCode);
-            return email;
-        } catch (error) {
-            console.error('Verify Password Reset Code Error:', error);
-            throw error;
-        }   
     }
 }

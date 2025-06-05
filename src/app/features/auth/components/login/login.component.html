@@ -70,63 +70,48 @@
               </div>
             </div>
           </div>
-          <div class="form-buttons">
-            <button
-              type="submit"
-              class="btn btn-primary"
-              [disabled]="loginForm.invalid || loading"
-              [attr.aria-busy]="loading"
-            >
-              <span *ngIf="!loading">
-                <span class="button-icon">🚀</span>
-                Anmelden
-              </span>
-              <span *ngIf="loading">
-                Wird angemeldet...
-                <div class="loading-spinner"></div>
-              </span>
-            </button>
-          </div>
-  
-          <!-- Divider -->
-          <div class="divider">
-            <span>ODER</span>
-          </div>
-  
-          <!-- Google Sign In -->
-          <div class="form-buttons">
-            <button
-              type="button"
-              class="btn btn-google"
-              (click)="onGoogleSignIn()"
-              [disabled]="loading"
-            >
-              <span class="button-icon">🔍</span>
-              Mit Google anmelden
-            </button>
-          </div>
-  
-          <!-- Form Links -->
-          <div class="form-links">
+          <div class="form__bottom">
             <a
-              class="link link-secondary"
+              class="link"
               (click)="navigateToForgotPassword()"
               role="button"
               tabindex="0"
             >
               Passwort vergessen?
             </a>
-            <a
-              class="link link-primary"
-              (click)="navigateToRegister()"
-              role="button"
-              tabindex="0"
+            <div class="divider">
+                <span>ODER</span>
+            </div>
+            <button
+              type="button"
+              class="btn btn__google"
+              (click)="onGoogleSignIn()"
+              [disabled]="loading"
             >
-              Noch kein Konto? Registrieren
-            </a>
+              <span class="btn__icon"></span>
+              Anmelden mit Google
+            </button>
+            <div class="btn__box">
+                <button
+                    type="submit"
+                    class="btn btn__primary"
+                    [disabled]="loginForm.invalid || loading"
+                    [attr.aria-busy]="loading"
+                >
+                    <span *ngIf="!loading">
+                        Anmelden
+                    </span>
+                    <span *ngIf="loading">
+                        Wird angemeldet...
+                        <div class="loading__spinner"></div>
+                    </span>
+                </button>
+                <button class="btn btn__secondary">
+                    Gäste-Login
+                </button>
+            </div>
           </div>
         </form>
       </div>
     </div>
-  </div>
-  
+</div>
