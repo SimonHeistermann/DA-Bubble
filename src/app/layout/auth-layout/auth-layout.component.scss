@@ -1,11 +1,9 @@
 @use './../../../styles.scss' as *;
 
 .auth-layout {
-    min-height: 100vh;
-    display: flex;
+    height: 100vh;
+    @include displayFlex($g: 8px);
     flex-direction: column;
-    justify-content: center;
-    align-items: center;
 }
 
 app-auth-header {
@@ -21,7 +19,7 @@ main {
 }
   
 .auth-container {
-    max-width: 700px;
+    max-width: 606px;
     background: white;
     border-radius: 30px;
     box-shadow: 0 2px 10px 0px #00000014;
