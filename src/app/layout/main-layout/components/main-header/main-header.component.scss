@@ -1,0 +1,41 @@
+.main-container {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    position: relative;
+    width: 100%;
+    gap: 45px;
+}
+
+
+
+.search-field {
+    background-color: #FFFFFF !important;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    border: none;
+    padding: 17.5px 45px;
+    width: 60%;
+    max-width: 989px;
+    height: 70px;
+    border-radius: 42px;
+    font-size: 24px;
+    background: url('/icons/search.png') no-repeat scroll right 20px center;
+
+    &:focus {
+        outline: none;
+    }
+}
+
+.profile-container {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 20px;
+}
+
+.avatar {
+    height: 70px;
+    border-radius: 50%;
+}

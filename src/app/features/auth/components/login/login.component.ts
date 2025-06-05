@@ -31,7 +31,6 @@ export class LoginComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    // Check if user is already authenticated
     this.authService.isAuthenticated$.pipe(
       takeUntil(this.destroy$)
     ).subscribe(isAuth => {
@@ -39,8 +38,6 @@ export class LoginComponent implements OnInit, OnDestroy {
         this.router.navigate(['/dashboard']);
       }
     });
-
-    // Subscribe to loading state
     this.authService.loading$.pipe(
       takeUntil(this.destroy$)
     ).subscribe(loading => {
@@ -83,7 +80,7 @@ export class LoginComponent implements OnInit, OnDestroy {
         },
         error: (error) => {
           console.error('Login error:', error);
-          this.errorMessage = error.message || 'Anmeldung fehlgeschlagen. Bitte versuchen Sie es erneut.';
+          this.errorMessage = error.message || 'Falsches Passwort oder Email. Bitte versuchen Sie es erneut.';
         }
       });
     } else {
@@ -128,19 +125,18 @@ export class LoginComponent implements OnInit, OnDestroy {
     });
   }
 
-  // Helper methods for template
   getFieldError(fieldName: string): string | null {
     const field = this.loginForm.get(fieldName);
     if (field?.touched && field?.invalid) {
       const errors = field.errors;
       if (errors?.['required']) {
-        return fieldName === 'email' ? 'E-Mail ist erforderlich' : 'Passwort ist erforderlich';
+        return fieldName === 'email' ? '*Email ist erforderlich.' : '*Passwort ist erforderlich.';
       }
       if (errors?.['email']) {
-        return 'Bitte geben Sie eine gültige E-Mail-Adresse ein';
+        return '*Diese Email ist leider ungültig.';
       }
       if (errors?.['simplePassword']) {
-        return 'Passwort muss mindestens 6 Zeichen lang sein';
+        return '*Passwort muss mindestens 6 Zeichen lang sein';
       }
     }
     return null;
