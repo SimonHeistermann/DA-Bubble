@@ -1,0 +1,20 @@
+
+@use './../../../../../styles/colors.scss' as *;
+@use './../../../../../styles.scss' as *;
+@use './../../../../../styles/overlay.scss' as *;
+
+.channel-name {
+    position: relative;
+    width: 100%;
+    >span {
+        color: var(--grey);
+        font-size: 18px;
+        position: absolute;
+        left: 18px;
+        top: 50%;
+        transform: translateY(-50%);
+    }
+    >input {
+        padding-left: 36px !important;
+    }
+}

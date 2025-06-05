@@ -1,16 +1,18 @@
 import { Component, ElementRef, ViewChild } from '@angular/core';
 import { MainHeaderComponent } from './components/main-header/main-header.component';
 import { CommonModule } from '@angular/common';
+import { AddChannelComponent } from './components/add-channel/add-channel.component';
 
 @Component({
   selector: 'app-main-layout',
-  imports: [MainHeaderComponent, CommonModule ],
+  imports: [MainHeaderComponent, CommonModule, AddChannelComponent],
   templateUrl: './main-layout.component.html',
   styleUrl: './main-layout.component.scss'
 })
 export class MainLayoutComponent {
 
   menuOpen = false;
+  showOverlay = true;
   
   @ViewChild('overlay') overlay!: ElementRef;
   @ViewChild('main') main!: ElementRef;
@@ -34,5 +36,18 @@ export class MainLayoutComponent {
     }
 
   }
+
+  clickAddChannel() {
+    console.log(this.showOverlay);
+    
+    this.showOverlay = true;
+  }
+
+  clickOverlay() {
+    console.log('click overlay');
+    
+    this.showOverlay = false;
+  }
+
 
 }

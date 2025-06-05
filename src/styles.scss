@@ -5,11 +5,12 @@
 $standardWidth: min(100%, 1920px);
 $standardInlinePadding: clamp(20px, 6vw, 77px);
 
-@mixin displayFlex($ai: center, $jc: center, $g: 0px) {
+@mixin displayFlex($ai: center, $jc: center, $g: 0px, $fd: row) {
   display: flex !important;
   align-items: $ai;
   justify-content: $jc;
   gap: $g;
+  flex-direction: $fd;
 }
 
 @mixin fontNunito($fw: 400, $lh: 120%, $fs: 20px, $ls: 0) {
@@ -65,12 +66,20 @@ button {
     }
 }
 
+input:focus {
+  outline: none;
+}
+
 .d__none {
   display: none !important;
 }
 
 .d__flex {
   display: flex !important;
+}
+
+.pointer {
+  cursor: pointer;
 }
 
 .mat-tooltip.custom__tooltip {

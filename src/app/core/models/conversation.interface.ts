@@ -1,17 +1,16 @@
 import { Timestamp } from 'firebase/firestore';
 
 export interface Conversation {
-    name?: string;                    
-    description?: string;             
-    type: 'channel' | 'direct';       
-    createdBy: string;                
-    createdAt: Timestamp;
-    updatedAt: Timestamp;
-    participants: {                  
+    coversationID: string;                        
+    type: 'channel' | 'direct';                
+    // createdAt: Timestamp;
+    // updatedAt: Timestamp;
+    channelID?: string;
+    participants?: {                  
       [userUID: string]: ParticipantInfo;
     };
+    messageIDs?: [];
     messageCount: number;
-    lastMessage?: LastMessage;
 }
 
 export interface ParticipantInfo {

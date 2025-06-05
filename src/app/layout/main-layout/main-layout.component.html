@@ -20,7 +20,7 @@
                             <img src="/icons/channels.png">
                             <span>Channels</span>
                         </div>
-                        <img src="/icons/add.png">
+                        <img src="/icons/add.png" (click)="clickAddChannel()">
                     </div>
 
                 </section>
@@ -69,3 +69,7 @@
     </div>
 
 </section>
+<div class="overlay" (click)="clickOverlay()" *ngIf="showOverlay">
+    <app-add-channel (closeOverlay)="showOverlay = false"></app-add-channel>
+</div>
+

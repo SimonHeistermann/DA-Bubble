@@ -1,0 +1,33 @@
+
+    <div class="overlay-container">
+        <div class="create-channel-content"  (click)="$event.stopPropagation()">
+            <div class="content-header">
+                <h3 class="content-title">Channel Erstellen</h3>
+                <div class="close" (click)="clickClose()">
+                    <div class="close-content"></div>
+                </div>
+            </div>
+            <div class="content-description">
+                Chnnels dienen deinem Team zur Kommunikation. Am besten sollten sie themenbezogen sein, #marketing zum Beispiel.
+            </div>
+            <div class="input-div">
+                <div class="input-div-header">
+                    <label for="chanel-text" class="content-subtitle">Channel-Name</label>
+                    <span *ngIf="showChannelNameError">Der Channelname existiert schon</span>
+                </div>
+                <div class="channel-name">
+                    <span>#</span>
+                    <input [(ngModel)]="channelName" type="text" id="chanel-text" placeholder=" z.B. Kooperationsprojekte">
+                </div>
+               
+            </div>
+            <div class="input-div">
+                <label for="chanel-description"><span  class="content-subtitle">Beschreibung</span>(optional)</label>
+                <input type="text" id="chanel-description">
+            </div>
+            <div class="content-footer">
+                <button [class.active]="channelName.trim().length > 0">Erstellen</button>
+
+            </div>
+        </div>
+    </div>
