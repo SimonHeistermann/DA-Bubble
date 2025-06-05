@@ -50,7 +50,6 @@ export const routes: Routes = [
   { 
     path: 'dashboard', 
     component: MainLayoutComponent,
-    canActivate: [AuthGuard],
     children: [
         {
             path: '',
