@@ -4,7 +4,6 @@ import { map, switchMap, catchError } from 'rxjs/operators';
 import { Router } from '@angular/router';
 import { User as FirebaseUser, Unsubscribe } from 'firebase/auth';
 import { Timestamp } from 'firebase/firestore';
-
 import { FirebaseService } from './../firebase-service/firebase.service';
 import { UserService } from './../user-service/user.service';
 import { LoginCredentials, RegisterData, AuthUser } from './../../models/auth.interface';
@@ -29,26 +28,26 @@ export class AuthService {
     this.initializeAuthStateListener();
   }
 
-  /**
-   * Auth State Listener initialisieren
-   */
+  // ========== AUTH STATE MANAGEMENT ==========
+
   private initializeAuthStateListener(): void {
     this.authStateSubscription = this.firebaseService.onAuthStateChanged(
       async (firebaseUser: FirebaseUser | null) => {
-        if (firebaseUser) {
-          const authUser = this.mapFirebaseUserToAuthUser(firebaseUser);
-          this.currentUserSubject.next(authUser);
-          await this.syncUserToFirestore(firebaseUser);
-        } else {
-          this.currentUserSubject.next(null);
-        }
+        await this.handleAuthStateChange(firebaseUser);
       }
     );
   }
 
-  /**
-   * Firebase User zu AuthUser konvertieren
-   */
+  private async handleAuthStateChange(firebaseUser: FirebaseUser | null): Promise<void> {
+    if (firebaseUser) {
+      const authUser = this.mapFirebaseUserToAuthUser(firebaseUser);
+      this.currentUserSubject.next(authUser);
+      await this.syncUserToFirestore(firebaseUser);
+    } else {
+      this.currentUserSubject.next(null);
+    }
+  }
+
   private mapFirebaseUserToAuthUser(firebaseUser: FirebaseUser): AuthUser {
     return {
       uid: firebaseUser.uid,
@@ -59,294 +58,309 @@ export class AuthService {
     };
   }
 
-  /**
-   * Benutzer-Daten in Firestore synchronisieren
-   */
+  // ========== FIRESTORE SYNC ==========
+
   private async syncUserToFirestore(firebaseUser: FirebaseUser): Promise<void> {
     try {
-      const existingUser = await this.firebaseService.getDocument(
-        APP_CONSTANTS.COLLECTIONS.USERS, 
-        firebaseUser.uid
-      );
+      const existingUser = await this.getExistingUser(firebaseUser.uid);
       const now = Timestamp.now();
+      
       if (!existingUser) {
-        const newUser: Omit<User, 'uid'> = {
-          email: firebaseUser.email || '',
-          displayName: firebaseUser.displayName || '',
-          photoURL: firebaseUser.photoURL || '',
-          lastSeen: now,
-          isActive: true,
-          createdAt: now,
-          updatedAt: now,
-          profile: {
-            firstName: firebaseUser.displayName?.split(' ')[0] || '',
-            lastName: firebaseUser.displayName?.split(' ')[1] || ''
-          }
-        };
-        await this.firebaseService.setDocument(
-          APP_CONSTANTS.COLLECTIONS.USERS,
-          firebaseUser.uid,
-          newUser
-        );
+        await this.createNewUserInFirestore(firebaseUser, now);
       } else {
-        await this.firebaseService.updateDocument(
-          APP_CONSTANTS.COLLECTIONS.USERS,
-          firebaseUser.uid,
-          {
-            lastSeen: now,
-            isActive: true
-          }
-        );
+        await this.updateUserLastSeen(firebaseUser.uid, now);
       }
     } catch (error) {
       console.error('Error syncing user to Firestore:', error);
     }
   }
 
-  /**
-   * Anmeldung mit E-Mail und Passwort
-   */
+  private async getExistingUser(uid: string): Promise<any> {
+    return await this.firebaseService.getDocument(
+      APP_CONSTANTS.COLLECTIONS.USERS, 
+      uid
+    );
+  }
+
+  private async createNewUserInFirestore(firebaseUser: FirebaseUser, timestamp: Timestamp): Promise<void> {
+    const newUser: Omit<User, 'uid'> = this.buildNewUserData(firebaseUser, timestamp);
+    await this.firebaseService.setDocument(
+      APP_CONSTANTS.COLLECTIONS.USERS,
+      firebaseUser.uid,
+      newUser
+    );
+  }
+
+  private buildNewUserData(firebaseUser: FirebaseUser, timestamp: Timestamp): Omit<User, 'uid'> {
+    const nameParts = this.splitDisplayName(firebaseUser.displayName);
+    return {
+      email: firebaseUser.email || '',
+      displayName: firebaseUser.displayName || '',
+      photoURL: firebaseUser.photoURL || '',
+      lastSeen: timestamp,
+      isActive: true,
+      createdAt: timestamp,
+      updatedAt: timestamp,
+      profile: {
+        firstName: nameParts.firstName,
+        lastName: nameParts.lastName
+      }
+    };
+  }
+
+  private splitDisplayName(displayName: string | null): {firstName: string, lastName: string} {
+    const parts = displayName?.split(' ') || ['', ''];
+    return {
+      firstName: parts[0] || '',
+      lastName: parts[1] || ''
+    };
+  }
+
+  private async updateUserLastSeen(uid: string, timestamp: Timestamp): Promise<void> {
+    await this.firebaseService.updateDocument(
+      APP_CONSTANTS.COLLECTIONS.USERS,
+      uid,
+      {
+        lastSeen: timestamp,
+        isActive: true
+      }
+    );
+  }
+
+  // ========== AUTHENTICATION METHODS ==========
+
   signInWithEmail(credentials: LoginCredentials): Observable<AuthUser> {
-    this.loadingSubject.next(true);
+    this.setLoading(true);
+    return this.performEmailSignIn(credentials).pipe(
+      switchMap(() => this.waitForCurrentUser()),
+      catchError(error => this.handleSignInError(error))
+    );
+  }
+
+  private performEmailSignIn(credentials: LoginCredentials): Observable<AuthUser> {
     return from(
       this.firebaseService.signInWithEmail(credentials.email, credentials.password)
     ).pipe(
-      map(firebaseUser => {
-        if (!firebaseUser) {
-          throw new Error('Sign in failed');
-        }
-        return this.mapFirebaseUserToAuthUser(firebaseUser);
-      }),
-      catchError(error => {
-        console.error('Email sign in error:', error);
-        throw this.handleAuthError(error);
-      }),
-      switchMap(() => {
-        this.loadingSubject.next(false);
-        return this.currentUser$;
-      }),
-      map(user => {
-        if (!user) throw new Error('User not found after sign in');
-        return user;
-      })
+      map(firebaseUser => this.validateAndMapUser(firebaseUser, 'Sign in failed'))
     );
   }
 
-  /**
-   * Anmeldung mit Google
-   */
   signInWithGoogle(): Observable<AuthUser> {
-    this.loadingSubject.next(true);
-    return from(this.firebaseService.signInWithGoogle()).pipe(
-      map(firebaseUser => {
-        if (!firebaseUser) {
-          throw new Error('Google sign in failed');
-        }
-        return this.mapFirebaseUserToAuthUser(firebaseUser);
-      }),
-      catchError(error => {
-        console.error('Google sign in error:', error);
-        throw this.handleAuthError(error);
-      }),
-      switchMap(() => {
-        this.loadingSubject.next(false);
-        return this.currentUser$;
-      }),
-      map(user => {
-        if (!user) throw new Error('User not found after sign in');
-        return user;
-      })
+    this.setLoading(true);
+    return this.performGoogleSignIn().pipe(
+      switchMap(() => this.waitForCurrentUser()),
+      catchError(error => this.handleSignInError(error, 'Google sign in error:'))
     );
   }
 
-  /**
-   * Registrierung mit E-Mail und Passwort
-   */
+  private performGoogleSignIn(): Observable<AuthUser> {
+    return from(this.firebaseService.signInWithGoogle()).pipe(
+      map(firebaseUser => this.validateAndMapUser(firebaseUser, 'Google sign in failed'))
+    );
+  }
+
   registerWithEmail(registerData: RegisterData): Observable<AuthUser> {
-    this.loadingSubject.next(true);
+    this.setLoading(true);
+    return this.performEmailRegistration(registerData).pipe(
+      switchMap(() => this.waitForCurrentUser()),
+      catchError(error => this.handleRegistrationError(error))
+    );
+  }
+
+  private performEmailRegistration(registerData: RegisterData): Observable<AuthUser> {
     return from(
       this.firebaseService.createUserWithEmail(registerData.email, registerData.password)
     ).pipe(
-      switchMap(firebaseUser => {
-        if (!firebaseUser) {
-          throw new Error('Registration failed');
+      switchMap(firebaseUser => this.updateUserProfileAfterRegistration(firebaseUser, registerData)),
+      map(firebaseUser => this.mapFirebaseUserToAuthUser(firebaseUser))
+    );
+  }
+
+  private updateUserProfileAfterRegistration(firebaseUser: FirebaseUser | null, registerData: RegisterData): Observable<FirebaseUser> {
+    if (!firebaseUser) {
+      throw new Error('Registration failed');
+    }
+    const displayName = `${registerData.firstName} ${registerData.lastName}`;
+    return from(
+      this.firebaseService.updateUserProfile(displayName, registerData.photoURL)
+    ).pipe(
+      map(() => firebaseUser)
+    );
+  }
+
+  // ========== SIGN OUT ==========
+
+  signOut(): Observable<void> {
+    this.setLoading(true);
+    return this.performSignOut().pipe(
+      map(() => this.navigateToLogin()),
+      catchError(error => this.handleSignOutError(error))
+    );
+  }
+
+  private performSignOut(): Observable<void> {
+    return from(this.updateUserOfflineStatus()).pipe(
+      switchMap(() => from(this.firebaseService.signOut()))
+    );
+  }
+
+  private async updateUserOfflineStatus(): Promise<void> {
+    const currentUser = this.currentUserSubject.value;
+    if (!currentUser) return;
+    
+    await this.setUserOfflineStatus(currentUser.uid);
+  }
+
+  private async setUserOfflineStatus(uid: string): Promise<void> {
+    try {
+      await this.firebaseService.updateDocument(
+        APP_CONSTANTS.COLLECTIONS.USERS,
+        uid,
+        {
+          isActive: false,
+          lastSeen: Timestamp.now()
         }
-        const displayName = `${registerData.firstName} ${registerData.lastName}`;
-        return from(
-          this.firebaseService.updateUserProfile(displayName, registerData.photoURL)
-        ).pipe(
-          map(() => firebaseUser)
-        );
-      }),
-      map(firebaseUser => this.mapFirebaseUserToAuthUser(firebaseUser)),
-      catchError(error => {
-        console.error('Email registration error:', error);
-        throw this.handleAuthError(error);
-      }),
-      switchMap(() => {
-        this.loadingSubject.next(false);
-        return this.currentUser$;
-      }),
+      );
+    } catch (error) {
+      console.error('Error updating offline status:', error);
+    }
+  }
+
+  private navigateToLogin(): void {
+    this.setLoading(false);
+    this.router.navigate(['/auth/login']);
+  }
+
+  // ========== PASSWORD RESET ==========
+
+  resetPassword(email: string): Observable<void> {
+    this.setLoading(true);
+    return this.sendPasswordResetEmail(email).pipe(
+      map(() => this.setLoading(false)),
+      catchError(error => this.handlePasswordResetError(error))
+    );
+  }
+
+  private sendPasswordResetEmail(email: string): Observable<void> {
+    return from(this.firebaseService.sendPasswordReset(email));
+  }
+
+  confirmPasswordReset(oobCode: string, newPassword: string): Observable<void> {
+    this.setLoading(true);
+    return this.executePasswordReset(oobCode, newPassword).pipe(
+      map(() => this.setLoading(false)),
+      catchError(error => this.handlePasswordResetError(error, 'Confirm password reset error:'))
+    );
+  }
+
+  private executePasswordReset(oobCode: string, newPassword: string): Observable<void> {
+    return from(this.firebaseService.confirmPasswordReset(oobCode, newPassword));
+  }
+
+  verifyPasswordResetCode(oobCode: string): Observable<string> {
+    return from(this.firebaseService.verifyPasswordResetCode(oobCode)).pipe(
+      catchError(error => this.handleVerificationError(error))
+    );
+  }
+
+  // ========== UTILITY METHODS ==========
+
+  private validateAndMapUser(firebaseUser: FirebaseUser | null, errorMessage: string): AuthUser {
+    if (!firebaseUser) {
+      throw new Error(errorMessage);
+    }
+    return this.mapFirebaseUserToAuthUser(firebaseUser);
+  }
+
+  private waitForCurrentUser(): Observable<AuthUser> {
+    this.setLoading(false);
+    return this.currentUser$.pipe(
       map(user => {
-        if (!user) throw new Error('User not found after registration');
+        if (!user) throw new Error('User not found after authentication');
         return user;
       })
     );
   }
 
-  /**
-   * Benutzer abmelden
-   */
-  signOut(): Observable<void> {
-    this.loadingSubject.next(true);
-    return from(this.updateUserOfflineStatus()).pipe(
-      switchMap(() => from(this.firebaseService.signOut())),
-      map(() => {
-        this.loadingSubject.next(false);
-        this.router.navigate(['/auth/login']);
-      }),
-      catchError(error => {
-        console.error('Sign out error:', error);
-        this.loadingSubject.next(false);
-        throw error;
-      })
-    );
+  private setLoading(loading: boolean): void {
+    this.loadingSubject.next(loading);
   }
 
-  /**
-   * Benutzer als offline markieren
-   */
-  private async updateUserOfflineStatus(): Promise<void> {
-    const currentUser = this.currentUserSubject.value;
-    if (currentUser) {
-      try {
-        await this.firebaseService.updateDocument(
-          APP_CONSTANTS.COLLECTIONS.USERS,
-          currentUser.uid,
-          {
-            isActive: false,
-            lastSeen: Timestamp.now()
-          }
-        );
-      } catch (error) {
-        console.error('Error updating offline status:', error);
-      }
-    }
+  // ========== ERROR HANDLERS ==========
+
+  private handleSignInError(error: any, logMessage: string = 'Email sign in error:'): Observable<never> {
+    console.error(logMessage, error);
+    this.setLoading(false);
+    throw this.handleAuthError(error);
   }
 
-  /**
-   * Passwort zurücksetzen E-Mail senden
-   */
-  resetPassword(email: string): Observable<void> {
-    this.loadingSubject.next(true);
-    return from(this.firebaseService.sendPasswordReset(email)).pipe(
-      map(() => {
-        this.loadingSubject.next(false);
-      }),
-      catchError(error => {
-        console.error('Password reset error:', error);
-        this.loadingSubject.next(false);
-        throw this.handleAuthError(error);
-      })
-    );
+  private handleRegistrationError(error: any): Observable<never> {
+    console.error('Email registration error:', error);
+    this.setLoading(false);
+    throw this.handleAuthError(error);
   }
 
-  /**
-   * Aktueller Benutzer (synchron)
-   */
+  private handleSignOutError(error: any): Observable<never> {
+    console.error('Sign out error:', error);
+    this.setLoading(false);
+    throw error;
+  }
+
+  private handlePasswordResetError(error: any, logMessage: string = 'Password reset error:'): Observable<never> {
+    console.error(logMessage, error);
+    this.setLoading(false);
+    throw this.handleAuthError(error);
+  }
+
+  private handleVerificationError(error: any): Observable<never> {
+    console.error('Verify password reset code error:', error);
+    throw this.handleAuthError(error);
+  }
+
+  private handleAuthError(error: any): Error {
+    const errorMessages = this.getErrorMessages();
+    const message = errorMessages[error.code] || error.message || 'Ein unbekannter Fehler ist aufgetreten';
+    return new Error(message);
+  }
+
+  private getErrorMessages(): {[key: string]: string} {
+    return {
+      'auth/user-not-found': 'Benutzer nicht gefunden',
+      'auth/wrong-password': 'Falsches Passwort',
+      'auth/email-already-in-use': 'E-Mail-Adresse wird bereits verwendet',
+      'auth/weak-password': 'Passwort ist zu schwach',
+      'auth/invalid-email': 'Ungültige E-Mail-Adresse',
+      'auth/too-many-requests': 'Zu viele Anfragen. Bitte versuchen Sie es später erneut',
+      'auth/network-request-failed': 'Netzwerkfehler. Prüfen Sie Ihre Internetverbindung',
+      'auth/popup-closed-by-user': 'Anmeldung wurde abgebrochen'
+    };
+  }
+
+  // ========== GETTERS ==========
+
   get currentUser(): AuthUser | null {
     return this.currentUserSubject.value;
   }
 
-  /**
-   * Ist Benutzer angemeldet?
-   */
   get isAuthenticated(): boolean {
     return this.currentUserSubject.value !== null;
   }
 
-  /**
-   * Ist Benutzer angemeldet? (Observable)
-   */
   get isAuthenticated$(): Observable<boolean> {
     return this.currentUser$.pipe(
       map(user => user !== null)
     );
   }
 
-  /**
-   * Firebase Auth Fehler behandeln
-   */
-  private handleAuthError(error: any): Error {
-    let message = 'Ein unbekannter Fehler ist aufgetreten';
-    
-    switch (error.code) {
-      case 'auth/user-not-found':
-        message = 'Benutzer nicht gefunden';
-        break;
-      case 'auth/wrong-password':
-        message = 'Falsches Passwort';
-        break;
-      case 'auth/email-already-in-use':
-        message = 'E-Mail-Adresse wird bereits verwendet';
-        break;
-      case 'auth/weak-password':
-        message = 'Passwort ist zu schwach';
-        break;
-      case 'auth/invalid-email':
-        message = 'Ungültige E-Mail-Adresse';
-        break;
-      case 'auth/too-many-requests':
-        message = 'Zu viele Anfragen. Bitte versuchen Sie es später erneut';
-        break;
-      case 'auth/network-request-failed':
-        message = 'Netzwerkfehler. Prüfen Sie Ihre Internetverbindung';
-        break;
-      case 'auth/popup-closed-by-user':
-        message = 'Anmeldung wurde abgebrochen';
-        break;
-      default:
-        message = error.message || message;
-    }
-    
-    return new Error(message);
+  // ========== CLEANUP ==========
+
+  ngOnDestroy(): void {
+    this.cleanupAuthStateSubscription();
   }
 
-  /**
-   * Service aufräumen
-   */
-  ngOnDestroy(): void {
+  private cleanupAuthStateSubscription(): void {
     if (this.authStateSubscription) {
       this.authStateSubscription();
     }
-  }
-
-  /**
-  * Passwort mit Reset-Code zurücksetzen
-  */
-  confirmPasswordReset(oobCode: string, newPassword: string): Observable<void> {
-    this.loadingSubject.next(true);
-    return from(this.firebaseService.confirmPasswordReset(oobCode, newPassword)).pipe(
-      map(() => {
-        this.loadingSubject.next(false);
-      }),
-      catchError(error => {
-        console.error('Confirm password reset error:', error);
-        this.loadingSubject.next(false);
-        throw this.handleAuthError(error);
-      })
-    );
-  }
-
-  /**
-   * Reset-Code validieren (optional)
-   */
-  verifyPasswordResetCode(oobCode: string): Observable<string> {
-    return from(this.firebaseService.verifyPasswordResetCode(oobCode)).pipe(
-      catchError(error => {
-        console.error('Verify password reset code error:', error);
-        throw this.handleAuthError(error);
-      })
-    );
   }
 }
