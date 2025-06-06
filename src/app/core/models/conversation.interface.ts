@@ -6,21 +6,21 @@ export interface Conversation {
     // createdAt: Timestamp;
     // updatedAt: Timestamp;
     channelID?: string;
-    participants?: {                  
-      [userUID: string]: ParticipantInfo;
-    };
-    messageIDs?: [];
-    messageCount: number;
+    // participants?: {                  
+    //   [userUID: string]: ParticipantInfo;
+    // };
+    // messageIDs?: [];
+    // messageCount: number;
 }
 
-export interface ParticipantInfo {
-    joinedAt: Timestamp;
-    isActive: boolean;
-    lastRead?: Timestamp;
-}
+// export interface ParticipantInfo {
+//     joinedAt: Timestamp;
+//     isActive: boolean;
+//     lastRead?: Timestamp;
+// }
 
-export interface LastMessage {
-    text: string;
-    authorId: string;
-    timestamp: Timestamp;
-}
+// export interface LastMessage {
+//     text: string;
+//     authorId: string;
+//     timestamp: Timestamp;
+// }
