@@ -16,7 +16,7 @@
     position: relative;
     @include displayFlex();
 
-    .create-channel-content {
+    .overlay-content {
         @include displayFlex($fd: column);
         padding: 40px;
         border-radius: 30px;
@@ -43,7 +43,7 @@
                     width: 24px;
                     height: 24px;
                     background: {
-                        image: url('./../../public/icons/close.png');
+                        image: url('/icons/close.png');
                     };
                 }
 
@@ -51,7 +51,7 @@
                     background: var(--bg-color);
                     .close-content {
                         background: {
-                            image: url('./../../public/icons/close_hover.png');
+                            image: url('/icons/close_hover.png');
                             
                         };
                     }
@@ -64,12 +64,42 @@
             font-size: 18px;
         }
 
-        
+        .checkbox-div {
+            width: 100%;
+            @include displayFlex($jc: flex-start, $g:10px);
+            margin-top: 20px;
+            >p {
+                font-size: 18px;
+            }
+            >span {
+                width: 20px;
+                height: 20px;
+                
+                background: {
+                    image: url('/icons/cb.png');
+                };
+                
+            }
+            &.active{
+                >span{
+                    filter: brightness(1) !important;
+                    background: {
+                        image: url('/icons/cb_checked.png');
+                    };
+                }
+            }
+            &:hover {
+                >span {
+                    filter: brightness(1.2);
+                }
+            }
+        }
 
         .input-div {
             width: 100%;
-            margin-top: 10px;
-            @include displayFlex($fd: column, $ai: flex-start, $g:10px);
+            margin-top: 20px;
+            overflow: hidden;
+            @include displayFlex($fd: column, $ai: flex-start, $g:20px);
 
             .input-div-header {
                 width: 100%;
@@ -102,7 +132,7 @@
 
         .content-footer {
             width: 100%;
-            margin-top: 10px;
+            margin-top: 20px;
             @include displayFlex($jc: flex-end);
 
             button {

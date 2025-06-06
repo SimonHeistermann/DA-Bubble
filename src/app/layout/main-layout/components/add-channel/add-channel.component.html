@@ -1,6 +1,6 @@
 
     <div class="overlay-container">
-        <div class="create-channel-content"  (click)="$event.stopPropagation()">
+        <div class="create-channel-content overlay-content"  (click)="$event.stopPropagation()"  *ngIf="!showAddUserContent">
             <div class="content-header">
                 <h3 class="content-title">Channel Erstellen</h3>
                 <div class="close" (click)="clickClose()">
@@ -13,11 +13,11 @@
             <div class="input-div">
                 <div class="input-div-header">
                     <label for="chanel-text" class="content-subtitle">Channel-Name</label>
-                    <span *ngIf="showChannelNameError">Der Channelname existiert schon</span>
+                    <span *ngIf="showChannelNameError">{{ errMsg}}</span>
                 </div>
                 <div class="channel-name">
                     <span>#</span>
-                    <input [(ngModel)]="channelName" type="text" id="chanel-text" placeholder=" z.B. Kooperationsprojekte">
+                    <input [(ngModel)]="channelName" type="text" id="chanel-text" placeholder=" z.B. Kooperationsprojekte" (input)="showChannelNameError = false">
                 </div>
                
             </div>
@@ -26,7 +26,30 @@
                 <input type="text" id="chanel-description">
             </div>
             <div class="content-footer">
-                <button [class.active]="channelName.trim().length > 0">Erstellen</button>
+                <button [class.active]="channelName.trim().length > 0" (click)="clickCreateChannel()">Erstellen</button>
+
+            </div>
+        </div>
+        <div class="add-user-content overlay-content"  (click)="$event.stopPropagation()" *ngIf="showAddUserContent">
+            <div class="content-header">
+                <h3 class="content-title">Leute hinzufügen</h3>
+                <div class="close" (click)="clickClose()">
+                    <div class="close-content"></div>
+                </div>
+            </div>
+            <div class="checkbox-div pointer" [class.active]="firstCbActivated"  (click)="firstCbActivated = true; showChooseNameInput = false;">
+                <span></span>
+                <p>Alle Mitglieder von <span># Allgemein</span> hinzufügen</p>
+            </div>
+            <div class="checkbox-div pointer"  [class.active]="!firstCbActivated" (click)="clickAddSomeUsers()">
+                <span></span>
+                <p>Bestimmte Leute hinzufügen</p>
+            </div>
+            <div class="input-div" [@expandCollapse]="showChooseNameInput ? 'open' : 'closed'" >
+                <input type="text" (input)="inputUserName()">
+            </div>
+            <div class="content-footer">
+                <button [class.active]="firstCbActivated" (click)="clickCreateChannel()">Erstellen</button>
 
             </div>
         </div>
