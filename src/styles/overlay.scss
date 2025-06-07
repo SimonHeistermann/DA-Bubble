@@ -64,6 +64,26 @@
             font-size: 18px;
         }
 
+        .richtext-editor-div {
+            position: relative;
+            width: 100%;
+            margin-top: 20px;
+            font-size: 18px;
+
+            .user-list {
+                position: absolute;
+                left: 18px;
+                overflow: hidden;
+                border-bottom-right-radius: 20px;
+                border-bottom-left-radius: 20px;
+                border-top-right-radius: 20px;
+                border: 1px solid var(--light-purple);
+                padding: 10px 0;
+                background-color: var(--white);
+            }
+            
+        }
+
         .checkbox-div {
             width: 100%;
             @include displayFlex($jc: flex-start, $g:10px);

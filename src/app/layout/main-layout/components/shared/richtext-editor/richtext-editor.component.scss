@@ -1,0 +1,57 @@
+@use './../../../../../../styles.scss' as *;
+
+.editor {
+    white-space: pre-wrap;
+    border: 1px solid var(--light-purple);
+    padding: 5px 20px;
+    width: 100%;
+    min-height: 50px;
+    border-radius: 40px;
+    font-size: 18px;
+    line-height: 50px;
+    @include displayFlex($jc: flex-start, $g: 5px);
+    flex-wrap: wrap;
+    
+
+    &:focus {
+        outline: none;
+        border: 1px solid var(--purple-2);
+    }
+    
+    .tag {
+        background-color: #eef2ff;
+        border-radius: 35px;
+        padding: 3px 10px;
+        display: inline-flex;
+        align-items: center;
+        gap: 4px;
+        user-select: none;
+
+        img {
+            width: 34px;
+            height: 34px;
+            border-radius: 50%;
+        }
+        >span {
+            height: 43px;
+            line-height: 43px;
+        }
+    
+        .tag-close {
+            cursor: pointer;
+            width: 24px;
+            height: 24px;
+            background: {
+                repeat: no-repeat;
+                image: url('/icons/close.png');
+                position: center;
+            };
+        }
+    
+        .tag-close:hover {
+            background: {
+                image: url('/icons/close_hover.png');
+            };
+        }
+    }
+}

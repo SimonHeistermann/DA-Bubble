@@ -45,12 +45,14 @@
                 <span></span>
                 <p>Bestimmte Leute hinzufügen</p>
             </div>
-            <div class="input-div" [@expandCollapse]="showChooseNameInput ? 'open' : 'closed'" >
-                <input type="text" (input)="inputUserName()">
+           
+            
+            <div class="richtext-editor-div" [@expandCollapse]="showChooseNameInput ? 'open' : 'closed'" >
+                <app-richtext-editor #richtextEditor (editorReady)="onEditorReady($event)" (editorValueChanged)="onEditorValueChanged($event)"></app-richtext-editor>
+                <app-user-list class="user-list" *ngIf="showUserList" [dataSource]="filteredUsers" (clickedUser)="onClickedUser($event)"></app-user-list>
             </div>
             <div class="content-footer">
                 <button [class.active]="firstCbActivated" (click)="clickCreateChannel()">Erstellen</button>
-
             </div>
         </div>
     </div>
