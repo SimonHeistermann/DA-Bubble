@@ -81,6 +81,7 @@
                     @include displayFlex($g:10px);
 
                     span {
+                        font-size: 20px;
                         font-weight: 700;
                     }
                 }
@@ -160,7 +161,7 @@
             ul {
                 @include displayFlex($fd: column, $g: 20px, $ai: flex-start);
                 li {
-
+                    font-size: 18px;
                     @include displayFlex($jc: flex-start, $g: 10px);
 
                 }

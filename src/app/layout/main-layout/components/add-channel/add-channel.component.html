@@ -16,7 +16,7 @@
                     <span *ngIf="showChannelNameError">{{ errMsg}}</span>
                 </div>
                 <div class="channel-name">
-                    <span>#</span>
+                    <span></span>
                     <input [(ngModel)]="channel.name" type="text" id="chanel-text" placeholder=" z.B. Kooperationsprojekte" (input)="showChannelNameError = false">
                 </div>
                
