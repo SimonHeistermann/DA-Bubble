@@ -1,10 +1,14 @@
-import { Component, ElementRef, EventEmitter, inject, Output, ViewChild } from '@angular/core';
+import { Component, ElementRef, EventEmitter, inject, OnDestroy, Output, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ChannelService } from '../../../../core/services/channel.service';
 import { expandCollapseAnimation } from '../../animations/expand-collapse.animation';
 import { RichtextEditorComponent } from '../shared/richtext-editor/richtext-editor.component';
 import { UserListComponent } from '../shared/user-list/user-list.component';
+import { User } from '../../../../core/models/user.interface';
+import { Subscription } from 'rxjs';
+import { AuthService } from '../../../../core/services/auth-service/auth.service';
+import { UserService } from '../../../../core/services/user-service/user.service';
 
 
 @Component({
@@ -15,46 +19,16 @@ import { UserListComponent } from '../shared/user-list/user-list.component';
   styleUrl: './add-channel.component.scss',
   animations: [expandCollapseAnimation]
 })
-export class AddChannelComponent {
-  filteredUsers: any[] = [];
-  dummyUsers = [
-    {'img': 'avatar_1.png',
-      'status': 'online',
-      'name': 'Adson Mischner'
-    },
-    {'img': 'avatar_1.png',
-      'status': 'offline',
-      'name': 'Xin Yang'
-    },
-    {'img': 'avatar_1.png',
-      'status': 'offline',
-      'name': 'Xiongzi Yang'
-    },
-    {'img': 'avatar_1.png',
-      'status': 'offline',
-      'name': 'Anna Yang'
-    },
-    {'img': 'avatar_1.png',
-      'status': 'offline',
-      'name': 'Anna Yang 1'
-    },
-    {'img': 'avatar_1.png',
-      'status': 'online',
-      'name': 'Anna Yang 2'
-    },
-    {'img': 'avatar_1.png',
-      'status': 'online',
-      'name': 'Anna Yang 3'
-    },
-    {'img': 'avatar_1.png',
-      'status': 'online',
-      'name': 'Anna Yang 4'
-    },
-    {'img': 'avatar_1.png',
-      'status': 'online',
-      'name': 'Anna Yang 5'
-    },
-  ]
+export class AddChannelComponent implements OnDestroy {
+  filteredUsers: User[] = [];
+  allUsers: User[] = [];
+
+  currentUser: User | null = null;
+  private subscriptions = new Subscription();
+  authService = inject(AuthService);
+  userService = inject(UserService);
+  channelService = inject(ChannelService);
+  tagIDs: string[] = [];
 
   @Output() closeOverlay = new EventEmitter<void>();
   editorEl!: HTMLDivElement;
@@ -62,19 +36,49 @@ export class AddChannelComponent {
   showChannelNameError = false;
   showAddUserContent = true;
   firstCbActivated = true;
+  showActiveButtonInAddUser = false;
   showChooseNameInput = false;
   showUserList = false;
   errMsg = '';
   channelName: string = '';
 
-  userService = inject(ChannelService);
+  ngOnInit() {
+    
+    this.subCurrentUser();
+    this.subAllUsers();
+  }
+
+  subCurrentUser(){
+    const authUser = this.authService.currentUser;
+    if (authUser) {
+      this.userService.loadCurrentUser(authUser.uid);
+    }
+    this.subscriptions.add(
+      this.userService.currentUser$.subscribe(user => {
+        this.currentUser = user;
+        console.log(this.currentUser);
+        
+      })
+    );
+  }
+
+  subAllUsers() {
+    this.subscriptions.add(
+      this.userService.allUsers$.subscribe(users => {
+        this.allUsers = users;
+        console.log('alluser: ', this.allUsers);
+      }));
+
+    
+  }
+  
 
   clickClose() {
     this.closeOverlay.emit();
   }
 
   clickCreateChannel() {
-    this.userService.getChannels((data) => {
+    this.channelService.getChannels((data) => {
       const index = data.findIndex(e => e.name.toLowerCase() == this.channelName.toLowerCase());
       if (index !== -1) {
         this.errMsg = 'Der Channelname existiert schon';
@@ -95,7 +99,7 @@ export class AddChannelComponent {
   }
 
   inputUserName() {
-    console.log(11);
+
   }
 
   onEditorReady(el: HTMLDivElement) {
@@ -103,21 +107,37 @@ export class AddChannelComponent {
   }
 
   onEditorValueChanged(html: string) {
-    console.log('emmited html:', html);
-    
     if(html.trim().length > 0) {
       
-      this.filteredUsers = this.dummyUsers.filter(u => u.name.toLowerCase().startsWith(html.toLowerCase()));
+      
+      this.filteredUsers = this.allUsers.filter(u => u.displayName.toLowerCase().includes(html.toLowerCase()));
+      for (let index = 0; index < this.filteredUsers.length; index++) {
+        const u = this.filteredUsers[index];
+        const i = this.tagIDs.findIndex(tagID => tagID == u.uid);
+        if (i !== -1) {
+          this.filteredUsers.splice(index, 1);
+          index --;
+        }
+      }
       this.showUserList = true;
     } else {
       this.showUserList = false;
     }
-
-
   }
 
-  onClickedUser(u: any) {
-    console.log(u);
+  onHasTag(b: boolean) {
+    this.showActiveButtonInAddUser = b;
+  }
+
+  onTagIDsChanges(arr: string[]) {
+    this.tagIDs = arr;
+  }
+
+  onClickedUser(u: User) {
     this.richtextEditorRef.insertTag(u);
+  }
+
+  ngOnDestroy(): void {
+    this.subscriptions.unsubscribe();
   }
 }

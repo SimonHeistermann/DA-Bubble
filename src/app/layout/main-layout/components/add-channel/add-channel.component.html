@@ -39,7 +39,7 @@
             </div>
             <div class="checkbox-div pointer" [class.active]="firstCbActivated"  (click)="firstCbActivated = true; showChooseNameInput = false;">
                 <span></span>
-                <p>Alle Mitglieder von <span># Allgemein</span> hinzufügen</p>
+                <p>Alle Mitglieder von <span class="channel-span">#Allgemein</span> hinzufügen</p>
             </div>
             <div class="checkbox-div pointer"  [class.active]="!firstCbActivated" (click)="clickAddSomeUsers()">
                 <span></span>
@@ -48,11 +48,11 @@
            
             
             <div class="richtext-editor-div" [@expandCollapse]="showChooseNameInput ? 'open' : 'closed'" >
-                <app-richtext-editor #richtextEditor (editorReady)="onEditorReady($event)" (editorValueChanged)="onEditorValueChanged($event)"></app-richtext-editor>
-                <app-user-list class="user-list" *ngIf="showUserList" [dataSource]="filteredUsers" (clickedUser)="onClickedUser($event)"></app-user-list>
+                <app-richtext-editor #richtextEditor (editorReady)="onEditorReady($event)" (editorValueChanged)="onEditorValueChanged($event)" (hasTag)="onHasTag($event)" (tagIDsChanges)="onTagIDsChanges($event)"></app-richtext-editor>
+                <app-user-list class="user-list" *ngIf="showUserList" [dataSource]="filteredUsers" [tagIDs]="tagIDs" (clickedUser)="onClickedUser($event)"></app-user-list>
             </div>
             <div class="content-footer">
-                <button [class.active]="firstCbActivated" (click)="clickCreateChannel()">Erstellen</button>
+                <button [class.active]="(showActiveButtonInAddUser && !firstCbActivated)  || firstCbActivated" (click)="clickCreateChannel()">Erstellen</button>
             </div>
         </div>
     </div>

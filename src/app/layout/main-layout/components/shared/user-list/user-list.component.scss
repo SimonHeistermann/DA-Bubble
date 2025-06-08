@@ -14,6 +14,8 @@
     scrollbar-width: thin;
     scrollbar-color: var(--bg-color) transparent;
 
+   
+
     &::-webkit-scrollbar {
         width: 8px;
     }
@@ -46,6 +48,7 @@
             &.no-li:hover {
                 background-color: transparent !important;
             }
+           
             .li-content {
                 @include displayFlex($g: 20px, $jc: flex-start);
                 .avatar-div {
@@ -56,6 +59,7 @@
                         width: 100%;
                         height: 100%;
                         border-radius: 50%;
+                        background-color: var(--purple-2);
                     }
                     >.active-status {
                         position: absolute;

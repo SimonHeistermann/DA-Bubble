@@ -1,11 +1,20 @@
 <div #listContainer class="ul-list-container" [style.overflow-y]="isOverflowing ? 'auto' : 'hidden'">
     <ul>
         @for(u of dataSource; let index = $index; track $index) {
+          
             <li class="pointer" (click)="clickLi(u)">
+            
+           
                 <div class="li-content">
                     <div class="avatar-div">
-                        <img src="/icons/avatars/{{u.img}}" alt=""> 
-                        @if(u.status == 'offline') {
+
+                        <!-- @if (u.photoURL.startsWith('http')) {
+                            <img src="icons/avatars/avatar_1.png" alt=""> 
+                        } @else {
+                            <img src="{{u.photoURL}}" alt=""> 
+                        } -->
+                        <img src="{{u.photoURL}}" alt=""> 
+                        @if(!u.isActive) {
                             <span class="active-status offline"></span>
                         } @else {
                             <span class="active-status"></span>
@@ -13,7 +22,7 @@
                        
                     </div>
                     <span class="name">
-                        {{ u.name }}
+                        {{ u.displayName }}
                     </span>
                 </div>
             </li>

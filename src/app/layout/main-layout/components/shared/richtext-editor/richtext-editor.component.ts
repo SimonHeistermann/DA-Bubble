@@ -1,4 +1,5 @@
   import {Component, ElementRef, ViewChild, Input, AfterViewInit, ChangeDetectionStrategy, Output, EventEmitter, ViewEncapsulation} from '@angular/core';
+import { User } from '../../../../../core/models/user.interface';
 
 
   @Component({
@@ -15,6 +16,8 @@
 
     @Output() editorReady = new EventEmitter<HTMLDivElement>();
     @Output() editorValueChanged = new EventEmitter<string>();
+    @Output() hasTag = new EventEmitter<boolean>();
+    @Output() tagIDsChanges = new EventEmitter<Array<string>>();
 
     ngAfterViewInit() {
       const el = this.editorRef.nativeElement;
@@ -23,11 +26,22 @@
 
     }
 
+    checkIfHasTag() {
+      const editor = this.editorRef.nativeElement;
+      this.hasTag.emit(editor.querySelectorAll('.tag').length > 0);
+
+      const tagIDArr: string[] = [];
+      editor.querySelectorAll('.tag').forEach(tag => {
+        const id = tag.getAttribute('id') || '';
+        tagIDArr.push(id);
+      })
+      this.tagIDsChanges.emit(tagIDArr);
+    }
 
     editorValueChange() {
-      console.log('value change');
+      this.checkIfHasTag();
+
       const editor = this.editorRef.nativeElement;
-      
       const clone = editor.cloneNode(true) as HTMLElement;
       clone.querySelectorAll('div').forEach(div => div.remove());
       const plainText = clone.textContent?.trim() ?? '';
@@ -35,13 +49,8 @@
       this.editorValueChanged.emit(plainText);
     }
 
-    handleKeydown(event: KeyboardEvent) {
-    
-      
-    }
-
+   
     handleKeyup(event: KeyboardEvent) {
-      console.log('handleKeyup');
       
       const isBackspace = event.key === 'Backspace';
       if (!isBackspace) return;
@@ -90,19 +99,20 @@
     }
 
 
-    public insertTag(tag: { name: string; img: string, status: string }) {
-      const tagEl = this.createNewTag(tag);
+    public insertTag(u: User) {
+      const tagEl = this.createNewTag(u);
       const editor = this.editorRef.nativeElement;
       this.clearUserText();
       editor.appendChild(tagEl);
       this.createSpace();
     }
 
-    createNewTag(tag: { name: string; img: string, status: string }) {
+    createNewTag(u: User) {
       const tagEl = document.createElement('div');
       tagEl.className = 'tag';
+      tagEl.setAttribute('id', u.uid);
       tagEl.contentEditable = 'false';
-      tagEl.innerHTML = this.getTagTemplate(tag);
+      tagEl.innerHTML = this.getTagTemplate(u);
 
       tagEl.querySelector('.tag-close')?.addEventListener('click', e => {
         e.stopPropagation();
@@ -133,10 +143,10 @@
       return this.editorRef.nativeElement;
     }
 
-    getTagTemplate(tag: { name: string; img: string, status: string }) {
+    getTagTemplate(u: User) {
       return `
-      <img src="/icons/avatars/${tag.img}" />
-      <span class="tag-name">${tag.name}</span>
+      <img src="${u.photoURL}" />
+      <span class="tag-name">${u.displayName}</span>
       <div class="tag-close"></div>
       `;
     }
