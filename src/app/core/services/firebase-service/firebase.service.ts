@@ -188,7 +188,7 @@ export class FirebaseService {
       
             return onSnapshot(q, (snapshot) => {
                 const data = snapshot.docs.map(doc => ({
-                    uid: doc.id,
+                    id: doc.id,
                     ...doc.data()
                 }));
                 callback(data);

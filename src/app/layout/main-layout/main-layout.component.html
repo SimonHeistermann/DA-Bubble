@@ -22,7 +22,14 @@
                         </div>
                         <img src="/icons/add.png" (click)="clickAddChannel()">
                     </div>
-
+                    <div class="channel-names">
+                        <ul>
+                            @for(channel of channels; let index = $index; track $index) {
+                                <li> # {{channel.name}}</li>
+                            }
+                           
+                        </ul>
+                    </div>
                 </section>
                 <section>
                     <div class="devlist-head">
@@ -69,7 +76,7 @@
     </div>
 
 </section>
-<div class="overlay" (click)="clickOverlay()" *ngIf="showOverlay">
+<div class="overlay" (click)="clickOverlay()" *ngIf="showOverlay" >
     <app-add-channel (closeOverlay)="showOverlay = false"></app-add-channel>
 </div>
 

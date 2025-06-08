@@ -13,6 +13,7 @@ export const expandCollapseAnimation = trigger('expandCollapse', [
     paddingTop: '*',
     paddingBottom: '*',
   })),
+
   transition('closed <=> open', [
     animate('200ms ease-in-out')
   ]),

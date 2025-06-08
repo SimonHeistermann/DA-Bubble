@@ -102,7 +102,7 @@ export class UserService {
       return of([]);
     }
     return this.allUsers$.pipe(
-      map(allUsers => allUsers.filter(user => uids.includes(user.uid))),
+      map(allUsers => allUsers.filter(user => uids.includes(user.id))),
       catchError(error => {
         console.error('Error loading users by IDs:', error);
         return of([]);

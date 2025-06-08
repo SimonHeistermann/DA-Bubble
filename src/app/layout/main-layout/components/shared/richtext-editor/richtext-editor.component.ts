@@ -110,7 +110,7 @@ import { User } from '../../../../../core/models/user.interface';
     createNewTag(u: User) {
       const tagEl = document.createElement('div');
       tagEl.className = 'tag';
-      tagEl.setAttribute('id', u.uid);
+      tagEl.setAttribute('id', u.id);
       tagEl.contentEditable = 'false';
       tagEl.innerHTML = this.getTagTemplate(u);
 

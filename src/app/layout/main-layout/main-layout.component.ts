@@ -1,7 +1,10 @@
-import { Component, ElementRef, ViewChild } from '@angular/core';
+import { Component, ElementRef, inject, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { MainHeaderComponent } from './components/main-header/main-header.component';
 import { CommonModule } from '@angular/common';
 import { AddChannelComponent } from './components/add-channel/add-channel.component';
+import { ChannelService } from '../../core/services/channel.service';
+import { Subscription } from 'rxjs';
+import { Channel } from '../../core/models/channel.interface';
 
 @Component({
   selector: 'app-main-layout',
@@ -9,10 +12,13 @@ import { AddChannelComponent } from './components/add-channel/add-channel.compon
   templateUrl: './main-layout.component.html',
   styleUrl: './main-layout.component.scss'
 })
-export class MainLayoutComponent {
+export class MainLayoutComponent implements OnInit, OnDestroy {
+  private subscriptions = new Subscription();
+  channelService = inject(ChannelService);
+  channels: Channel[] = [];
 
   menuOpen = false;
-  showOverlay = true;
+  showOverlay = false;
   
   @ViewChild('overlay') overlay!: ElementRef;
   @ViewChild('main') main!: ElementRef;
@@ -37,6 +43,15 @@ export class MainLayoutComponent {
 
   }
 
+  ngOnInit(): void {
+    this.subscriptions.add(
+      this.channelService.getChannelsOrderByCreatedAt((data) => {
+        this.channels = [];
+        this.channels.push(...data);
+      })
+    );
+  }
+
   clickAddChannel() {
     console.log(this.showOverlay);
     
@@ -47,6 +62,10 @@ export class MainLayoutComponent {
     console.log('click overlay');
     
     this.showOverlay = false;
+  }
+
+  ngOnDestroy(): void {
+    this.subscriptions.unsubscribe();
   }
 
 
