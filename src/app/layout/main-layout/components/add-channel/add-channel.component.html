@@ -45,7 +45,7 @@
                 <span></span>
                 <p>Bestimmte Leute hinzufügen</p>
             </div>
-            <div class="richtext-editor-div" [@expandCollapse]="showChooseNameInput ? 'open' : 'closed'" [style.overflow]="editorOverflowStyle">
+            <div class="richtext-editor-div" [@verticalExpandCollapse]="showChooseNameInput ? 'open' : 'closed'" [style.overflow]="editorOverflowStyle">
                 <app-richtext-editor #richtextEditor (editorReady)="onEditorReady($event)" (editorValueChanged)="onEditorValueChanged($event)" (hasTag)="onHasTag($event)" (tagIDsChanges)="onTagIDsChanges($event)"></app-richtext-editor>
                 <app-user-list class="user-list" *ngIf="showUserList" [dataSource]="filteredUsers" [tagIDs]="tagIDs" (clickedUser)="onClickedUser($event)"></app-user-list>
             </div>

@@ -39,10 +39,8 @@ export class UserListComponent implements AfterViewInit{
 
   checkOverflow() {
     const el = this.listContainerRef.nativeElement;
-    
     setTimeout(()=>{
       this.isOverflowing = (el.scrollHeight - el.clientHeight) > 2;
     })
-    
   }
 }

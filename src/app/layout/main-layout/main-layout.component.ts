@@ -5,19 +5,19 @@ import { AddChannelComponent } from './components/add-channel/add-channel.compon
 import { ChannelService } from '../../core/services/channel.service';
 import { Subscription } from 'rxjs';
 import { Channel } from '../../core/models/channel.interface';
+import { SidebarComponent } from './components/sidebar/sidebar.component';
+import { horizontalExpandCollapseAnimation } from './animations/expand-collapse.animation';
 
 @Component({
   selector: 'app-main-layout',
-  imports: [MainHeaderComponent, CommonModule, AddChannelComponent],
+  imports: [MainHeaderComponent, CommonModule, AddChannelComponent, SidebarComponent],
   templateUrl: './main-layout.component.html',
-  styleUrl: './main-layout.component.scss'
+  styleUrl: './main-layout.component.scss',
+  animations: [horizontalExpandCollapseAnimation]
 })
-export class MainLayoutComponent implements OnInit, OnDestroy {
-  private subscriptions = new Subscription();
-  channelService = inject(ChannelService);
-  channels: Channel[] = [];
-
-  menuOpen = false;
+export class MainLayoutComponent  {
+  
+  showSidebar = true;
   showOverlay = false;
   
   @ViewChild('overlay') overlay!: ElementRef;
@@ -25,38 +25,18 @@ export class MainLayoutComponent implements OnInit, OnDestroy {
   @ViewChild('devSpace') devSpace!: ElementRef;
 
   toggleMenu(){
-    if (!this.menuOpen) {
-      console.log(`Opening menu` + this.menuOpen);
-      this.overlay.nativeElement.classList.add('show-menu');
-      this.overlay.nativeElement.classList.remove('hide-menu'); 
-      this.main.nativeElement.classList.add('shrink-menu');
-      this.devSpace.nativeElement.classList.remove('d__none');
-      this.menuOpen = true;
-    } else {
-      console.log(`Closing menu` + this.menuOpen);
-      this.overlay.nativeElement.classList.remove('show-menu');
-      this.overlay.nativeElement.classList.add('hide-menu'); 
-      this.main.nativeElement.classList.remove('shrink-menu');
-      this.devSpace.nativeElement.classList.add('d__none');
-      this.menuOpen = false;
-    }
-
-  }
-
-  ngOnInit(): void {
-    this.subscriptions.add(
-      this.channelService.getChannelsOrderByCreatedAt((data) => {
-        this.channels = [];
-        this.channels.push(...data);
-      })
-    );
-  }
-
-  clickAddChannel() {
-    console.log(this.showOverlay);
+    console.log('click toggle sidebar');
     
+    this.showSidebar = !this.showSidebar;
+  }
+
+  onAddChannel() {
     this.showOverlay = true;
   }
+
+  
+
+  
 
   clickOverlay() {
     console.log('click overlay');
@@ -64,9 +44,7 @@ export class MainLayoutComponent implements OnInit, OnDestroy {
     this.showOverlay = false;
   }
 
-  ngOnDestroy(): void {
-    this.subscriptions.unsubscribe();
-  }
+  
 
 
 }

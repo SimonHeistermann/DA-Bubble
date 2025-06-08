@@ -2,7 +2,7 @@ import { Component, ElementRef, EventEmitter, inject, OnDestroy, Output, ViewChi
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ChannelService } from '../../../../core/services/channel.service';
-import { expandCollapseAnimation } from '../../animations/expand-collapse.animation';
+import { verticalExpandCollapseAnimation } from '../../animations/expand-collapse.animation';
 import { RichtextEditorComponent } from '../shared/richtext-editor/richtext-editor.component';
 import { UserListComponent } from '../shared/user-list/user-list.component';
 import { User } from '../../../../core/models/user.interface';
@@ -18,7 +18,7 @@ import { Channel, ChannelData } from '../../../../core/models/channel.interface'
   imports: [CommonModule, FormsModule, RichtextEditorComponent, UserListComponent],
   templateUrl: './add-channel.component.html',
   styleUrl: './add-channel.component.scss',
-  animations: [expandCollapseAnimation]
+  animations: [verticalExpandCollapseAnimation]
 })
 export class AddChannelComponent implements OnDestroy {
   filteredUsers: User[] = [];

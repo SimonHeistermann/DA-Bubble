@@ -8,6 +8,7 @@
     width: 100%;
     height: 100vh;
     padding: 20px;
+    gap: 20px;
 }
 
 app-main-header {
@@ -18,18 +19,20 @@ app-main-header {
     width: 100%;
     display: flex;
     flex-direction: row;
+    gap: 20px; 
 }
 
-main {
+.main-content {
     display: flex;
     flex-direction: column;
     align-items: center;
     width: 100%;
     border-radius: 30px;
     background-color: #FFFFFF;
-    height: calc(100vh - 122px);
-    margin-top: 20px;
+    height: calc(100vh - 130px);
     padding: 0px 45px 45px 45px;
+    
+    
 }
 
 .container-head {
@@ -178,115 +181,4 @@ textarea {
     width: 74%;
     margin-left: auto;
     transition: width 0.1s;
-}
-
-.devspace {
-    width: 24%;
-    height: 100%;
-    gap: 25px;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    border-radius: 30px;
-    background-color: #FFFFFF;
-    height: calc(100vh - 122px);
-    margin-top: 20px;
-    padding: 32px 30px;
-}
-
-.devspace-head {
-    width: 100%;
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    justify-content: space-between;
-
-    >img:nth-child(2) {
-        cursor: pointer;
-
-        &:hover {
-            content: url('/icons/edit_square_hover.png');
-            transition: 0.6s;
-        }
-    }
-
-    .channel-names {
-        ul {
-            
-        }
-    }
-}
-
-.dev-logo-cont {
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    gap: 10px;
-
-    >span {
-        font-size: 24px;
-        font-weight: 700;
-    }
-}
-
-.devlist-container {
-    width: 100%;
-    display: flex;
-    flex-direction: column;
-    flex: 1;
-    gap: 25px;
-
-    >section {
-        gap: 25px;
-        display: flex;
-        flex-direction: column;
-        align-items: center;
-    }
-
-    >section:nth-child(1) {
-        .devlist-head {
-            >div:hover {
-                color: #535AF1;
-                transition: all 0.6s;
-
-                >img:nth-child(1) {
-                    content: url('/icons/arrow_down_hover.png');
-                }
-
-                >img:nth-child(2) {
-                    content: url('/icons/channels_hover.png');
-                }
-            }
-
-            >img {
-                padding: 3px;
-
-                &:hover {
-                    content: url('/icons/add_hover.png');
-                }
-            }
-
-        }
-    }
-}
-
-.devlist-head {
-    width: 100%;
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    justify-content: space-between;
-
-    >div {
-        display: flex;
-        flex-direction: row;
-        align-items: center;
-        gap: 10px;
-        cursor: pointer;
-    }
-
-    >img {
-        cursor: pointer;
-    }
-
 }

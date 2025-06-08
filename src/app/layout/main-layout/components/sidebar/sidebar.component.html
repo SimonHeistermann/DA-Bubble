@@ -1,0 +1,108 @@
+<section class="devspace">
+
+    <section class="devspace-wrapper">
+        <section class="devspace-content scollbar" #devspaceContent [style.overflow-y]="isOverflowing ? 'auto' : 'hidden'">
+            <div class="devspace-head">
+                <div class="dev-logo-cont">
+                    <img src="/icons/devspaceIcon.png">
+                    <span>Devspace</span>
+                </div>
+                <img src="/icons/edit_square.png">
+            </div>
+        
+            <div class="devlist-container">
+                <section>
+                    <div class="devlist-head">
+                        <div class="devlist-head-left"  (click)="clickChannelHead()" [class.closed]="!openChannel">
+                            <div class="arrow-down">
+
+                            </div>
+                            <div class="icon-title">
+                                <img class="channel-img" src="/icons/channels.png">
+                                <span>Channels</span>
+                            </div>
+                            
+                        </div>
+                        <img class="add-btn" src="/icons/add.png" (click)="clickAddChannel()">
+                    </div>
+                    <div class="channel-names" [@verticalMarginExpandCollapse]="openChannel ? 'open' : 'closed'" (@verticalMarginExpandCollapse.done)="onSectionAnimationDone()">
+                        <ul>
+                            @for(channel of channels; let index = $index; track $index) {
+                                <li class="channel-li pointer" [class.selected]="index === currentChannelIndex"  (click)="clickChannelName(index)">
+                                    <div class="channel-li-content">
+                                        <div class="tag"></div>
+                                        <span class="channel-name">{{channel.name}}</span>
+                                    </div>
+                                    
+                                </li>
+                            }
+                            <li class="add-channel-li pointer"  (click)="clickAddChannel()">
+                                <div class="add-btn-circle"></div>
+                                <span>Channel hinzufügen</span>
+                            </li>
+                        </ul>
+                    </div>
+                </section>
+                <section>
+                    <div class="devlist-head">
+                        <div class="devlist-head-left"   (click)="clickMessageHead()" [class.closed]="!openMessage">
+                            <div class="arrow-down">
+                                
+                            </div>
+                            <div class="icon-title">
+                                <img  class="account-img" src="/icons/account.png">
+                                <span>Direktnachrichten</span>
+                            </div>
+                        </div>
+        
+                    </div>
+                    <div class="users" [@verticalMarginExpandCollapse]="openMessage ? 'open' : 'closed'" (@verticalMarginExpandCollapse.done)="onSectionAnimationDone()">
+                        <ul>
+                            <li class="current-user pointer">
+                                <div class="li-content">
+                                    <div class="avatar-div">
+                                        <img [src]=" currentUser?.id && imgLoadStatus[currentUser?.id || 'currentUser'] ? currentUser?.photoURL : 'icons/avatars/avatar_1.png'"
+                                        (load)="imgLoadStatus[currentUser?.id || 'currentUser'] = true"
+                                        (error)="imgLoadStatus[currentUser?.id || 'currentUser'] = false"> 
+                                       
+                                        @if(!currentUser?.isActive) {
+                                            <span class="active-status offline"></span>
+                                        } @else {
+                                            <span class="active-status"></span>
+                                        }
+                                        
+                                    </div>
+                                    <span class="name">
+                                        {{ currentUser?.displayName }}
+                                    </span>
+                                </div>
+                            </li>
+                            @for (user of allUsers; let index = $index; track $index) {
+                                <li>
+                                    <div class="li-content pointer">
+                                        <div class="avatar-div">
+                                            <img [src]="imgLoadStatus[user.id] ? user.photoURL : 'icons/avatars/avatar_1.png'"
+                                            (load)="imgLoadStatus[user.id] = true"
+                                            (error)="imgLoadStatus[user.id] = false"> 
+                                            @if(!user?.isActive) {
+                                                <span class="active-status offline"></span>
+                                            } @else {
+                                                <span class="active-status"></span>
+                                            }
+                                            
+                                        </div>
+                                        <span class="name">
+                                            {{ user?.displayName }}
+                                        </span>
+                                    </div>
+                                </li>
+                            }
+                        </ul>
+                    </div>
+        
+                </section>
+            </div>
+        </section>
+    </section>
+
+</section>

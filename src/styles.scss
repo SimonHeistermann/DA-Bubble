@@ -83,6 +83,35 @@ input:focus {
   cursor: pointer;
 }
 
+
+
+.scollbar {
+  scrollbar-width: thin;
+  scrollbar-color: var(--bg-color) transparent;
+  // scrollbar-arrow-color: transparent;
+
+  &::-webkit-scrollbar {
+      width: 8px;
+  }
+  &::-webkit-scrollbar-track {
+      background: transparent;
+      border-radius: 10px;
+  }
+  
+  &::-webkit-scrollbar-thumb {
+      background: var(--bg-color);
+      border-radius: 10px;
+  }
+  
+  &::-webkit-scrollbar-thumb:hover {
+      background: #555;
+  }
+
+  &::-webkit-scrollbar-button {
+    display: none;
+  }
+}
+
 .mat-tooltip.custom__tooltip {
   @include fontFigtree($fs: 14px);
   background-color: red;
