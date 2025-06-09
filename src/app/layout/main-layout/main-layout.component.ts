@@ -6,14 +6,14 @@ import { ChannelService } from '../../core/services/channel.service';
 import { Subscription } from 'rxjs';
 import { Channel } from '../../core/models/channel.interface';
 import { SidebarComponent } from './components/sidebar/sidebar.component';
-import { horizontalExpandCollapseAnimation } from './animations/expand-collapse.animation';
+import { MessageComponent } from './components/message/message.component';
 
 @Component({
   selector: 'app-main-layout',
-  imports: [MainHeaderComponent, CommonModule, AddChannelComponent, SidebarComponent],
+  imports: [MainHeaderComponent, CommonModule, AddChannelComponent, SidebarComponent, MessageComponent],
   templateUrl: './main-layout.component.html',
   styleUrl: './main-layout.component.scss',
-  animations: [horizontalExpandCollapseAnimation]
+  animations: []
 })
 export class MainLayoutComponent  {
   
@@ -25,18 +25,12 @@ export class MainLayoutComponent  {
   @ViewChild('devSpace') devSpace!: ElementRef;
 
   toggleMenu(){
-    console.log('click toggle sidebar');
-    
     this.showSidebar = !this.showSidebar;
   }
 
   onAddChannel() {
     this.showOverlay = true;
   }
-
-  
-
-  
 
   clickOverlay() {
     console.log('click overlay');

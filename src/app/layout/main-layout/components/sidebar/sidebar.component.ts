@@ -1,20 +1,19 @@
-import { AfterViewInit, Component, ElementRef, EventEmitter, inject, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, EventEmitter, inject, Input, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
 import { Subscription } from 'rxjs';
 import { ChannelService } from '../../../../core/services/channel.service';
 import { Channel } from '../../../../core/models/channel.interface';
-import { verticalMarginExpandCollapseAnimation } from '../../animations/expand-collapse.animation';
+import { toggleMarginRight20Animation, verticalMarginExpandCollapseAnimation } from '../../animations/expand-collapse.animation';
 import { User } from '../../../../core/models/user.interface';
 import { AuthService } from '../../../../core/services/auth-service/auth.service';
 import { UserService } from '../../../../core/services/user-service/user.service';
 import { user } from '@angular/fire/auth';
-import { DefaultImgDirective } from '../../../../core/directives/defaultImg.directive';
 
 @Component({
   selector: 'app-sidebar',
-  imports: [DefaultImgDirective],
+  imports: [],
   templateUrl: './sidebar.component.html',
   styleUrl: './sidebar.component.scss',
-  animations: [verticalMarginExpandCollapseAnimation],
+  animations: [verticalMarginExpandCollapseAnimation, toggleMarginRight20Animation],
 
 })
 export class SidebarComponent implements OnInit, OnDestroy, AfterViewInit {
@@ -28,8 +27,8 @@ export class SidebarComponent implements OnInit, OnDestroy, AfterViewInit {
   currentUser: User | null = null;
   imgLoadStatus: Record<string, boolean> = {};
   isOverflowing = false;
-  
 
+  @Input() showSelf: boolean = true;
   @Output() addChannel = new EventEmitter<void>();
 
   openChannel = true;

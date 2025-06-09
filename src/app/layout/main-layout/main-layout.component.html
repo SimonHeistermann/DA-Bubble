@@ -1,38 +1,16 @@
 <section class="main-layout">
     <app-main-header></app-main-header>
-
-    <div class="main-container" [style.gap.px]="showSidebar ? 20 : 0">
-        <app-sidebar [@horizontalExpandCollapse]="showSidebar ? 'open' : 'closed'" (addChannel)="onAddChannel()"></app-sidebar>
-
-        <main class="main-content">
-            <div class="container-head">
-
-            </div>
-
-            <div class="container-body">
-
-
-            </div>
-
-            <div class="container-input">
-                <textarea name="message" id="message" placeholder="Nachricht an #Entwicklerteam"></textarea>
-                <div class="input-icons">
-                    <div>
-                        <img src="/icons/sentiment_satisfied.png">
-                        <img src="/icons/alternate_email.png">
-                    </div>
-                    <img src="/icons/send_icon.png">
-                </div>
-
-            </div>
-
-            <div class="overlay-bar" [ngClass]="{'show-menu': showSidebar, 'hide-menu': !showSidebar}" #overlay (click)="toggleMenu()">
-                <img class="icon-show-menu">
-            </div>
-        </main>
-
+    <div class="main-container">
+        <div class="side-bar">
+            <app-sidebar (addChannel)="onAddChannel()" [showSelf]="showSidebar"></app-sidebar>
+        </div>
+        <div class="message">
+            <app-message></app-message>
+        </div>
     </div>
-
+    <div class="overlay-bar" [ngClass]="{'show-menu': showSidebar, 'hide-menu': !showSidebar}" #overlay (click)="toggleMenu()">
+        <img class="icon-show-menu">
+    </div>
 </section>
 <div class="overlay" (click)="clickOverlay()" *ngIf="showOverlay" >
     <app-add-channel (closeOverlay)="showOverlay = false"></app-add-channel>

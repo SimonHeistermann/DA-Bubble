@@ -32,14 +32,17 @@ export const verticalExpandCollapseAnimation = trigger('verticalExpandCollapse',
   ]),
 ]);
 
-export const horizontalExpandCollapseAnimation = trigger('horizontalExpandCollapse', [
+export const toggleMarginRight20Animation = trigger('toggleMarginRight20', [
   state('closed', style({
     width: '0',
     opacity: 0,
+    marginRight: '0',
   })),
   state('open', style({
     width: '*',
     opacity: 1,
+    
+    marginRight: '20px',
   })),
 
   transition('closed <=> open', [
