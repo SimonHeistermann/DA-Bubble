@@ -2,7 +2,7 @@ import { AfterViewInit, Component, ElementRef, EventEmitter, inject, Input, OnDe
 import { Subscription } from 'rxjs';
 import { ChannelService } from '../../../../core/services/channel.service';
 import { Channel } from '../../../../core/models/channel.interface';
-import { toggleMarginRight20Animation, verticalMarginExpandCollapseAnimation } from '../../animations/expand-collapse.animation';
+import { toggleMarginRight20Animation, toggleMarginTop25Animation } from '../../animations/expand-collapse.animation';
 import { User } from '../../../../core/models/user.interface';
 import { AuthService } from '../../../../core/services/auth-service/auth.service';
 import { UserService } from '../../../../core/services/user-service/user.service';
@@ -13,7 +13,7 @@ import { user } from '@angular/fire/auth';
   imports: [],
   templateUrl: './sidebar.component.html',
   styleUrl: './sidebar.component.scss',
-  animations: [verticalMarginExpandCollapseAnimation, toggleMarginRight20Animation],
+  animations: [toggleMarginTop25Animation, toggleMarginRight20Animation],
 
 })
 export class SidebarComponent implements OnInit, OnDestroy, AfterViewInit {
@@ -30,6 +30,7 @@ export class SidebarComponent implements OnInit, OnDestroy, AfterViewInit {
 
   @Input() showSelf: boolean = true;
   @Output() addChannel = new EventEmitter<void>();
+  @Output() clickChannelNameEmitter = new EventEmitter<Channel>();
 
   openChannel = true;
   openMessage = true;
@@ -37,7 +38,6 @@ export class SidebarComponent implements OnInit, OnDestroy, AfterViewInit {
   currentChannelIndex: number = 0;
 
   ngOnInit(): void {
-    
     
   }
 
@@ -78,8 +78,9 @@ export class SidebarComponent implements OnInit, OnDestroy, AfterViewInit {
     this.addChannel.emit();
   }
 
-  clickChannelName(index: number) {
+  clickChannelName(index: number, channel: Channel) {
     this.currentChannelIndex = index;
+    this.clickChannelNameEmitter.emit(channel);
   }
 
 
@@ -92,6 +93,9 @@ export class SidebarComponent implements OnInit, OnDestroy, AfterViewInit {
       this.channelService.getChannelsOrderByCreatedAt((data) => {
         this.channels = [];
         this.channels.push(...data);
+        if (this.channels.length > 0) {
+          this.clickChannelNameEmitter.emit(this.channels[0]);
+        }
       })
     );
 
@@ -104,8 +108,6 @@ export class SidebarComponent implements OnInit, OnDestroy, AfterViewInit {
 
   checkOverflow() {
     const el = this.devSpaceContentRef.nativeElement;
-    console.log(el.scrollHeight);
-    console.log(el.clientHeight);
     
     setTimeout(()=>{
       this.isOverflowing = (el.scrollHeight - el.clientHeight) > 2;

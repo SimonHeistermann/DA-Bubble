@@ -1,4 +1,4 @@
-import { Component, ElementRef, EventEmitter, inject, OnDestroy, Output, ViewChild } from '@angular/core';
+import { Component, ElementRef, EventEmitter, inject, Input, OnDestroy, Output, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ChannelService } from '../../../../core/services/channel.service';
@@ -31,10 +31,10 @@ export class AddChannelComponent implements OnDestroy {
   channelService = inject(ChannelService);
   tagIDs: string[] = [];
 
-  @Output() closeOverlay = new EventEmitter<void>();
+  @Input() showOverlay = false;
+  @Output() closeOverlayEmitter = new EventEmitter<void>();
   editorEl!: HTMLDivElement;
   @ViewChild("richtextEditor") richtextEditorRef!: RichtextEditorComponent;
-
 
   showChannelNameError = false;
   showAddUserContent = false;
@@ -80,11 +80,6 @@ export class AddChannelComponent implements OnDestroy {
       }));
   }
   
-
-  clickClose() {
-    this.closeOverlay.emit();
-  }
-
   clickCreateChannel() {
     this.subscriptions.add(
       this.channelService.getChannels((data) => {
@@ -110,7 +105,7 @@ export class AddChannelComponent implements OnDestroy {
         },
         complete: () => {
           console.log('Add channel operation completed.');
-          this.closeOverlay.emit();
+          this.closeOverlayEmitter.emit();
         }
       })
     )
@@ -208,6 +203,12 @@ export class AddChannelComponent implements OnDestroy {
   onClickedUser(u: User) {
     this.richtextEditorRef.insertTag(u);
   }
+
+  closeOverlay() {
+    this.showOverlay = false;
+    this.closeOverlayEmitter.emit();
+  }
+
 
   ngOnDestroy(): void {
     this.subscriptions.unsubscribe();

@@ -13,6 +13,7 @@
     line-height: 50px;
     @include displayFlex($jc: flex-start, $g: 5px);
     flex-wrap: wrap;
+    overflow: scroll;
 
     &::-webkit-scrollbar {
         display: none;

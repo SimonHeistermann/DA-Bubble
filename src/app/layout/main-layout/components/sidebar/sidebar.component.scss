@@ -163,17 +163,28 @@
                 li {
                     font-size: 18px;
                     @include displayFlex($jc: flex-start, $g: 10px);
+                    &:hover {
+                        &:hover {
+                            border-radius: 30px;
+                            background-color: var(--bg-color);
+                        }
+                    }
 
                 }
                 li.add-channel-li {
                     
-                    padding-left: 40px;
-                    .add-btn-circle {
-                        width: 24px;
-                        height: 24px;
-                        background-image: url('/icons/add_circle.png');
+                    margin-left: 20px;
+                    .add-channel-li-content {
+                        border-radius: 20px;
+                        padding: 4px 20px;
+                        @include displayFlex($jc: flex-start, $g: 10px);
+                        .add-btn-circle {
+                            width: 24px;
+                            height: 24px;
+                            background-image: url('/icons/add_circle.png');
+                        }
+    
                     }
-
                     &:hover {
                         color: var(--purple-3);
                         .add-btn-circle {
@@ -185,6 +196,7 @@
                             background-image: url('/icons/add_circle_click.png');
                         }
                     }
+                    
                 }
                 li.channel-li {
                     margin-left: 20px;

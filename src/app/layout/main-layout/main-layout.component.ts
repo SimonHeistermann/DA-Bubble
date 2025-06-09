@@ -18,27 +18,22 @@ import { MessageComponent } from './components/message/message.component';
 export class MainLayoutComponent  {
   
   showSidebar = true;
-  showOverlay = false;
+  showAddChannelOverlay = false;
+  clickedChannel: Channel | undefined;
   
-  @ViewChild('overlay') overlay!: ElementRef;
-  @ViewChild('main') main!: ElementRef;
-  @ViewChild('devSpace') devSpace!: ElementRef;
 
   toggleMenu(){
     this.showSidebar = !this.showSidebar;
   }
 
   onAddChannel() {
-    this.showOverlay = true;
+    console.log('onAddChannel');
+    this.showAddChannelOverlay = true;
   }
 
-  clickOverlay() {
-    console.log('click overlay');
-    
-    this.showOverlay = false;
+  onClickChannelName(c: Channel){
+    this.clickedChannel = c;
   }
-
-  
 
 
 }

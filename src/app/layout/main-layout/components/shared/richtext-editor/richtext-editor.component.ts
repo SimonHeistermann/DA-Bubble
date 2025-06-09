@@ -145,7 +145,7 @@ import { User } from '../../../../../core/models/user.interface';
 
     getTagTemplate(u: User) {
       return `
-      <img src="${u.photoURL}" />
+      <img src="${u.photoURL.startsWith('http') ? '/icons/avatars/avatar_1.png' : u.photoURL}" />
       <span class="tag-name">${u.displayName}</span>
       <div class="tag-close"></div>
       `;
@@ -158,7 +158,6 @@ import { User } from '../../../../../core/models/user.interface';
       const range = document.createRange();
       let lastChild = editor.lastChild;
       if (lastChild && lastChild.nodeName === 'BR' && editor.querySelector('.tag') === null) editor.innerHTML = '';
-      
       if (lastChild && editor.contains(lastChild)) {
         if (lastChild.nodeType === Node.TEXT_NODE) {
           range.setStart(lastChild, lastChild.textContent?.length ?? 0);

@@ -1,0 +1,21 @@
+
+    <div class="add-channel-user-content overlay-content" @slideFadeIn (click)="$event.stopPropagation()">
+        <div class="content-header">
+            <h3 class="content-title">Leute hinzufügen</h3>
+            <div class="close" (click)="closeOverlay()">
+                <div class="close-content"></div>
+            </div>
+        </div>
+        <h4 class="content-subheader">
+            <img src="/icons/tag_click.png" alt="">
+            <span>Entwicklerteam</span>
+        </h4>
+        
+        <div class="richtext-editor-div">
+            <app-richtext-editor #richtextEditor (editorReady)="onEditorReady($event)" (editorValueChanged)="onEditorValueChanged($event)" (hasTag)="onHasTag($event)" (tagIDsChanges)="onTagIDsChanges($event)"></app-richtext-editor>
+            <app-user-list class="user-list" *ngIf="showUserList" [dataSource]="filteredUsers" [tagIDs]="tagIDs" (clickedUser)="onClickedUser($event)"></app-user-list>
+        </div>
+        <div class="content-footer">
+            <button >Erstellen</button>
+        </div>
+    </div>

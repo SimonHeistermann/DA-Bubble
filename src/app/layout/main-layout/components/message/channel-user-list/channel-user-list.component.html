@@ -1,0 +1,52 @@
+
+<div class="add-channel-user-content overlay-content" @slideFadeIn (click)="$event.stopPropagation()">
+    <div class="content-header">
+        <h3 class="content-title">Mitglieder</h3>
+        <div class="close" (click)="closeOverlay()">
+            <div class="close-content"></div>
+        </div>
+    </div>
+    <ul>
+        <li class="current-user pointer">
+            <div class="li-content">
+                <div class="avatar-div">
+                    <img [src]="currentUser?.photoURL?.startsWith('http') ? '/icons/avatars/avatar_1.png' : currentUser?.photoURL">
+                   
+                    @if(!currentUser?.isActive) {
+                        <span class="active-status offline"></span>
+                    } @else {
+                        <span class="active-status"></span>
+                    }
+                    
+                </div>
+                <span class="name">
+                    {{ currentUser?.displayName }} (Du)
+                </span>
+            </div>
+        </li>
+        @for (user of allUsers; let index = $index; track $index) {
+            <li>
+                <div class="li-content pointer">
+                    <div class="avatar-div">
+                        <img [src]="user?.photoURL?.startsWith('http') ? '/icons/avatars/avatar_1.png' : user?.photoURL">
+                        @if(!user?.isActive) {
+                            <span class="active-status offline"></span>
+                        } @else {
+                            <span class="active-status"></span>
+                        }
+                        
+                    </div>
+                    <span class="name">
+                        {{ user?.displayName }}
+                    </span>
+                </div>
+            </li>
+        }
+    </ul>
+    <div class="footer">
+        <div class="footer-content pointer" (click)="addMember()">
+            <button class="add-member"></button>
+            <span>Mitglieder Hinzufügen</span>
+        </div>
+    </div>
+</div>

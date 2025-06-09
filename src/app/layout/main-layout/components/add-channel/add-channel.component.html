@@ -1,9 +1,10 @@
 
+<div class="overlay" (click)="closeOverlay()" >
     <div class="overlay-container">
         <div class="create-channel-content overlay-content"  (click)="$event.stopPropagation()"  *ngIf="!showAddUserContent">
             <div class="content-header">
                 <h3 class="content-title">Channel Erstellen</h3>
-                <div class="close" (click)="clickClose()">
+                <div class="close" (click)="closeOverlay()">
                     <div class="close-content"></div>
                 </div>
             </div>
@@ -33,7 +34,7 @@
         <div class="add-user-content overlay-content"  (click)="$event.stopPropagation()" *ngIf="showAddUserContent">
             <div class="content-header">
                 <h3 class="content-title">Leute hinzufügen</h3>
-                <div class="close" (click)="clickClose()">
+                <div class="close" (click)="closeOverlay()">
                     <div class="close-content"></div>
                 </div>
             </div>
@@ -54,3 +55,4 @@
             </div>
         </div>
     </div>
+</div>

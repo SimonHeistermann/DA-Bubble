@@ -1,18 +1,22 @@
 <section class="main-layout">
     <app-main-header></app-main-header>
     <div class="main-container">
-        <div class="side-bar">
-            <app-sidebar (addChannel)="onAddChannel()" [showSelf]="showSidebar"></app-sidebar>
+        <div class="side-bar" >
+            <app-sidebar 
+                (addChannel)="onAddChannel()" 
+                [showSelf]="showSidebar" 
+                (clickChannelNameEmitter)="onClickChannelName($event)">
+            </app-sidebar>
         </div>
         <div class="message">
-            <app-message></app-message>
+            <app-message [channel]="clickedChannel"></app-message>
         </div>
     </div>
     <div class="overlay-bar" [ngClass]="{'show-menu': showSidebar, 'hide-menu': !showSidebar}" #overlay (click)="toggleMenu()">
         <img class="icon-show-menu">
     </div>
 </section>
-<div class="overlay" (click)="clickOverlay()" *ngIf="showOverlay" >
-    <app-add-channel (closeOverlay)="showOverlay = false"></app-add-channel>
-</div>
+
+<app-add-channel (closeOverlayEmitter)="showAddChannelOverlay = false"  *ngIf="showAddChannelOverlay"></app-add-channel>
+
 

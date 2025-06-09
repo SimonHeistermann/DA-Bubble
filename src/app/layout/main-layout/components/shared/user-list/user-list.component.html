@@ -7,13 +7,7 @@
            
                 <div class="li-content">
                     <div class="avatar-div">
-
-                        <!-- @if (u.photoURL.startsWith('http')) {
-                            <img src="icons/avatars/avatar_1.png" alt=""> 
-                        } @else {
-                            <img src="{{u.photoURL}}" alt=""> 
-                        } -->
-                        <img src="{{u.photoURL}}" alt=""> 
+                        <img [src]="u?.photoURL?.startsWith('http') ? '/icons/avatars/avatar_1.png' : u?.photoURL">
                         @if(!u.isActive) {
                             <span class="active-status offline"></span>
                         } @else {
