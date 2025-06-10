@@ -1,0 +1,100 @@
+
+@use './../../../../../styles.scss' as *;
+@use './../../../../../styles/overlay.scss' as *;
+.main-content {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    width: 100%;
+    border-radius: 30px;
+    background-color: #FFFFFF;
+    height: calc(100vh - 130px);
+
+
+    .container-head {
+        height: 96px;
+        width: 100%;
+        padding: 0 30px;
+        border-top-right-radius: 30px;
+        border-top-left-radius: 30px;
+        background-color: #FFFFFF;
+        box-shadow: 0px 2px 10px 0px #00000014;
+        @include displayFlex($jc: space-between, $ai:center);
+
+        .channel-message {
+            width: 100%;
+            @include displayFlex($jc: space-between, $ai:center);
+            .channel-message-left {
+                padding: 5px 10px;
+                border-radius: 30px;
+
+                @include displayFlex($g: 10px);
+                .tag {
+                    @include imgButton($wh: 32px, $url: '/icons/tag.png');
+                }
+                .channel-name {
+                    font-size: 24px;
+                }
+                .arrow-down {
+                    @include imgButton($wh: 30px, $url: '/icons/arrow_down1.png');
+                }
+
+                &:hover {
+                    color: var(--purple-3);
+                    background-color: var(--bg-color);
+                    .tag {
+                        background-image: url('/icons/tag_hover.png');
+                    }
+                    .arrow-down {
+                        background-image: url('/icons/arrow_down1_hover.png');
+                    }
+                }
+            }   
+
+            .channel-message-right {
+                position: relative;
+                @include displayFlex($g: 10px);
+                .logos-number {
+                    border-radius: 30px;
+                    padding: 5px 10px 5px 20px;
+                    @include displayFlex($g: 10px);
+                    .logos {
+                        @include displayFlex();
+                        img {
+                            width: 38px;
+                            height: 38px;
+                            border-radius: 50%;
+                            margin-left: -10px;
+                            border: 2px solid var(--white);
+                        }
+                    }
+                    .number {
+                        font-size: 20px;
+                        font-weight: 600;
+                    }
+                    &:hover {
+                        color: var(--purple-3);
+                        background-color: var(--bg-color);
+                    }
+                }
+                .add-member{
+                    border-radius: 50%;
+                    @include imgButton($wh:40px, $url:'/icons/add_member.png');
+                    &:hover {
+                        background-image: url('/icons/add_member_hover.png');
+                    }
+                }
+            }
+        }
+    }
+    
+    .container-body {
+        flex: 1;
+    }
+    
+    .container-input {
+        width: 100%;
+    }
+}
+
+

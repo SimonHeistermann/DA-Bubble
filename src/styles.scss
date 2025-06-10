@@ -5,11 +5,12 @@
 $standardWidth: min(100%, 1920px);
 $standardInlinePadding: clamp(20px, 6vw, 77px);
 
-@mixin displayFlex($ai: center, $jc: center, $g: 0px) {
+@mixin displayFlex($ai: center, $jc: center, $g: 0px, $fd: row) {
   display: flex !important;
   align-items: $ai;
   justify-content: $jc;
   gap: $g;
+  flex-direction: $fd;
 }
 
 @mixin fontNunito($fw: 400, $lh: 120%, $fs: 20px, $ls: 0) {
@@ -47,6 +48,7 @@ html {
   box-sizing: border-box;
   margin: 0;
   padding: 0;
+  list-style: none;
 }
 
 html, body {
@@ -65,12 +67,60 @@ button {
     }
 }
 
+input:focus {
+  outline: none;
+}
+
 .d__none {
   display: none !important;
 }
 
 .d__flex {
   display: flex !important;
+}
+
+@mixin imgButton($wh:30px, $url) {
+  background-image: url($url);
+  width: $wh;
+  height: $wh;
+  background-position: center;
+  background-size: contain;
+  background-repeat: no-repeat;
+}
+
+.pointer {
+  cursor: pointer;
+}
+
+.scollbar {
+  scrollbar-width: thin;
+  scrollbar-color: var(--bg-color) transparent;
+  // scrollbar-arrow-color: transparent;
+
+  &::-webkit-scrollbar {
+      width: 8px;
+  }
+  &::-webkit-scrollbar-track {
+      background: transparent;
+      border-radius: 10px;
+  }
+  
+  &::-webkit-scrollbar-thumb {
+      background: var(--bg-color);
+      border-radius: 10px;
+  }
+  
+  &::-webkit-scrollbar-thumb:hover {
+      background: #555;
+  }
+
+  &::-webkit-scrollbar-button {
+    display: none;
+  }
+}
+
+.cdk-overlay-container {
+  background-color: rgba($color: #000000, $alpha: .3);
 }
 
 .mat-tooltip.custom__tooltip {

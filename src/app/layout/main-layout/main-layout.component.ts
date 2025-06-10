@@ -1,38 +1,39 @@
-import { Component, ElementRef, ViewChild } from '@angular/core';
+import { Component, ElementRef, inject, OnDestroy, OnInit, ViewChild } from '@angular/core';
 import { MainHeaderComponent } from './components/main-header/main-header.component';
 import { CommonModule } from '@angular/common';
+import { AddChannelComponent } from './components/add-channel/add-channel.component';
+import { ChannelService } from '../../core/services/channel.service';
+import { Subscription } from 'rxjs';
+import { Channel } from '../../core/models/channel.interface';
+import { SidebarComponent } from './components/sidebar/sidebar.component';
+import { MessageComponent } from './components/message/message.component';
 
 @Component({
   selector: 'app-main-layout',
-  imports: [MainHeaderComponent, CommonModule ],
+  imports: [MainHeaderComponent, CommonModule, AddChannelComponent, SidebarComponent, MessageComponent],
   templateUrl: './main-layout.component.html',
-  styleUrl: './main-layout.component.scss'
+  styleUrl: './main-layout.component.scss',
+  animations: []
 })
-export class MainLayoutComponent {
-
-  menuOpen = false;
+export class MainLayoutComponent  {
   
-  @ViewChild('overlay') overlay!: ElementRef;
-  @ViewChild('main') main!: ElementRef;
-  @ViewChild('devSpace') devSpace!: ElementRef;
+  showSidebar = true;
+  showAddChannelOverlay = false;
+  clickedChannel: Channel | undefined;
+  
 
   toggleMenu(){
-    if (!this.menuOpen) {
-      console.log(`Opening menu` + this.menuOpen);
-      this.overlay.nativeElement.classList.add('show-menu');
-      this.overlay.nativeElement.classList.remove('hide-menu'); 
-      this.main.nativeElement.classList.add('shrink-menu');
-      this.devSpace.nativeElement.classList.remove('d__none');
-      this.menuOpen = true;
-    } else {
-      console.log(`Closing menu` + this.menuOpen);
-      this.overlay.nativeElement.classList.remove('show-menu');
-      this.overlay.nativeElement.classList.add('hide-menu'); 
-      this.main.nativeElement.classList.remove('shrink-menu');
-      this.devSpace.nativeElement.classList.add('d__none');
-      this.menuOpen = false;
-    }
-
+    this.showSidebar = !this.showSidebar;
   }
+
+  onAddChannel() {
+    console.log('onAddChannel');
+    this.showAddChannelOverlay = true;
+  }
+
+  onClickChannelName(c: Channel){
+    this.clickedChannel = c;
+  }
+
 
 }

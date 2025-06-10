@@ -1,0 +1,58 @@
+
+<div class="overlay" (click)="closeOverlay()" >
+    <div class="overlay-container">
+        <div class="create-channel-content overlay-content"  (click)="$event.stopPropagation()"  *ngIf="!showAddUserContent">
+            <div class="content-header">
+                <h3 class="content-title">Channel Erstellen</h3>
+                <div class="close" (click)="closeOverlay()">
+                    <div class="close-content"></div>
+                </div>
+            </div>
+            <div class="content-description">
+                Chnnels dienen deinem Team zur Kommunikation. Am besten sollten sie themenbezogen sein, #marketing zum Beispiel.
+            </div>
+            <div class="input-div">
+                <div class="input-div-header">
+                    <label for="chanel-text" class="content-subtitle">Channel-Name</label>
+                    <span *ngIf="showChannelNameError">{{ errMsg}}</span>
+                </div>
+                <div class="channel-name">
+                    <span></span>
+                    <input [(ngModel)]="channel.name" type="text" id="chanel-text" placeholder=" z.B. Kooperationsprojekte" (input)="showChannelNameError = false">
+                </div>
+               
+            </div>
+            <div class="input-div">
+                <label for="chanel-description"><span  class="content-subtitle">Beschreibung</span>(optional)</label>
+                <input  [(ngModel)]="channel.description" type="text" id="chanel-description">
+            </div>
+            <div class="content-footer">
+                <button [class.active]="(channel.name || '').trim().length > 0" (click)="clickCreateChannel()">Erstellen</button>
+
+            </div>
+        </div>
+        <div class="add-user-content overlay-content"  (click)="$event.stopPropagation()" *ngIf="showAddUserContent">
+            <div class="content-header">
+                <h3 class="content-title">Leute hinzufügen</h3>
+                <div class="close" (click)="closeOverlay()">
+                    <div class="close-content"></div>
+                </div>
+            </div>
+            <div class="checkbox-div pointer" [class.active]="firstCbActivated"  (click)="clickAddAllUserFromAllgemin()">
+                <span></span>
+                <p>Alle Mitglieder von <span class="channel-span">#Allgemein</span> hinzufügen</p>
+            </div>
+            <div class="checkbox-div pointer"  [class.active]="!firstCbActivated" (click)="clickAddSomeUsers()">
+                <span></span>
+                <p>Bestimmte Leute hinzufügen</p>
+            </div>
+            <div class="richtext-editor-div" [@verticalExpandCollapse]="showChooseNameInput ? 'open' : 'closed'" [style.overflow]="editorOverflowStyle">
+                <app-richtext-editor #richtextEditor (editorReady)="onEditorReady($event)" (editorValueChanged)="onEditorValueChanged($event)" (hasTag)="onHasTag($event)" (tagIDsChanges)="onTagIDsChanges($event)"></app-richtext-editor>
+                <app-user-list class="user-list" *ngIf="showUserList" [dataSource]="filteredUsers" [tagIDs]="tagIDs" (clickedUser)="onClickedUser($event)"></app-user-list>
+            </div>
+            <div class="content-footer">
+                <button [class.active]="(showActiveButtonInAddUser && !firstCbActivated)  || firstCbActivated" (click)="clickCreateChannelInAddUser()">Erstellen</button>
+            </div>
+        </div>
+    </div>
+</div>

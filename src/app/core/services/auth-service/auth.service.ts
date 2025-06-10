@@ -83,7 +83,7 @@ export class AuthService {
   }
 
   private async createNewUserInFirestore(firebaseUser: FirebaseUser, timestamp: Timestamp): Promise<void> {
-    const newUser: Omit<User, 'uid'> = this.buildNewUserData(firebaseUser, timestamp);
+    const newUser: Omit<User, 'id'> = this.buildNewUserData(firebaseUser, timestamp);
     await this.firebaseService.setDocument(
       APP_CONSTANTS.COLLECTIONS.USERS,
       firebaseUser.uid,
@@ -91,7 +91,7 @@ export class AuthService {
     );
   }
 
-  private buildNewUserData(firebaseUser: FirebaseUser, timestamp: Timestamp): Omit<User, 'uid'> {
+  private buildNewUserData(firebaseUser: FirebaseUser, timestamp: Timestamp): Omit<User, 'id'> {
     const nameParts = this.splitDisplayName(firebaseUser.displayName);
     return {
       email: firebaseUser.email || '',
