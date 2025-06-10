@@ -1,0 +1,125 @@
+@use './../../../../../../styles/colors.scss' as *;
+@use './../../../../../../styles.scss' as *;
+
+.overlay-content {
+    @include displayFlex($fd: column);
+    padding: 40px;
+    border-radius: 30px;
+    border-top-right-radius: 0;
+    width: 420px;
+    background-color:var(--white);
+    box-shadow: 5px 5px 5px rgba($color: #000000, $alpha: .2);
+
+    .content-header {
+        width: 100%;
+        @include displayFlex($jc: space-between);
+
+        .content-title {
+            font-weight: 700;
+            font-size: 24px;
+        }
+
+        .close {
+            padding: 5px;
+            cursor: pointer;  
+            background-color: var(--white);  
+            border-radius: 50%;
+
+            .close-content {
+                width: 24px;
+                height: 24px;
+                background: {
+                    image: url('/icons/close.png');
+                };
+            }
+
+            &:hover {
+                background: var(--bg-color);
+                .close-content {
+                    background: {
+                        image: url('/icons/close_hover.png');
+                        
+                    };
+                }
+            }
+        }
+    }
+    ul {
+        margin-top: 30px;
+        margin-bottom: 30px;
+        width: 100%;    
+        @include displayFlex($fd: column, $g: 20px, $ai: flex-start);
+        
+        li {
+            margin-left: 20px;
+            .li-content {
+                border-radius: 20px;
+                padding: 4px 20px;
+                @include displayFlex($g: 15px, $jc: flex-start);
+                .avatar-div {
+                    width: 50px;
+                    height: 50px;
+                    position: relative;
+                    >img {
+                        width: 100%;
+                        height: 100%;
+                        border-radius: 50%;
+                        background-color: var(--purple-2);
+                    }
+                    >.active-status {
+                        position: absolute;
+                        border-radius: 50%;
+                        bottom: 0;
+                        right: 0;
+                        width: 14px;
+                        height: 14px;
+                        background-color: var(--green);
+                        border: 2px solid var(--white);
+
+                        &.offline {
+                            background-color: var(--grey) !important;
+                        }
+                    }
+                }
+                .name {
+                    font-size: 18px;
+                    font-weight: 400;
+                }
+            }
+
+            &:hover {
+                border-radius: 30px;
+                background-color: var(--bg-color);
+            }
+        }
+    }
+
+    .footer {
+        width: 100%;
+        font-size: 18px;
+        .footer-content {
+            width: fit-content;
+            margin-left: 20px;   
+            border-radius: 30px;
+            padding: 4px 0;
+            @include displayFlex($g:20px, $jc: flex-start);
+            .add-member{
+                margin-left: 20px;
+                border-radius: 50%;
+                @include imgButton($wh:40px, $url:'/icons/add_member.png');
+                
+            }
+            span {
+                margin-right: 20px;
+            }
+    
+            &:hover {
+                color: var(--purple-3);
+                background-color: var(--bg-color);
+                .add-member{
+                    background-image: url('/icons/add_member_hover.png');
+                }
+            }
+        }
+    }
+}

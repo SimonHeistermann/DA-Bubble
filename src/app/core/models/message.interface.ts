@@ -4,7 +4,7 @@ export interface Message {
     conversationId: string;          
     authorId: string;                
     content: string;
-    type: 'text';
+    // type: 'text';
     timestamp: Timestamp;
     editedAt?: Timestamp;
     isEdited: boolean;
@@ -14,9 +14,10 @@ export interface Message {
 }
 
 export interface ThreadMessage {
+    messageId: string;
     authorId: string;               
     content: string;
-    type: 'text';
+    // type: 'text';
     timestamp: Timestamp;
     editedAt?: Timestamp;
     isEdited: boolean;
@@ -28,5 +29,6 @@ export interface MessageReactions {
     [emoji: string]: {
       users: string[]; 
       count: number;
+      emojiUrl?: string; 
     };
 }

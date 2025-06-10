@@ -1,0 +1,43 @@
+<main class="main-content">
+    <div class="container-head">
+        <div class="new-message-to" *ngIf="showHeader == 'new'">
+
+        </div>
+        <div class="channel-message" *ngIf="showHeader == 'channel'">
+            <div class="channel-message-left pointer">
+                <span class="tag"></span>
+                <span class="channel-name">{{ channel?.name }}</span>
+                <span class="arrow-down"></span>
+            </div>
+            <div class="channel-message-right">
+                <div class="logos-number pointer" #userList (click)="openUserListOverlay()">
+                    <div class="logos">
+                        @for (user of allUsers.slice(0, 3); let index = $index; track $index) {
+                            <img [src]="user?.photoURL?.startsWith('http') ? '/icons/avatars/avatar_1.png' : user?.photoURL">
+                        }
+                    </div>
+                    <span class="number">{{ allUsers.length + 1}}</span>
+                </div>
+                <button class="add-member pointer" #addMember (click)="openAddMemberOverlay()"></button>
+                
+            </div>
+        </div>
+        <div class="direct-message" *ngIf="showHeader == 'direct'">
+
+        </div>
+    </div>
+    <div class="container-body">
+
+    </div>
+    <div class="container-input">
+        <app-input></app-input>
+    </div>
+</main>
+
+
+<ng-template #addChannelUserTemplate>
+    <app-add-channel-user (closeOverlayEmitter)="closeOverlay()"></app-add-channel-user>
+</ng-template>
+<ng-template #channelUserListTemplate>
+    <app-channel-user-list (closeOverlayEmitter)="closeOverlay()" (addMemberEmitter)="onAddMemberFromChannelUserList()" [currentUser]="currentUser" [allUsers]="allUsers"></app-channel-user-list>
+</ng-template>
