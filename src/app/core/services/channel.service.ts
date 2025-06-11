@@ -53,8 +53,6 @@ export class ChannelService implements OnDestroy{
         return this.dataService.subscribeToCollection(this.CHANNEL_COL_NAME, callback, where('name', '==',  name)); 
     }
 
-
-
     createTimestamp(): Timestamp {
         return Timestamp.now();
     }
