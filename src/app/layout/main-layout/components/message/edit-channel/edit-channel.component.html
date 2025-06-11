@@ -1,0 +1,71 @@
+
+<div class="add-channel-user-content overlay-content" @slideFadeIn (click)="$event.stopPropagation()">
+    <div class="content-header">
+        <h3 class="content-title">Leute hinzufügen</h3>
+        <div class="close" (click)="closeOverlay()">
+            <div class="close-content"></div>
+        </div>
+    </div>
+
+    <div class="content-scroll scrollbar__none">
+        <div class="content-top" [class.no-border]="showChannelNameInput" [@padding20]="!showChannelNameInput ? 'open' : 'closed'">
+            <div class="content-subtitle-wrapper">
+                <div class="subtitle">Channel-Name</div>
+                @if (currentChannel?.name !== 'Allgemein') {
+                    <button class="edit" (click)="clickEditName()" *ngIf="!showChannelNameInput">Bearbeiten</button>
+                } 
+               
+                <button class="edit" (click)="clickSaveName()" *ngIf="showChannelNameInput">Speichern</button>
+            </div>
+            <div class="channel-name-input-wrapper">
+                <div class="channel-name" *ngIf="!showChannelNameInput">
+                    <img src="/icons/tag.png" alt="">
+                    <span>{{ currentChannel?.name }}</span>
+                </div>
+                <div class="channel-name-input" *ngIf="showChannelNameInput">
+                    <span></span>
+                    @if (currentChannel) {
+                        <input [(ngModel)]="channelName" class="channel-name-input" type="text">
+                    }
+                </div>
+            </div>
+            
+        </div>
+        <div class="content-bottom" [class.no-border]="showDescriptionInput" [@padding20]="!showDescriptionInput ? 'open' : 'closed'">
+            <div class="description-wrapper">
+                <div class="content-subtitle-wrapper">
+                    <div class="subtitle">Beschreibung</div>
+                    @if (currentChannel?.name !== 'Allgemein') {
+                        <button class="edit" *ngIf="!showDescriptionInput" (click)="clickEditDescription()">Bearbeiten</button>
+                    }
+                    <button class="edit" *ngIf="showDescriptionInput" (click)="clickSaveDescription()">Speichern</button>
+                </div>
+                <div class="description-input">
+                    <p *ngIf="!showDescriptionInput"> {{ currentChannel?.description }}</p>
+                    @if (currentChannel) {
+                        <textarea class="scrollbar__none" [(ngModel)]="channelDescription" *ngIf="showDescriptionInput" type="text" name="description" autoResize></textarea>
+                    }
+                    
+                </div>
+            </div>
+            <div class="divide-line"></div>
+            <div class="createdby-wrapper">
+                <div class="subtitle">Erstellt von</div>
+                <p class="createdby">
+                    @if (currentChannel?.name === 'Allgemein') { 
+                        {{ currentChannel?.createdBy }}
+                    } @else { 
+                        {{ createdUser?.displayName }}
+                    }
+                </p>
+            </div>
+        </div>
+    </div>
+   
+    @if (this.currentChannel?.name !== 'Allgemein') {
+        <div class="content-footer">
+            <button class="pointer active" (click)="clickLeaveChannel()">Channel verlasssen</button>
+        </div>
+    }
+   
+</div>

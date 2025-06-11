@@ -3,13 +3,14 @@
     <div class="main-container">
         <div class="side-bar" >
             <app-sidebar 
+                #sidebar
                 (addChannel)="onAddChannel()" 
                 [showSelf]="showSidebar" 
                 (clickChannelNameEmitter)="onClickChannelName($event)">
             </app-sidebar>
         </div>
         <div class="message">
-            <app-message [channel]="clickedChannel"></app-message>
+            <app-message #message [channel]="clickedChannel" (leaveChannelEmitter)="onLeaveChannel()"></app-message>
         </div>
     </div>
     <div class="overlay-bar" [ngClass]="{'show-menu': showSidebar, 'hide-menu': !showSidebar}" #overlay (click)="toggleMenu()">

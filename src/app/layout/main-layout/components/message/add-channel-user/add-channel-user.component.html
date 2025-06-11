@@ -16,6 +16,6 @@
             <app-user-list class="user-list" *ngIf="showUserList" [dataSource]="filteredUsers" [tagIDs]="tagIDs" (clickedUser)="onClickedUser($event)"></app-user-list>
         </div>
         <div class="content-footer">
-            <button >Erstellen</button>
+            <button [class.active]="showActiveButtonInAddUser" (click)="clickAddChannelUser()">Hinzufügen</button>
         </div>
     </div>

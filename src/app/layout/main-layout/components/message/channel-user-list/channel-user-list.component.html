@@ -6,30 +6,14 @@
             <div class="close-content"></div>
         </div>
     </div>
-    <ul>
-        <li class="current-user pointer">
-            <div class="li-content">
-                <div class="avatar-div">
-                    <img [src]="currentUser?.photoURL?.startsWith('http') ? '/icons/avatars/avatar_1.png' : currentUser?.photoURL">
-                   
-                    @if(!currentUser?.isActive) {
-                        <span class="active-status offline"></span>
-                    } @else {
-                        <span class="active-status"></span>
-                    }
-                    
-                </div>
-                <span class="name">
-                    {{ currentUser?.displayName }} (Du)
-                </span>
-            </div>
-        </li>
-        @for (user of allUsers; let index = $index; track $index) {
-            <li>
-                <div class="li-content pointer">
+    <div class="ul-wrapper scrollbar">
+        <ul>
+            <li class="current-user pointer">
+                <div class="li-content">
                     <div class="avatar-div">
-                        <img [src]="user?.photoURL?.startsWith('http') ? '/icons/avatars/avatar_1.png' : user?.photoURL">
-                        @if(!user?.isActive) {
+                        <img [src]="currentUser?.photoURL?.startsWith('http') ? '/icons/avatars/avatar_1.png' : currentUser?.photoURL">
+                       
+                        @if(!currentUser?.isActive) {
                             <span class="active-status offline"></span>
                         } @else {
                             <span class="active-status"></span>
@@ -37,12 +21,31 @@
                         
                     </div>
                     <span class="name">
-                        {{ user?.displayName }}
+                        {{ currentUser?.displayName }} (Du)
                     </span>
                 </div>
             </li>
-        }
-    </ul>
+            @for (user of allChannelUsers; let index = $index; track $index) {
+                <li>
+                    <div class="li-content pointer" (click)="showProfile()">
+                        <div class="avatar-div">
+                            <img [src]="user?.photoURL?.startsWith('http') ? '/icons/avatars/avatar_1.png' : user?.photoURL">
+                            @if(!user?.isActive) {
+                                <span class="active-status offline"></span>
+                            } @else {
+                                <span class="active-status"></span>
+                            }
+                            
+                        </div>
+                        <span class="name">
+                            {{ user?.displayName }}
+                        </span>
+                    </div>
+                </li>
+            }
+        </ul>
+    </div>
+   
     <div class="footer">
         <div class="footer-content pointer" (click)="addMember()">
             <button class="add-member"></button>
@@ -50,3 +53,8 @@
         </div>
     </div>
 </div>
+
+<!-- <app-add-channel (closeOverlayEmitter)="showAddChannelOverlay = false"  *ngIf="showAddChannelOverlay"></app-add-channel>
+ -->
+
+<app-profile *ngIf="showProfileOverlay"></app-profile>

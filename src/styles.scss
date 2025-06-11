@@ -67,7 +67,11 @@ button {
     }
 }
 
-input:focus {
+input, textarea {
+  font-family: fonts.$font-family-nunito;
+}
+
+input:focus, textarea:focus {
   outline: none;
 }
 
@@ -92,7 +96,7 @@ input:focus {
   cursor: pointer;
 }
 
-.scollbar {
+.scrollbar {
   scrollbar-width: thin;
   scrollbar-color: var(--bg-color) transparent;
   // scrollbar-arrow-color: transparent;
@@ -116,6 +120,14 @@ input:focus {
 
   &::-webkit-scrollbar-button {
     display: none;
+  }
+}
+
+.scrollbar__none {
+  scrollbar-width: none;  /* Firefox */
+  -ms-overflow-style: none; /* IE 10+ */
+  &::-webkit-scrollbar {
+      display: none;
   }
 }
 

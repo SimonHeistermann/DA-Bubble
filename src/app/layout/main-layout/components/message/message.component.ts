@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, inject, Input, OnChanges, OnInit, SimpleChanges } from '@angular/core';
+import { AfterViewInit, Component, EventEmitter, inject, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
 import { InputComponent } from '../shared/input/input.component';
 import { CommonModule } from '@angular/common';
 import { Channel } from '../../../../core/models/channel.interface';
@@ -20,11 +20,12 @@ import {
 import { OverlayService } from '../../../../core/services/overlay.service';
 import { AuthService } from '../../../../core/services/auth-service/auth.service';
 import { ChannelUserListComponent } from './channel-user-list/channel-user-list.component';
+import { EditChannelComponent } from './edit-channel/edit-channel.component';
 
 
 @Component({
   selector: 'app-message',
-  imports: [InputComponent, CommonModule, AddChannelUserComponent, ChannelUserListComponent],
+  imports: [InputComponent, CommonModule, AddChannelUserComponent, ChannelUserListComponent, EditChannelComponent],
   standalone: true,
   templateUrl: './message.component.html',
   styleUrl: './message.component.scss',
@@ -36,16 +37,24 @@ export class MessageComponent implements OnInit, OnChanges, AfterViewInit{
   @ViewChild('addMember') addMemberRef!: ElementRef;
   @ViewChild('channelUserListTemplate') channelUserListTemplate!: TemplateRef<any>;
   @ViewChild('userList') userListRef!: ElementRef;
+  @ViewChild('editChannelTemplate') editChannelTemplate!: TemplateRef<any>;
+  @ViewChild('editChannel') editChannelRef!: ElementRef;
+
   overlayRef!: OverlayRef;
   overlayService = inject(OverlayService);
   viewContainerRef = inject(ViewContainerRef);
 
+  @Input() channel: Channel | null = null;
+
+  @Output() leaveChannelEmitter = new EventEmitter<void>();
 
   private subscriptions = new Subscription();
   showHeader: 'direct' | 'channel' | 'new' = 'channel';
-  showAddChannelUserOverlay = true;
+  activeChannelUserButton = false;
+  activeOpenUserButton = false;
+  activeEditChannelButton = false;
  
-  @Input() channel: Channel | undefined;
+  
   userService = inject(UserService);
   allUsers: User[] = [];
   authService = inject(AuthService);
@@ -53,7 +62,6 @@ export class MessageComponent implements OnInit, OnChanges, AfterViewInit{
 
   ngOnInit(): void {
     this.subCurrentUser();
-    
   }
 
   ngAfterViewInit(): void {
@@ -108,6 +116,11 @@ export class MessageComponent implements OnInit, OnChanges, AfterViewInit{
   }
 
   openUserListOverlay() {
+    this.activeOpenUserButton = true; 
+    let positions = this.overlayService.defaultPositions;
+    positions[0] = { originX: 'end', originY: 'bottom', overlayX: 'end', overlayY: 'top' };
+
+
     this.overlayRef = this.overlayService.openTemplateOverlay(
       this.userListRef, 
       this.channelUserListTemplate, 
@@ -118,9 +131,27 @@ export class MessageComponent implements OnInit, OnChanges, AfterViewInit{
   }
 
   openAddMemberOverlay() {
+    this.activeChannelUserButton = true;
+    let positions = this.overlayService.defaultPositions;
+    positions[0] = { originX: 'end', originY: 'bottom', overlayX: 'end', overlayY: 'top' };
+
     this.overlayRef = this.overlayService.openTemplateOverlay(
       this.addMemberRef, 
       this.addChannelUserTemplate, 
+      this.viewContainerRef, 
+    );
+
+    this.overlayRef.backdropClick().subscribe(() => this.closeOverlay());
+  }
+
+  openEditChannelOverlay(){
+    this.activeEditChannelButton = true;
+    let positions = this.overlayService.defaultPositions;
+    positions[0] = { originX: 'start', originY: 'bottom', overlayX: 'start', overlayY: 'top' };
+
+    this.overlayRef = this.overlayService.openTemplateOverlay(
+      this.editChannelRef, 
+      this.editChannelTemplate, 
       this.viewContainerRef, 
     );
 
@@ -133,9 +164,16 @@ export class MessageComponent implements OnInit, OnChanges, AfterViewInit{
   }
 
   closeOverlay() {
+    this.activeChannelUserButton = false;
+    this.activeOpenUserButton = false;
     this.overlayRef?.detach();
   }
 
+  closeEditChannelOverlay(isLeaving: boolean) {
+    this.activeEditChannelButton = false;
+    if(isLeaving) this.leaveChannelEmitter.emit();
+    this.overlayRef?.detach();
+  }
 
 
 }
