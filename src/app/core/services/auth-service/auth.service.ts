@@ -6,8 +6,10 @@ import { User as FirebaseUser, Unsubscribe } from 'firebase/auth';
 import { Timestamp } from 'firebase/firestore';
 import { FirebaseService } from './../firebase-service/firebase.service';
 import { UserService } from './../user-service/user.service';
+import { ChannelService } from '../channel.service';
 import { LoginCredentials, RegisterData, AuthUser } from './../../models/auth.interface';
 import { User } from '../../models/user.interface';
+import { Channel } from '../../models/channel.interface';
 import { APP_CONSTANTS } from '../../constants/app.constants';
 
 @Injectable({
@@ -23,6 +25,7 @@ export class AuthService {
   constructor(
     private firebaseService: FirebaseService,
     private userService: UserService,
+    private channelService: ChannelService,
     private router: Router
   ) {
     this.initializeAuthStateListener();
@@ -40,11 +43,19 @@ export class AuthService {
 
   private async handleAuthStateChange(firebaseUser: FirebaseUser | null): Promise<void> {
     if (firebaseUser) {
-      const authUser = this.mapFirebaseUserToAuthUser(firebaseUser);
-      this.currentUserSubject.next(authUser);
-      await this.syncUserToFirestore(firebaseUser);
+      await this.processAuthenticatedUser(firebaseUser);
     } else {
       this.currentUserSubject.next(null);
+    }
+  }
+
+  private async processAuthenticatedUser(firebaseUser: FirebaseUser): Promise<void> {
+    const authUser = this.mapFirebaseUserToAuthUser(firebaseUser);
+    this.currentUserSubject.next(authUser);
+    const isNewUser = await this.syncUserToFirestore(firebaseUser);
+    
+    if (isNewUser) {
+      await this.addUserToAllgemeinChannel(firebaseUser.uid);
     }
   }
 
@@ -60,18 +71,25 @@ export class AuthService {
 
   // ========== FIRESTORE SYNC ==========
 
-  private async syncUserToFirestore(firebaseUser: FirebaseUser): Promise<void> {
+  private async syncUserToFirestore(firebaseUser: FirebaseUser): Promise<boolean> {
     try {
       const existingUser = await this.getExistingUser(firebaseUser.uid);
       const now = Timestamp.now();
       
-      if (!existingUser) {
-        await this.createNewUserInFirestore(firebaseUser, now);
-      } else {
-        await this.updateUserLastSeen(firebaseUser.uid, now);
-      }
+      return await this.handleUserSync(firebaseUser, existingUser, now);
     } catch (error) {
       console.error('Error syncing user to Firestore:', error);
+      return false;
+    }
+  }
+
+  private async handleUserSync(firebaseUser: FirebaseUser, existingUser: any, now: Timestamp): Promise<boolean> {
+    if (!existingUser) {
+      await this.createNewUserInFirestore(firebaseUser, now);
+      return true;
+    } else {
+      await this.updateUserLastSeen(firebaseUser.uid, now);
+      return false;
     }
   }
 
@@ -93,6 +111,10 @@ export class AuthService {
 
   private buildNewUserData(firebaseUser: FirebaseUser, timestamp: Timestamp): Omit<User, 'id'> {
     const nameParts = this.splitDisplayName(firebaseUser.displayName);
+    return this.createUserDataObject(firebaseUser, timestamp, nameParts);
+  }
+
+  private createUserDataObject(firebaseUser: FirebaseUser, timestamp: Timestamp, nameParts: {firstName: string, lastName: string}): Omit<User, 'id'> {
     return {
       email: firebaseUser.email || '',
       displayName: firebaseUser.displayName || '',
@@ -125,6 +147,48 @@ export class AuthService {
         isActive: true
       }
     );
+  }
+
+  // ========== CHANNEL ASSIGNMENT ==========
+
+  private async addUserToAllgemeinChannel(userId: string): Promise<void> {
+    try {
+      const allgemeinChannel = await this.findAllgemeinChannel();
+      
+      if (allgemeinChannel) {
+        await this.addUserToChannelIfNotExists(allgemeinChannel, userId);
+      } else {
+        console.warn('Allgemein channel not found');
+      }
+    } catch (error) {
+      console.error('Error adding user to Allgemein channel:', error);
+    }
+  }
+
+  private async addUserToChannelIfNotExists(channel: Channel, userId: string): Promise<void> {
+    const currentUserIDs = channel.userIDs || [];
+    
+    if (!currentUserIDs.includes(userId)) {
+      await this.updateChannelWithNewUser(channel, userId, currentUserIDs);
+    }
+  }
+
+  private async updateChannelWithNewUser(channel: Channel, userId: string, currentUserIDs: string[]): Promise<void> {
+    const updatedUserIDs = [...currentUserIDs, userId];
+    await this.channelService.updateChannel(channel.id, {
+      ...channel,
+      userIDs: updatedUserIDs
+    }).toPromise();
+    console.log(`User ${userId} added to Allgemein channel`);
+  }
+
+  private async findAllgemeinChannel(): Promise<Channel | null> {
+    return new Promise((resolve) => {
+      const unsubscribe = this.channelService.getChannelByName('Allgemein', (channels: Channel[]) => {
+        unsubscribe();
+        resolve(channels.length > 0 ? channels[0] : null);
+      });
+    });
   }
 
   // ========== AUTHENTICATION METHODS ==========
@@ -180,9 +244,18 @@ export class AuthService {
     if (!firebaseUser) {
       throw new Error('Registration failed');
     }
-    const displayName = `${registerData.firstName} ${registerData.lastName}`;
+    
+    const displayName = this.buildDisplayName(registerData);
+    return this.updateProfileAndReturnUser(firebaseUser, displayName, registerData.photoURL);
+  }
+
+  private buildDisplayName(registerData: RegisterData): string {
+    return `${registerData.firstName} ${registerData.lastName}`;
+  }
+
+  private updateProfileAndReturnUser(firebaseUser: FirebaseUser, displayName: string, photoURL?: string): Observable<FirebaseUser> {
     return from(
-      this.firebaseService.updateUserProfile(displayName, registerData.photoURL)
+      this.firebaseService.updateUserProfile(displayName, photoURL)
     ).pipe(
       map(() => firebaseUser)
     );
@@ -206,9 +279,9 @@ export class AuthService {
 
   private async updateUserOfflineStatus(): Promise<void> {
     const currentUser = this.currentUserSubject.value;
-    if (!currentUser) return;
-    
-    await this.setUserOfflineStatus(currentUser.uid);
+    if (currentUser) {
+      await this.setUserOfflineStatus(currentUser.uid);
+    }
   }
 
   private async setUserOfflineStatus(uid: string): Promise<void> {
@@ -216,14 +289,18 @@ export class AuthService {
       await this.firebaseService.updateDocument(
         APP_CONSTANTS.COLLECTIONS.USERS,
         uid,
-        {
-          isActive: false,
-          lastSeen: Timestamp.now()
-        }
+        this.buildOfflineStatusUpdate()
       );
     } catch (error) {
       console.error('Error updating offline status:', error);
     }
+  }
+
+  private buildOfflineStatusUpdate(): {isActive: boolean, lastSeen: Timestamp} {
+    return {
+      isActive: false,
+      lastSeen: Timestamp.now()
+    };
   }
 
   private navigateToLogin(): void {
@@ -275,11 +352,15 @@ export class AuthService {
   private waitForCurrentUser(): Observable<AuthUser> {
     this.setLoading(false);
     return this.currentUser$.pipe(
-      map(user => {
-        if (!user) throw new Error('User not found after authentication');
-        return user;
-      })
+      map(user => this.validateCurrentUser(user))
     );
+  }
+
+  private validateCurrentUser(user: AuthUser | null): AuthUser {
+    if (!user) {
+      throw new Error('User not found after authentication');
+    }
+    return user;
   }
 
   private setLoading(loading: boolean): void {
@@ -319,8 +400,12 @@ export class AuthService {
 
   private handleAuthError(error: any): Error {
     const errorMessages = this.getErrorMessages();
-    const message = errorMessages[error.code] || error.message || 'Ein unbekannter Fehler ist aufgetreten';
+    const message = this.getLocalizedErrorMessage(error, errorMessages);
     return new Error(message);
+  }
+
+  private getLocalizedErrorMessage(error: any, errorMessages: {[key: string]: string}): string {
+    return errorMessages[error.code] || error.message || 'Ein unbekannter Fehler ist aufgetreten';
   }
 
   private getErrorMessages(): {[key: string]: string} {
