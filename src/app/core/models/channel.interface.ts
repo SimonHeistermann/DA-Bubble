@@ -5,7 +5,8 @@ export interface ChannelData {
     description?: string;
     createdAt: Timestamp;
     updatedAt: Timestamp;
-    userIDs?: string[];
+    createdBy: string;
+    userIDs: string[];
 }
 
 

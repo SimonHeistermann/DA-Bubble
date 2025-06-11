@@ -45,14 +45,19 @@ export class ChannelService implements OnDestroy{
         return this.dataService.subscribeToCollection(this.CHANNEL_COL_NAME, callback); 
     }
 
-    getChannelsOrderByCreatedAt(callback: (data: Channel[]) => void){
-        return this.dataService.subscribeToCollection(this.CHANNEL_COL_NAME, callback, orderBy('createdAt', 'asc')); 
+    getChannelsOrderByCreatedAt(currentUserID: string, callback: (data: Channel[]) => void){
+        console.log(currentUserID);
+        
+        return this.dataService.subscribeToCollection(
+            this.CHANNEL_COL_NAME, callback, 
+            orderBy('createdAt', 'asc'),
+            where('userIDs', 'array-contains', currentUserID),
+        ); 
     }
 
     getChannelByName(name: string, callback: (data: Channel[]) => void){
         return this.dataService.subscribeToCollection(this.CHANNEL_COL_NAME, callback, where('name', '==',  name)); 
     }
-
 
 
     createTimestamp(): Timestamp {

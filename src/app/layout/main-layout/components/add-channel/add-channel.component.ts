@@ -50,6 +50,7 @@ export class AddChannelComponent implements OnDestroy {
   channel:Partial<ChannelData> = {
     name: 'New Channel',
     description: '',
+    createdBy: '',
     userIDs: []
   };
 
@@ -67,7 +68,7 @@ export class AddChannelComponent implements OnDestroy {
     this.subscriptions.add(
       this.userService.currentUser$.subscribe(user => {
         this.currentUser = user;
-        console.log(this.currentUser);
+        this.channel.createdBy = this.currentUser?.id;
       })
     );
   }
@@ -135,8 +136,6 @@ export class AddChannelComponent implements OnDestroy {
       }
       this.addOneChannelToDB();
     }
-
-    
   }
 
   clickAddAllUserFromAllgemin() {

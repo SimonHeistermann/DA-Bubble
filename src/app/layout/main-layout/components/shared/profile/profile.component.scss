@@ -1,0 +1,88 @@
+
+@use './../../../../../../styles/colors.scss' as *;
+@use './../../../../../../styles.scss' as *;
+@use './../../../../../../styles/overlay.scss' as *;
+
+
+.overlay-content {
+    width: 380px !important;
+    gap: 30px !important;
+    .img-wrapper {
+
+        img {
+            border-radius: 50%;
+            width: 200px;
+            height: 200px;
+        }
+    }
+    .name-wrapper {
+        width: 100%;
+        @include displayFlex($fd:column, $g:10px, $ai: flex-start);
+        >span {
+            font-weight: 700;
+            font-size: 32px;
+        }
+        .status {
+            @include displayFlex($g:20px, $jc: flex-start);
+            >span:nth-child(1) {
+                display: inline-block;
+                width: 16px;
+                height: 16px;
+                background-color: var(--green);
+                border-radius: 50%;
+            }
+            >span:nth-child(2) {
+                color: var(--green);
+                font-weight: 400;
+                font-size: 20px;
+            }
+            &.offline {
+                >span:nth-child(1) {
+                    background-color: var(--grey);
+                }
+                > span:nth-child(2) {
+                    color: var(--grey);
+                }
+            }
+        }
+        
+    }
+    .email-wrapper {
+        width: 100%;
+        @include displayFlex($g:20px, $jc: flex-start);
+        .email-left {
+            height: 61px;
+            @include displayFlex($ai: flex-start);
+
+        }
+        .email-right {
+            @include displayFlex($g:10px, $ai: flex-start, $fd: column);
+            >span {
+                font-size: 20px;
+                font-weight: 700;
+            }
+            >a{
+                font-weight: 400;
+                font-size: 18px;
+            }
+        }
+
+    }
+    .footer {
+        .button {
+            height: 50px;
+            background-color: var(--purple-1);
+            border-radius: 50px;
+            padding: 12px 25px;
+            @include displayFlex($g:10px);
+            >img {
+
+            }
+            >span {
+                color: var(--white);
+            }
+        }
+    }
+}
+
+

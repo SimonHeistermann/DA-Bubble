@@ -1,0 +1,44 @@
+
+<div class="overlay" (click)="closeOverlay()" >
+    <div class="overlay-container">
+        <div class="overlay-content"  (click)="$event.stopPropagation()">
+            <div class="content-header">
+                <h3 class="content-title">Profile</h3>
+                <div class="close" (click)="closeOverlay()">
+                    <div class="close-content"></div>
+                </div>
+            </div>
+            <div class="img-wrapper">
+                <img src="icons/avatars/avatar_1.png" alt="">
+            </div>
+            <div class="name-wrapper">
+                <span>Sofia Müller</span>
+                <div class="status">
+                    <span></span>
+                    <span>Aktiv</span>
+                </div>
+                <div class="status offline">
+                    <span></span>
+                    <span>Abwesend</span>
+                </div>
+            </div>
+            <div class="email-wrapper">
+                <div class="email-left">
+                    <img src="icons/mail.png" alt="">
+                    
+                </div>
+                <div class="email-right">
+                    <span>E-Mail-Addresse</span>
+                    <a href="mailto:sofia.muel@beispeil.com">sofia.muel&#64;beispeil.com</a>
+                </div>
+            </div>
+            <div class="footer">
+                <div class="button pointer">
+                    <img src="icons/message.png" alt="">
+                    <span>Nachricht</span>
+                </div>
+            </div>
+            
+        </div>
+    </div>
+</div>

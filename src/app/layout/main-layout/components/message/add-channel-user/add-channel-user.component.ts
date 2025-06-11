@@ -25,7 +25,10 @@ export class AddChannelUserComponent implements OnDestroy {
   filteredUsers: User[] = [];
   allUsers: User[] = [];
 
-  currentUser: User | null = null;
+  @Input() currentUser: User | null = null;
+  @Input() allChannelUsers: User[] = [];
+  @Input() currentChannel: Channel | null = null;
+
   private subscriptions = new Subscription();
   authService = inject(AuthService);
   userService = inject(UserService);
@@ -40,31 +43,10 @@ export class AddChannelUserComponent implements OnDestroy {
   editorOverflowStyle = 'hidden';
 
   showUserList = false;
-  errMsg = '';
-  
-  channel:Partial<ChannelData> = {
-    name: 'New Channel',
-    description: '',
-    userIDs: []
-  };
+ 
 
   ngOnInit() {
-    
-    this.subCurrentUser();
     this.subAllUsers();
-  }
-
-  subCurrentUser(){
-    const authUser = this.authService.currentUser;
-    if (authUser) {
-      this.userService.loadCurrentUser(authUser.uid);
-    }
-    this.subscriptions.add(
-      this.userService.currentUser$.subscribe(user => {
-        this.currentUser = user;
-        console.log(this.currentUser);
-      })
-    );
   }
 
   subAllUsers() {
@@ -75,15 +57,19 @@ export class AddChannelUserComponent implements OnDestroy {
       }));
   }
   
-  
-  filterOutCurrentUser() {
-    const i = this.filteredUsers.findIndex(u => u.id === (this.currentUser?.id || '') );
-    if (i !== -1) this.filteredUsers.splice(i, 1);
+  filterOutExitedUsers() {
+    this.filteredUsers = this.filteredUsers.filter(u => u.id !== this.currentUser?.id);
+    for (let index = 0; index < this.filteredUsers.length; index++) {
+      const u = this.filteredUsers[index];
+      const i = this.allChannelUsers.findIndex(existedUser => existedUser.id === u.id);
+      if (i !== -1) {
+        this.filteredUsers.splice(index, 1);
+        index --;
+      }
+    }
   }
 
-  filterOutChosenUser() {
-    this.filterOutCurrentUser();
-
+  filterOutChosenUsers() {
     for (let index = 0; index < this.filteredUsers.length; index++) {
       const u = this.filteredUsers[index];
       const i = this.tagIDs.findIndex(tagID => tagID === u.id);
@@ -99,10 +85,10 @@ export class AddChannelUserComponent implements OnDestroy {
   }
 
   onEditorValueChanged(html: string) {
-    
     if(html.trim().length > 0) {
       this.filteredUsers = this.allUsers.filter(u => u.displayName.toLowerCase().includes(html.toLowerCase()));
-      this.filterOutChosenUser();
+      this.filterOutChosenUsers();
+      this.filterOutExitedUsers();
 
       this.showUserList = true;
     } else {
@@ -120,6 +106,29 @@ export class AddChannelUserComponent implements OnDestroy {
 
   onClickedUser(u: User) {
     this.richtextEditorRef.insertTag(u);
+  }
+
+  clickAddChannelUser() {
+    if (this.currentChannel && this.tagIDs.length > 0) {
+      this.currentChannel.userIDs?.push(...this.tagIDs);
+      let {id, ...channelData} = this.currentChannel;
+      // let channelData = ;
+      this.subscriptions.add( 
+        this.channelService.updateChannel(this.currentChannel?.id, channelData).subscribe({
+          next: () => {
+            console.log('Channel members updated');
+            
+          },
+          error: (e)=> {
+
+          },
+          complete: () => {
+            this.closeOverlayEmitter.emit();
+          }
+        })
+      );
+    }
+   
   }
 
   closeOverlay() {

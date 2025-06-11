@@ -161,19 +161,15 @@
             ul {
                 @include displayFlex($fd: column, $g: 20px, $ai: flex-start);
                 li {
+                    width: 100%;
+                    border-radius: 20px;
                     font-size: 18px;
                     @include displayFlex($jc: flex-start, $g: 10px);
-                    &:hover {
-                        &:hover {
-                            border-radius: 30px;
-                            background-color: var(--bg-color);
-                        }
-                    }
-
                 }
                 li.add-channel-li {
-                    
                     margin-left: 20px;
+                    margin-right: 20px;
+                    width: calc(100% - 40px);
                     .add-channel-li-content {
                         border-radius: 20px;
                         padding: 4px 20px;
@@ -188,20 +184,23 @@
                     &:hover {
                         color: var(--purple-3);
                         .add-btn-circle {
-                            background-image: url('/icons/add_circle_hover.png');
+                            background-image: url('/icons/add_circle_hover.png') !important;
                         }
                     }
                     &:active, &.active {
                         .add-btn-circle {
-                            background-image: url('/icons/add_circle_click.png');
+                            background-image: url('/icons/add_circle_click.png') !important;
                         }
                     }
                     
                 }
                 li.channel-li {
                     margin-left: 20px;
+                    margin-right: 20px;
+                    
                     .channel-li-content {
-                        border-radius: 20px;
+                        width: calc(100% - 40px);
+                        border-radius: 30px;
                         padding: 4px 20px;
                         @include displayFlex($jc: flex-start, $g: 10px);
                         
@@ -211,13 +210,18 @@
                             background-image: url('/icons/tag.png');
                         }
 
+                        &:hover {
+                            background-color: var(--bg-color);
+                            
+                        }
+
                     }
 
                     &.selected {
                         .channel-li-content { 
                             background-color: var(--bg-color);
                             .tag {
-                                background-image: url('/icons/tag_hover.png');
+                                background-image: url('/icons/tag_click.png');
                             }
                             .channel-name {
                                 font-weight: 700;
@@ -249,6 +253,8 @@
                 
                 li {
                     margin-left: 20px;
+                    margin-right: 20px;
+                    width: calc(100% - 40px);
                     .li-content {
                         border-radius: 20px;
                         padding: 4px 20px;
