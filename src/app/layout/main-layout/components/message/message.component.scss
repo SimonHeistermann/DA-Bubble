@@ -49,6 +49,16 @@
                         background-image: url('/icons/arrow_down1_hover.png');
                     }
                 }
+                &:active, &.active {
+                    color: var(--purple-3);
+                    background-color: var(--bg-color);
+                    .tag {
+                        background-image: url('/icons/tag_click.png');
+                    }
+                    .arrow-down {
+                        background-image: url('/icons/arrow_down1_hover.png');
+                    }
+                }
             }   
 
             .channel-message-right {
@@ -72,7 +82,7 @@
                         font-size: 20px;
                         font-weight: 600;
                     }
-                    &:hover {
+                    &:hover, &.active {
                         color: var(--purple-3);
                         background-color: var(--bg-color);
                     }
@@ -83,6 +93,10 @@
                     &:hover {
                         background-image: url('/icons/add_member_hover.png');
                     }
+                    &:active, &.active {
+                        background-image: url('/icons/add_member_hover.png');
+                    }
+
                 }
             }
         }

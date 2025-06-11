@@ -16,10 +16,12 @@ import { MessageComponent } from './components/message/message.component';
   animations: []
 })
 export class MainLayoutComponent  {
+  @ViewChild('sidebar') sidebarRef!:SidebarComponent;
   
   showSidebar = true;
   showAddChannelOverlay = false;
-  clickedChannel: Channel | undefined;
+  clickedChannel: Channel | null = null;
+
   
 
   toggleMenu(){
@@ -33,6 +35,10 @@ export class MainLayoutComponent  {
 
   onClickChannelName(c: Channel){
     this.clickedChannel = c;
+  }
+
+  onLeaveChannel() {
+    this.sidebarRef.clickChannelName(0, this.sidebarRef.channels[0]);
   }
 
 

@@ -35,10 +35,14 @@ export class SidebarComponent implements OnInit, OnDestroy, AfterViewInit {
   openChannel = true;
   openMessage = true;
 
-  currentChannelIndex: number = 0;
+  public currentChannelIndex: number = 0;
 
   ngOnInit(): void {
     
+  }
+
+  ngAfterViewInit() {
+    this.subCurrentUser();
   }
 
   subCurrentUser(){
@@ -50,6 +54,7 @@ export class SidebarComponent implements OnInit, OnDestroy, AfterViewInit {
       this.userService.currentUser$.subscribe(user => {
         this.currentUser = user;
         this.subAllUsers();
+        this.subAllChannels();
       })
     );
   }
@@ -61,6 +66,21 @@ export class SidebarComponent implements OnInit, OnDestroy, AfterViewInit {
         this.allUsers = this.allUsers.filter(u => u.id !== this.currentUser?.id);
         this.checkOverflow();
       }));
+  }
+
+  subAllChannels() {
+    if(!this.currentUser) return;
+    
+    this.subscriptions.add(
+      this.channelService.getChannelsOrderByCreatedAt(this.currentUser.id, (data) => {
+        this.channels.length=0;
+        this.channels.push(...data);
+        
+        if (this.channels.length > 0) {
+          this.clickChannelNameEmitter.emit(this.channels[this.currentChannelIndex]);
+        }
+      })
+    );
   }
 
   clickChannelHead(){
@@ -88,19 +108,7 @@ export class SidebarComponent implements OnInit, OnDestroy, AfterViewInit {
     this.subscriptions.unsubscribe();
   }
 
-  ngAfterViewInit() {
-    this.subscriptions.add(
-      this.channelService.getChannelsOrderByCreatedAt((data) => {
-        this.channels = [];
-        this.channels.push(...data);
-        if (this.channels.length > 0) {
-          this.clickChannelNameEmitter.emit(this.channels[0]);
-        }
-      })
-    );
-
-    this.subCurrentUser();
-  }
+  
 
   onSectionAnimationDone() {
     this.checkOverflow();
