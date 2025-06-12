@@ -106,7 +106,8 @@
     }
     
     .container-body-input {
-        height: 100%;
+        height: calc(100% - 54px);
+        overflow: hidden;
         width: 100%;
         @include displayFlex($fd: column);
         .container-body {
@@ -116,6 +117,7 @@
         }
         
         .container-input {
+            flex-shrink: 0;
             width: 100%;
         }
     }

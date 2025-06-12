@@ -43,7 +43,7 @@
                 <div class="description-input">
                     <p *ngIf="!showDescriptionInput"> {{ currentChannel?.description }}</p>
                     @if (currentChannel) {
-                        <textarea class="scrollbar__none" [(ngModel)]="channelDescription" *ngIf="showDescriptionInput" type="text" name="description" autoResize></textarea>
+                        <textarea autoResize [styles]="{'fontSize': '18px', 'padding': '18px 20px', 'lineHeight': 'normal'}" class="scrollbar__none" [(ngModel)]="channelDescription" *ngIf="showDescriptionInput" type="text" name="description"></textarea>
                     }
                     
                 </div>

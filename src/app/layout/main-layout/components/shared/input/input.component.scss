@@ -21,15 +21,17 @@ textarea {
     box-sizing: border-box;
     width: 100%;
     font-size: 16px;
-    padding: 0 15px;           
+    padding: 0 12px;  
+    letter-spacing: normal;         
     height: auto;          
     overflow: hidden;
     resize: none;
     border: none;
     background-color: #fff;
     color: #686868;
-    height: 25px; 
-    line-height: 25px;
+    height: 30px; 
+    line-height: 30px;
+
 
     &:focus {
         outline: none;

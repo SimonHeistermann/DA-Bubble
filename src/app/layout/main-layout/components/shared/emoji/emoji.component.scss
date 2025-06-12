@@ -1,0 +1,9 @@
+
+@use './../../../../../../styles.scss' as *;
+span {
+    @include displayFlex();
+    img {
+        width: 20px;
+        height: 20px;
+    }
+}

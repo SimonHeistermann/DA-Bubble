@@ -8,23 +8,26 @@
                     <div class="close-content"></div>
                 </div>
             </div>
-            <div class="content-description">
-                Chnnels dienen deinem Team zur Kommunikation. Am besten sollten sie themenbezogen sein, #marketing zum Beispiel.
-            </div>
-            <div class="input-div">
-                <div class="input-div-header">
-                    <label for="chanel-text" class="content-subtitle">Channel-Name</label>
-                    <span *ngIf="showChannelNameError">{{ errMsg}}</span>
+            <div class="content-scroll scrollbar__none">
+                <div class="content-description">
+                    Chnnels dienen deinem Team zur Kommunikation. Am besten sollten sie themenbezogen sein, #marketing zum Beispiel.
                 </div>
-                <div class="channel-name">
-                    <span></span>
-                    <input [(ngModel)]="channel.name" type="text" id="chanel-text" placeholder=" z.B. Kooperationsprojekte" (input)="showChannelNameError = false">
+                <div class="input-div">
+                    <div class="input-div-header">
+                        <label for="chanel-text" class="content-subtitle">Channel-Name</label>
+                        <span *ngIf="showChannelNameError">{{ errMsg}}</span>
+                    </div>
+                    <div class="channel-name">
+                        <span></span>
+                        <input [(ngModel)]="channel.name" type="text" id="chanel-text" placeholder=" z.B. Kooperationsprojekte" (input)="showChannelNameError = false">
+                    </div>
+                
                 </div>
-               
-            </div>
-            <div class="input-div">
-                <label for="chanel-description"><span  class="content-subtitle">Beschreibung</span>(optional)</label>
-                <input  [(ngModel)]="channel.description" type="text" id="chanel-description">
+                <div class="input-div">
+                    <label for="chanel-description"><span  class="content-subtitle">Beschreibung</span>(optional)</label>
+                    <!-- <input  [(ngModel)]="channel.description" type="text" id="chanel-description"> -->
+                    <textarea autoResize [styles]="{'fontSize': '18px', 'padding': '18px 20px', 'lineHeight': 'normal'}" class="scrollbar__none" [(ngModel)]="channel.description"  name="description"></textarea>
+                </div>
             </div>
             <div class="content-footer">
                 <button [class.active]="(channel.name || '').trim().length > 0" (click)="clickCreateChannel()">Erstellen</button>

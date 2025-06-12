@@ -10,12 +10,13 @@ import { Subscription } from 'rxjs';
 import { AuthService } from '../../../../core/services/auth-service/auth.service';
 import { UserService } from '../../../../core/services/user-service/user.service';
 import { Channel, ChannelData } from '../../../../core/models/channel.interface';
+import { AutoResizeDirective } from '../../../../core/directives/auto-resize.directive';
 
 
 @Component({
   selector: 'app-add-channel',
   standalone: true,
-  imports: [CommonModule, FormsModule, RichtextEditorComponent, UserListComponent],
+  imports: [CommonModule, FormsModule, RichtextEditorComponent, UserListComponent, AutoResizeDirective],
   templateUrl: './add-channel.component.html',
   styleUrl: './add-channel.component.scss',
   animations: [verticalExpandCollapseAnimation]
