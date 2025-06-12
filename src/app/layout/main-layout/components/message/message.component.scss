@@ -12,7 +12,8 @@
 
 
     .container-head {
-        height: 96px;
+        height: 80px;
+        flex-shrink: 0;
         width: 100%;
         padding: 0 30px;
         border-top-right-radius: 30px;
@@ -33,7 +34,7 @@
                     @include imgButton($wh: 32px, $url: '/icons/tag.png');
                 }
                 .channel-name {
-                    font-size: 24px;
+                    font-size: 22px;
                 }
                 .arrow-down {
                     @include imgButton($wh: 30px, $url: '/icons/arrow_down1.png');
@@ -80,7 +81,9 @@
                     }
                     .number {
                         font-size: 20px;
-                        font-weight: 600;
+                        font-weight: 400;
+                        font-family: "Segoe UI", sans-serif;
+
                     }
                     &:hover, &.active {
                         color: var(--purple-3);
@@ -102,13 +105,21 @@
         }
     }
     
-    .container-body {
-        flex: 1;
+    .container-body-input {
+        height: 100%;
+        width: 100%;
+        @include displayFlex($fd: column);
+        .container-body {
+            flex: 1;
+            width: 100%;
+            height: 100%;
+        }
+        
+        .container-input {
+            width: 100%;
+        }
     }
     
-    .container-input {
-        width: 100%;
-    }
 }
 
 

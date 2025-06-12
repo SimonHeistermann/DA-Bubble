@@ -46,8 +46,6 @@ export class ChannelService implements OnDestroy{
     }
 
     getChannelsOrderByCreatedAt(currentUserID: string, callback: (data: Channel[]) => void){
-        console.log(currentUserID);
-        
         return this.dataService.subscribeToCollection(
             this.CHANNEL_COL_NAME, callback, 
             orderBy('createdAt', 'asc'),

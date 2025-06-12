@@ -1,4 +1,4 @@
-import { Component, ElementRef, EventEmitter, inject, Input, OnDestroy, Output, ViewChild } from '@angular/core';
+import { Component, ElementRef, EventEmitter, inject, Input, OnDestroy, Output, TemplateRef, ViewChild, ViewContainerRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ChannelService } from '../../../../../core/services/channel.service';
@@ -11,6 +11,8 @@ import { AuthService } from '../../../../../core/services/auth-service/auth.serv
 import { UserService } from '../../../../../core/services/user-service/user.service';
 import { Channel, ChannelData } from '../../../../../core/models/channel.interface';
 import { slideFadeInAnimation } from '../../../animations/slide.animation';
+import { OverlayRef } from '@angular/cdk/overlay';
+import { OverlayService } from '../../../../../core/services/overlay.service';
 
 
 @Component({
@@ -41,19 +43,32 @@ export class AddChannelUserComponent implements OnDestroy {
 
   showActiveButtonInAddUser = false;
   editorOverflowStyle = 'hidden';
-
   showUserList = false;
  
+  _showOverlay = false;
+  overlayRef!: OverlayRef;
+  overlayService = inject(OverlayService);
+  viewContainerRef = inject(ViewContainerRef);
+  @ViewChild('addChannelUserTemplate') addChannelUserTemplate!: TemplateRef<any>;
+  @Input() addMemberRef: ElementRef | null = null;
 
   ngOnInit() {
     this.subAllUsers();
+  }
+
+  @Input()
+  set showOverlay(value: boolean) {
+    this._showOverlay = value;
+
+    if (value) {
+       this.openAddMemberOverlay();
+    }
   }
 
   subAllUsers() {
     this.subscriptions.add(
       this.userService.allUsers$.subscribe(users => {
         this.allUsers = users;
-        console.log('alluser: ', this.allUsers);
       }));
   }
   
@@ -123,7 +138,7 @@ export class AddChannelUserComponent implements OnDestroy {
 
           },
           complete: () => {
-            this.closeOverlayEmitter.emit();
+            this.closeOverlay();
           }
         })
       );
@@ -132,11 +147,38 @@ export class AddChannelUserComponent implements OnDestroy {
   }
 
   closeOverlay() {
+    this.showActiveButtonInAddUser = false;
+    this.showUserList = false;
     this.closeOverlayEmitter.emit();
+    this.overlayRef?.dispose();
+
+    if (this.richtextEditorRef) {
+      this.richtextEditorRef.clearContent(); 
+    }
+    
   }
 
 
   ngOnDestroy(): void {
     this.subscriptions.unsubscribe();
   }
+
+  openAddMemberOverlay() {
+    console.log('openAddMemberOverlay');
+    
+    if (!this.addMemberRef) return;
+    
+    let positions = this.overlayService.defaultPositions;
+    positions[0] = { originX: 'end', originY: 'bottom', overlayX: 'end', overlayY: 'top' };
+
+    this.overlayRef = this.overlayService.openTemplateOverlay(
+      this.addMemberRef, 
+      this.addChannelUserTemplate, 
+      this.viewContainerRef, 
+    );
+
+    this.overlayRef.backdropClick().subscribe(() => this.closeOverlay());
+  }
+
+   
 }

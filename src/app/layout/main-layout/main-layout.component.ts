@@ -1,45 +1,70 @@
-import { Component, ElementRef, inject, OnDestroy, OnInit, ViewChild } from '@angular/core';
-import { MainHeaderComponent } from './components/main-header/main-header.component';
-import { CommonModule } from '@angular/common';
-import { AddChannelComponent } from './components/add-channel/add-channel.component';
+import { Component, inject,  OnInit,  } from '@angular/core';
 import { ChannelService } from '../../core/services/channel.service';
 import { Subscription } from 'rxjs';
 import { Channel } from '../../core/models/channel.interface';
-import { SidebarComponent } from './components/sidebar/sidebar.component';
-import { MessageComponent } from './components/message/message.component';
+import {Router, RouterOutlet } from '@angular/router';
+import { AuthService } from '../../core/services/auth-service/auth.service';
+import { UserService } from '../../core/services/user-service/user.service';
+import { User } from '../../core/models/user.interface';
 
 @Component({
   selector: 'app-main-layout',
-  imports: [MainHeaderComponent, CommonModule, AddChannelComponent, SidebarComponent, MessageComponent],
+  imports: [RouterOutlet],
   templateUrl: './main-layout.component.html',
   styleUrl: './main-layout.component.scss',
   animations: []
 })
-export class MainLayoutComponent  {
-  @ViewChild('sidebar') sidebarRef!:SidebarComponent;
+export class MainLayoutComponent implements OnInit  {
+  private subscriptions = new Subscription();
+  authService = inject(AuthService);
+  userService = inject(UserService);
+  channelService = inject(ChannelService);
+  router = inject(Router);
+
+  currentUser: User | null = null;
+  channels: Channel[] = [];
   
-  showSidebar = true;
-  showAddChannelOverlay = false;
-  clickedChannel: Channel | null = null;
-
-  
-
-  toggleMenu(){
-    this.showSidebar = !this.showSidebar;
+  ngOnInit() {
+    this.subCurrentUser();
   }
 
-  onAddChannel() {
-    console.log('onAddChannel');
-    this.showAddChannelOverlay = true;
+  subCurrentUser(){
+    const authUser = this.authService.currentUser;
+    if (authUser) {
+      this.userService.loadCurrentUser(authUser.uid);
+    }
+    this.subscriptions.add(
+      this.userService.currentUser$.subscribe(user => {
+        this.currentUser = user;
+        this.subAllChannels();
+      })
+    );
   }
 
-  onClickChannelName(c: Channel){
-    this.clickedChannel = c;
+  subAllChannels() {
+    if(!this.currentUser) return;
+    this.subscriptions.add(
+      this.channelService.getChannelsOrderByCreatedAt(this.currentUser.id, (data) => {
+        this.channels.length=0;
+        this.channels.push(...data);
+
+        const currentUrl = this.router.url;
+        const isAlreadyOnAChannel = currentUrl.includes('/dashboard/channels/');
+
+        
+        if (!isAlreadyOnAChannel && this.channels.length > 0) {
+          const firstChannelId = this.channels[0].id;
+        
+          this.router.navigate(['/dashboard/channels', firstChannelId]);
+        } else {
+          console.warn('No channels available');
+        }
+      })
+    );
   }
 
-  onLeaveChannel() {
-    this.sidebarRef.clickChannelName(0, this.sidebarRef.channels[0]);
+  ngOnDestroy(): void {
+    this.subscriptions.unsubscribe();
   }
-
 
 }

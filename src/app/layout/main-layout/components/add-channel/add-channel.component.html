@@ -1,5 +1,5 @@
 
-<div class="overlay" (click)="closeOverlay()" >
+<div class="overlay" (click)="closeOverlay()" *ngIf="showOverlay">
     <div class="overlay-container">
         <div class="create-channel-content overlay-content"  (click)="$event.stopPropagation()"  *ngIf="!showAddUserContent">
             <div class="content-header">

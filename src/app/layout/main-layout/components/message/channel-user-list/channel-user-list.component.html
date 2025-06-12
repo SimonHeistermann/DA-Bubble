@@ -1,36 +1,20 @@
 
-<div class="add-channel-user-content overlay-content" @slideFadeIn (click)="$event.stopPropagation()">
-    <div class="content-header">
-        <h3 class="content-title">Mitglieder</h3>
-        <div class="close" (click)="closeOverlay()">
-            <div class="close-content"></div>
+<ng-template #channelUserListTemplate>
+    <div class="add-channel-user-content overlay-content" @slideFadeIn (click)="$event.stopPropagation()">
+        <div class="content-header">
+            <h3 class="content-title">Mitglieder</h3>
+            <div class="close" (click)="closeOverlay()">
+                <div class="close-content"></div>
+            </div>
         </div>
-    </div>
-    <div class="ul-wrapper scrollbar">
-        <ul>
-            <li class="current-user pointer">
-                <div class="li-content">
-                    <div class="avatar-div">
-                        <img [src]="currentUser?.photoURL?.startsWith('http') ? '/icons/avatars/avatar_1.png' : currentUser?.photoURL">
-                       
-                        @if(!currentUser?.isActive) {
-                            <span class="active-status offline"></span>
-                        } @else {
-                            <span class="active-status"></span>
-                        }
-                        
-                    </div>
-                    <span class="name">
-                        {{ currentUser?.displayName }} (Du)
-                    </span>
-                </div>
-            </li>
-            @for (user of allChannelUsers; let index = $index; track $index) {
-                <li>
-                    <div class="li-content pointer" (click)="showProfile()">
+        <div class="ul-wrapper scrollbar">
+            <ul>
+                <li class="current-user">
+                    <div class="li-content">
                         <div class="avatar-div">
-                            <img [src]="user?.photoURL?.startsWith('http') ? '/icons/avatars/avatar_1.png' : user?.photoURL">
-                            @if(!user?.isActive) {
+                            <img [src]="currentUser?.photoURL?.startsWith('http') ? '/icons/avatars/avatar_1.png' : currentUser?.photoURL">
+                        
+                            @if(!currentUser?.isActive) {
                                 <span class="active-status offline"></span>
                             } @else {
                                 <span class="active-status"></span>
@@ -38,23 +22,38 @@
                             
                         </div>
                         <span class="name">
-                            {{ user?.displayName }}
+                            {{ currentUser?.displayName }} (Du)
                         </span>
                     </div>
                 </li>
-            }
-        </ul>
-    </div>
-   
-    <div class="footer">
-        <div class="footer-content pointer" (click)="addMember()">
-            <button class="add-member"></button>
-            <span>Mitglieder Hinzufügen</span>
+                @for (user of allChannelUsers; let index = $index; track $index) {
+                    <li class="pointer" [class.selected]="currentUserIndex == index">
+                        <div class="li-content" (click)="showProfile(index)" >
+                            <div class="avatar-div">
+                                <img [src]="user?.photoURL?.startsWith('http') ? '/icons/avatars/avatar_1.png' : user?.photoURL">
+                                @if(!user?.isActive) {
+                                    <span class="active-status offline"></span>
+                                } @else {
+                                    <span class="active-status"></span>
+                                }
+                                
+                            </div>
+                            <span class="name">
+                                {{ user?.displayName }}
+                            </span>
+                        </div>
+                    </li>
+                }
+            </ul>
+        </div>
+    
+        <div class="footer">
+            <div class="footer-content pointer" (click)="addMember()">
+                <button class="add-member"></button>
+                <span>Mitglieder Hinzufügen</span>
+            </div>
         </div>
     </div>
-</div>
 
-<!-- <app-add-channel (closeOverlayEmitter)="showAddChannelOverlay = false"  *ngIf="showAddChannelOverlay"></app-add-channel>
- -->
-
-<app-profile *ngIf="showProfileOverlay"></app-profile>
+    <app-profile [showOverlay]="showProfileOverlay" (closeOverlayEmitter)="showProfileOverlay = false; currentUserIndex = -1" [currentUser]="selectedUser"></app-profile>
+</ng-template>

@@ -1,16 +1,18 @@
 import { Timestamp } from 'firebase/firestore';
 
 export interface Message {
-    conversationId: string;          
+    id: string;          
     authorId: string;                
     content: string;
-    // type: 'text';
-    timestamp: Timestamp;
-    editedAt?: Timestamp;
+    createdAt?: Timestamp;
+    updatedAt?: Timestamp;
     isEdited: boolean;
-    mentions: string[];               
+    mentionIDs?: string[];               
     threadCount: number;              
-    reactions: MessageReactions;
+    reactions?: MessageReactions;
+    type: 'channel' | 'private';
+    channelID?: string;
+    recipientID?: string;
 }
 
 export interface ThreadMessage {
@@ -18,8 +20,8 @@ export interface ThreadMessage {
     authorId: string;               
     content: string;
     // type: 'text';
-    timestamp: Timestamp;
-    editedAt?: Timestamp;
+    createdAt?: Timestamp;
+    updatedAt?: Timestamp;
     isEdited: boolean;
     mentions: string[];
     reactions: MessageReactions;

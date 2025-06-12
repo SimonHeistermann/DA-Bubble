@@ -97,9 +97,10 @@
                 }
             }
 
-            &:hover {
+            &:hover, &.selected {
                 border-radius: 30px;
                 background-color: var(--bg-color);
+
             }
         }
     }

@@ -1,65 +1,75 @@
 
+@use './../../../../../../styles.scss' as *;
+
 .input-container {
+
     position: relative;
-    width: 100%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
+    @include displayFlex($fd: column);
+    width: calc(100% - 60px);
+    margin: 30px;
+    margin-bottom: 20px;
+    margin-top: 0;
+    border: 1px solid #ADB0D9;
+    border-radius: 20px;
+    padding: 10px 10px 5px;
+    &.focused {
+        border: 1px solid var(--purple-2);
+    }
 }
 
 textarea {
-    height: 145px;
+    box-sizing: border-box;
     width: 100%;
-    background-color: #FFFFFF;
-    border: 1px solid #ADB0D9;
-    border-radius: 20px;
-    padding: 20px;
-    gap: 40px;
-    padding: 20px;
+    font-size: 16px;
+    padding: 0 15px;           
+    height: auto;          
+    overflow: hidden;
     resize: none;
-    font-size: 18px;
+    border: none;
+    background-color: #fff;
     color: #686868;
+    height: 25px; 
+    line-height: 25px;
 
     &:focus {
         outline: none;
     }
 }
 
+
 .input-icons {
-    position: absolute;
-    bottom: 0;
+    width: 100%;
     display: flex;
     flex-direction: row;
     align-items: center;
     justify-content: space-between;
-    width: 95%;
 
-    >div {
-        >img {
-            padding: 10px;
-            cursor: pointer;
-            border-radius: 50%;
+    .input-icons-left {
+        @include displayFlex($g:5px);
+       
+        .emoji {
+            @include imgButton($wh: 40px, $url:'/icons/emoji.png');
+            &:hover {
+                background-image: url('/icons/emoji_hover.png');
+            }
         }
+    
 
-        >:nth-child(1):hover {
-            content: url('/icons/sentiment_satisfied_selected.png');
-            background-color: #ECEEFE;
-            transition: 0.3s;
+    
+        .at {
+            @include imgButton($wh: 40px, $url:'/icons/at.png');
+            &:hover {
+                background-image: url('/icons/at_hover.png');
+            }
         }
+    
 
-        >:nth-child(2):hover {
-            content: url('/icons/alternate_email_selected.png');
-            background-color: #ECEEFE;
-            transition: 0.3s;
-        }
     }
 
-    >img {
-        cursor: pointer;
-
+    .send-button {
+        @include imgButton($wh: 23px, $url:'/icons/send.png');
         &:hover {
-            content: url('/icons/send_icon_hover.png');
-            transition: 0.3s;
+            background-image: url('/icons/send_hover.png');
         }
     }
 

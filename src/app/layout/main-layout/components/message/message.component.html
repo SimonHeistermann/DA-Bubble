@@ -10,16 +10,16 @@
                 <span class="arrow-down"></span>
             </div>
             <div class="channel-message-right">
-                <div class="logos-number pointer" [class.active]="activeOpenUserButton" #userList (click)="openUserListOverlay()">
+                <div class="logos-number pointer" [class.active]="activeUserListButton" #userList  (click)="openUserListOverlay()">
                     <div class="logos">
                         <img [src]="currentUser?.photoURL?.startsWith('http') ? '/icons/avatars/avatar_1.png' : currentUser?.photoURL">
                         @for (user of allUsers.slice(0, 3); let index = $index; track $index) {
                             <img [src]="user?.photoURL?.startsWith('http') ? '/icons/avatars/avatar_1.png' : user?.photoURL">
                         }
                     </div>
-                    <span class="number">{{ allUsers.length + 1}}</span>
+                    <span class="number">{{allUsers.length + 1}}</span>
                 </div>
-                <button class="add-member pointer" [class.active]="activeChannelUserButton" #addMember (click)="openAddMemberOverlay()"></button>
+                <button class="add-member pointer" [class.active]="activeAddChannelUserButton" #addMember (click)="openAddChannelUserOverlay()"></button>
                 
             </div>
         </div>
@@ -27,21 +27,34 @@
 
         </div>
     </div>
-    <div class="container-body">
-
-    </div>
-    <div class="container-input">
-        <app-input></app-input>
+    <div class="container-body-input">
+        <div class="container-body">
+            <app-message-box></app-message-box>
+        </div>
+        <div class="container-input">
+            <app-input></app-input>
+        </div>
     </div>
 </main>
 
 
-<ng-template #addChannelUserTemplate>
-    <app-add-channel-user (closeOverlayEmitter)="closeOverlay()" [currentUser]="currentUser" [allChannelUsers]="allUsers" [currentChannel]="channel"></app-add-channel-user>
-</ng-template>
-<ng-template #channelUserListTemplate>
-    <app-channel-user-list (closeOverlayEmitter)="closeOverlay()" (addMemberEmitter)="onAddMemberFromChannelUserList()" [currentUser]="currentUser" [allChannelUsers]="allUsers"></app-channel-user-list>
-</ng-template>
+<app-add-channel-user 
+    (closeOverlayEmitter)="closeAddChannelUserOverlay()" 
+    [showOverlay]="showAddChannelUserOverlay" 
+    [currentUser]="currentUser" 
+    [allChannelUsers]="allUsers" 
+    [currentChannel]="channel">
+</app-add-channel-user>
+
+
+<app-channel-user-list 
+    [showOverlay]="showUserListOverlay" 
+    (closeOverlayEmitter)="closeUserListOverlay()" 
+    (addMemberEmitter)="onAddMemberFromChannelUserList()" 
+    [currentUser]="currentUser" 
+    [allChannelUsers]="allUsers">
+</app-channel-user-list>
+
 <ng-template #editChannelTemplate>
-    <app-edit-channel (closeEditChannelOverlayEmitter)="closeEditChannelOverlay($event)" [currentChannel]="channel" [currentUser]="currentUser"></app-edit-channel>
+    <app-edit-channel (closeEditChannelOverlayEmitter)="closeEditChannelOverlayByLeavingChannel($event)" [currentChannel]="channel" [currentUser]="currentUser"></app-edit-channel>
 </ng-template>

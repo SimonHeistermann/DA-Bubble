@@ -1,0 +1,135 @@
+
+@use './../../../../../../styles.scss' as *;
+
+.message-container {
+    height: 100%;
+    overflow: hidden;
+
+    .message {
+        .data-divider {
+            position: relative;
+            height: 36px;
+            padding: 0 10px;
+            width: 100%;
+            .divider {
+                height: 1px;
+                width: calc(100% - 20px);
+                background-color: var(--light-purple);
+                position: absolute;
+                top: 50%;
+                transform: translateY(-50%);
+                z-index: 1;
+            }
+            .data {
+                width: fit-content;
+                border-radius: 30px;
+                border: 1px solid var(--light-purple);
+                padding: 5px 15px;
+                font-size: 16px;
+                font-weight: 400;
+                position: absolute;
+                left: 50%;
+                transform: translateX(-50%);
+                z-index: 2;
+                background-color: var(--white);
+
+                
+            }
+        }
+        .message-body {
+            @include displayFlex($g: 20px, $ai: flex-start);
+            justify-content: flex-start;
+            width: 100%;
+            padding: 10px 20px;
+            .avatar {
+                img {
+                    border-radius: 50%;
+                    width: 70px;
+                    height: 70px;
+                }
+            }
+            .message-content {
+                width: 100%;
+                @include displayFlex($fd: column, $ai: flex-start);
+               .message-content-top {
+                    @include displayFlex($g:20px, $jc: flex-start);
+                    .name {
+                        font-weight: 700;
+                        font-size: 16px;
+                    }
+                    .time {
+                        color: var(--grey);
+                        font-size: 14px;
+                    }
+               }
+               .message-content-middle {
+                    margin-top: 10px;
+                    p {
+                        font-weight: 400;
+                        font-size: 16px;
+                        padding: 10px;
+                        border-radius: 30px;
+                        border-top-left-radius: 0;
+                        background-color: var(--bg-color);
+                    }
+                    
+               }
+               .message-content-bottom {
+                    .emoji-wrapper {
+                        @include displayFlex($g: 10px, $jc: flex-start);
+                        .emoji-picker-trigger {
+                            @include imgButton($wh: 40px, $url:'/icons/add_reaction.png');
+                            &:hover {
+                                background-image: url('/icons/add_reaction_hover.png');
+                            }
+                        }
+                        .emojis {
+                            @include displayFlex($g: 10px);
+                            .emoji-div {
+                                @include displayFlex($g: 5px);
+                                border: 1px solid var(--purple-1);
+                                padding: 3px 8px;
+                                border-radius: 20px;
+                            }
+                        }
+                    }
+
+                    .thread-wrapper {
+                        margin-top: 5px;
+                        @include displayFlex($g:20px);
+                        .answer {
+                            font-weight: 400px;
+                            font-size: 16px;
+                            color: var(--purple-3);
+                            &:hover {
+                                font-weight: 700;
+                                color: var(--purple-1);
+                            }
+                        }
+                        .last-answer-time {
+                            font-size: 14px;
+                            color: var(--grey);
+                        }
+                    }
+               
+               }
+            }
+
+            &:hover{
+                background-color: var(--bg-color);
+
+                .message-content {
+                    .message-content-middle {
+                        p {
+                            background-color: var(--white);
+                        }
+                        
+                    }
+                }
+            }
+        }
+        &:nth-child(1) {
+            margin-top: 10px;
+        }
+    }
+}

@@ -105,7 +105,7 @@ export class EditChannelComponent implements OnChanges, OnDestroy {
   }
 
   closeOverlay(){
-    this.closeEditChannelOverlayEmitter.emit();
+    this.closeEditChannelOverlayEmitter.emit(false);
   }
 
   ngOnDestroy(): void {

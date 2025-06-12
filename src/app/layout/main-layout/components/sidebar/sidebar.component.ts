@@ -6,11 +6,12 @@ import { toggleMarginRight20Animation, toggleMarginTop25Animation } from '../../
 import { User } from '../../../../core/models/user.interface';
 import { AuthService } from '../../../../core/services/auth-service/auth.service';
 import { UserService } from '../../../../core/services/user-service/user.service';
-import { user } from '@angular/fire/auth';
+import { ActivatedRoute, Router } from '@angular/router';
+import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-sidebar',
-  imports: [],
+  imports: [CommonModule],
   templateUrl: './sidebar.component.html',
   styleUrl: './sidebar.component.scss',
   animations: [toggleMarginTop25Animation, toggleMarginRight20Animation],
@@ -22,6 +23,7 @@ export class SidebarComponent implements OnInit, OnDestroy, AfterViewInit {
   channelService = inject(ChannelService);
   authService = inject(AuthService);
   userService = inject(UserService);
+  route = inject(ActivatedRoute);
   channels: Channel[] = [];
   allUsers: User[] = [];
   currentUser: User | null = null;
@@ -36,13 +38,18 @@ export class SidebarComponent implements OnInit, OnDestroy, AfterViewInit {
   openMessage = true;
 
   public currentChannelIndex: number = 0;
+  router = inject(Router);
 
   ngOnInit(): void {
+    console.log('sidebar init');
     
+    this.subCurrentUser();
   }
 
   ngAfterViewInit() {
-    this.subCurrentUser();
+   
+    this.checkOverflow();
+    
   }
 
   subCurrentUser(){
@@ -64,7 +71,6 @@ export class SidebarComponent implements OnInit, OnDestroy, AfterViewInit {
       this.userService.allUsers$.subscribe(users => {
         this.allUsers = users;
         this.allUsers = this.allUsers.filter(u => u.id !== this.currentUser?.id);
-        this.checkOverflow();
       }));
   }
 
@@ -77,6 +83,8 @@ export class SidebarComponent implements OnInit, OnDestroy, AfterViewInit {
         this.channels.push(...data);
         
         if (this.channels.length > 0) {
+          console.log('channel updatged', this.currentChannelIndex);
+          
           this.clickChannelNameEmitter.emit(this.channels[this.currentChannelIndex]);
         }
       })
@@ -100,7 +108,8 @@ export class SidebarComponent implements OnInit, OnDestroy, AfterViewInit {
 
   clickChannelName(index: number, channel: Channel) {
     this.currentChannelIndex = index;
-    this.clickChannelNameEmitter.emit(channel);
+    this.router.navigate(['/dashboard', 'channels', channel.id]);
+   
   }
 
 
@@ -109,7 +118,6 @@ export class SidebarComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   
-
   onSectionAnimationDone() {
     this.checkOverflow();
   }

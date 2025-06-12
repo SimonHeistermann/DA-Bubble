@@ -3,11 +3,11 @@ import { LoginComponent } from './features/auth/components/login/login.component
 import { RegisterComponent } from './features/auth/components/register/register.component';
 import { ForgotPasswordComponent } from './features/auth/components/forgot-password/forgot-password.component';
 import { ResetPasswordComponent } from './features/auth/components/reset-password/reset-password.component';
-import { DashboardComponent } from './features/dashboard/components/dashboard/dashboard.component';
 import { AuthGuard } from './core/guards/auth-guard/auth.guard';
 import { NoAuthGuard } from './core/guards/no-auth-guard/no-auth.guard';
 import { AuthLayoutComponent } from './layout/auth-layout/auth-layout.component';
 import { MainLayoutComponent } from './layout/main-layout/main-layout.component';
+import { MainLayoutContentComponent } from './layout/main-layout/main-layout-content/main-layout-content.component';
 
 export const routes: Routes = [
   { 
@@ -52,14 +52,9 @@ export const routes: Routes = [
     component: MainLayoutComponent,
     canActivate: [AuthGuard],
     children: [
-        {
-            path: '',
-            component: DashboardComponent,
-            title: 'Dashboard'
-        }
+      { path: 'channels/:channelId', component:  MainLayoutContentComponent}
     ]
   },
-  
   { 
     path: '', 
     redirectTo: 'dashboard',

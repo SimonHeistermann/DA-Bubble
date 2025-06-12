@@ -63,7 +63,7 @@
                             <li class="current-user pointer">
                                 <div class="li-content">
                                     <div class="avatar-div">
-                                        <img [src]="currentUser?.photoURL?.startsWith('http') ? '/icons/avatars/avatar_1.png' : currentUser?.photoURL">
+                                        <img *ngIf="currentUser" [src]="currentUser.photoURL.startsWith('http') ? '/icons/avatars/avatar_1.png' : currentUser.photoURL">
                                        
                                         @if(!currentUser?.isActive) {
                                             <span class="active-status offline"></span>

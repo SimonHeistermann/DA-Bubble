@@ -1,5 +1,5 @@
 
-<div class="overlay" (click)="closeOverlay()" >
+<div class="overlay" (click)="closeOverlay()" *ngIf="showOverlay" >
     <div class="overlay-container">
         <div class="overlay-content"  (click)="$event.stopPropagation()">
             <div class="content-header">
@@ -12,15 +12,20 @@
                 <img src="icons/avatars/avatar_1.png" alt="">
             </div>
             <div class="name-wrapper">
-                <span>Sofia Müller</span>
-                <div class="status">
-                    <span></span>
-                    <span>Aktiv</span>
-                </div>
-                <div class="status offline">
-                    <span></span>
-                    <span>Abwesend</span>
-                </div>
+                <span>{{ currentUser?.displayName }}</span>
+                @if (currentUser?.isActive) {
+                    <div class="status">
+                        <span></span>
+                        <span>Aktiv</span>
+                    </div>
+                } @else {
+                    <div class="status offline">
+                        <span></span>
+                        <span>Abwesend</span>
+                    </div>
+                }
+               
+               
             </div>
             <div class="email-wrapper">
                 <div class="email-left">
@@ -29,7 +34,7 @@
                 </div>
                 <div class="email-right">
                     <span>E-Mail-Addresse</span>
-                    <a href="mailto:sofia.muel@beispeil.com">sofia.muel&#64;beispeil.com</a>
+                    <a href="mailto:{{currentUser?.email}}">{{currentUser?.email}}</a>
                 </div>
             </div>
             <div class="footer">

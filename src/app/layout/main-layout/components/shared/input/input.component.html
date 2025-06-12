@@ -1,12 +1,21 @@
-<div class="input-container">
-
-
-    <textarea name="message" id="message" placeholder="Nachricht an #Entwicklerteam"></textarea>
+<div class="input-container" [class.focused]="isTextareaFocused">
+    <textarea 
+         autoResize
+        class="scrollbar__none" name="message" id="message" 
+        placeholder="Nachricht an #Entwicklerteam"  
+        (focus)="isTextareaFocused = true" (blur)="isTextareaFocused = false">
+    </textarea>
     <div class="input-icons">
-        <div>
-            <img src="/icons/sentiment_satisfied.png">
-            <img src="/icons/alternate_email.png">
+        <div class="input-icons-left">
+            <span class="emoji pointer">
+
+            </span>
+            <span class="at pointer">
+
+            </span>
         </div>
-        <img src="/icons/send_icon.png">
+        <span class="send-button pointer">
+
+        </span>
     </div>
 </div>

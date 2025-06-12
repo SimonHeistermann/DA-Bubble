@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, EventEmitter, inject, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
+import { AfterViewInit, ChangeDetectionStrategy, Component, EventEmitter, inject, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
 import { InputComponent } from '../shared/input/input.component';
 import { CommonModule } from '@angular/common';
 import { Channel } from '../../../../core/models/channel.interface';
@@ -21,26 +21,29 @@ import { OverlayService } from '../../../../core/services/overlay.service';
 import { AuthService } from '../../../../core/services/auth-service/auth.service';
 import { ChannelUserListComponent } from './channel-user-list/channel-user-list.component';
 import { EditChannelComponent } from './edit-channel/edit-channel.component';
-
+import { MessageBoxComponent } from './message-box/message-box.component';
 
 @Component({
   selector: 'app-message',
-  imports: [InputComponent, CommonModule, AddChannelUserComponent, ChannelUserListComponent, EditChannelComponent],
+  imports: [InputComponent, CommonModule, AddChannelUserComponent, ChannelUserListComponent, EditChannelComponent, MessageBoxComponent],
   standalone: true,
   templateUrl: './message.component.html',
   styleUrl: './message.component.scss',
-  animations: []
+  animations: [],
 })
 export class MessageComponent implements OnInit, OnChanges, AfterViewInit{
-
-  @ViewChild('addChannelUserTemplate') addChannelUserTemplate!: TemplateRef<any>;
   @ViewChild('addMember') addMemberRef!: ElementRef;
-  @ViewChild('channelUserListTemplate') channelUserListTemplate!: TemplateRef<any>;
+  @ViewChild(AddChannelUserComponent) addChannelUserComp!: AddChannelUserComponent;
+
   @ViewChild('userList') userListRef!: ElementRef;
+  @ViewChild(ChannelUserListComponent) channelUserListComp!: ChannelUserListComponent;
+  
+
   @ViewChild('editChannelTemplate') editChannelTemplate!: TemplateRef<any>;
   @ViewChild('editChannel') editChannelRef!: ElementRef;
 
-  overlayRef!: OverlayRef;
+  userListOverlayRef!: OverlayRef;
+  editChannelOverlayRef!: OverlayRef;
   overlayService = inject(OverlayService);
   viewContainerRef = inject(ViewContainerRef);
 
@@ -50,22 +53,26 @@ export class MessageComponent implements OnInit, OnChanges, AfterViewInit{
 
   private subscriptions = new Subscription();
   showHeader: 'direct' | 'channel' | 'new' = 'channel';
-  activeChannelUserButton = false;
-  activeOpenUserButton = false;
+  activeAddChannelUserButton = false;
+  activeUserListButton = false;
   activeEditChannelButton = false;
- 
   
   userService = inject(UserService);
   allUsers: User[] = [];
   authService = inject(AuthService);
   currentUser: User | null = null;
 
+  showAddChannelUserOverlay = false;
+  showUserListOverlay = false;
+
   ngOnInit(): void {
     this.subCurrentUser();
   }
 
   ngAfterViewInit(): void {
-    this.openUserListOverlay();
+    
+    this.addChannelUserComp.addMemberRef = this.addMemberRef;
+    this.channelUserListComp.userListRef = this.userListRef;
   }
 
   subCurrentUser(){
@@ -87,6 +94,8 @@ export class MessageComponent implements OnInit, OnChanges, AfterViewInit{
     if (changes['channel'] && changes['channel'].currentValue) {
       this.onChannelChanged(changes['channel'].currentValue);
     }
+    console.log('changes in message', changes);
+    
   }
 
   onChannelChanged(channel: Channel) {
@@ -108,6 +117,8 @@ export class MessageComponent implements OnInit, OnChanges, AfterViewInit{
 
   filterOutCurrentUser() {
     this.allUsers = this.allUsers.filter(u => u.id !== this.currentUser?.id);
+    console.log(this.allUsers);
+    
   }
  
 
@@ -115,65 +126,58 @@ export class MessageComponent implements OnInit, OnChanges, AfterViewInit{
     this.subscriptions.unsubscribe();
   }
 
-  openUserListOverlay() {
-    this.activeOpenUserButton = true; 
-    let positions = this.overlayService.defaultPositions;
-    positions[0] = { originX: 'end', originY: 'bottom', overlayX: 'end', overlayY: 'top' };
+  
 
-
-    this.overlayRef = this.overlayService.openTemplateOverlay(
-      this.userListRef, 
-      this.channelUserListTemplate, 
-      this.viewContainerRef, 
-    );
-
-    this.overlayRef.backdropClick().subscribe(() => this.closeOverlay());
-  }
-
-  openAddMemberOverlay() {
-    this.activeChannelUserButton = true;
-    let positions = this.overlayService.defaultPositions;
-    positions[0] = { originX: 'end', originY: 'bottom', overlayX: 'end', overlayY: 'top' };
-
-    this.overlayRef = this.overlayService.openTemplateOverlay(
-      this.addMemberRef, 
-      this.addChannelUserTemplate, 
-      this.viewContainerRef, 
-    );
-
-    this.overlayRef.backdropClick().subscribe(() => this.closeOverlay());
-  }
 
   openEditChannelOverlay(){
     this.activeEditChannelButton = true;
     let positions = this.overlayService.defaultPositions;
     positions[0] = { originX: 'start', originY: 'bottom', overlayX: 'start', overlayY: 'top' };
-
-    this.overlayRef = this.overlayService.openTemplateOverlay(
+    
+    this.editChannelOverlayRef = this.overlayService.openTemplateOverlay(
       this.editChannelRef, 
       this.editChannelTemplate, 
       this.viewContainerRef, 
     );
 
-    this.overlayRef.backdropClick().subscribe(() => this.closeOverlay());
+    this.editChannelOverlayRef.backdropClick().subscribe(() => this.closeEditChannelOverlay());
+  }
+
+  closeEditChannelOverlay() {
+      this.activeEditChannelButton = false;
+      this.editChannelOverlayRef?.dispose();
   }
 
   onAddMemberFromChannelUserList() {
-    this.overlayRef?.detach();
-    this.openAddMemberOverlay();
+    this.userListOverlayRef?.dispose();
+    this.showAddChannelUserOverlay = true;
   }
 
-  closeOverlay() {
-    this.activeChannelUserButton = false;
-    this.activeOpenUserButton = false;
-    this.overlayRef?.detach();
+  openUserListOverlay() {
+    this.showUserListOverlay = true;
+    this.activeUserListButton = true;
   }
 
-  closeEditChannelOverlay(isLeaving: boolean) {
+  closeUserListOverlay() {
+    this.showUserListOverlay = false;
+    this.activeUserListButton = false;
+  }
+
+  openAddChannelUserOverlay() {
+    this.showAddChannelUserOverlay = true;
+    this.activeAddChannelUserButton = true;
+  }
+
+  closeAddChannelUserOverlay() {
+    this.showUserListOverlay = false;
+    this.showAddChannelUserOverlay = false;
+    this.activeAddChannelUserButton = false;
+  }
+
+  closeEditChannelOverlayByLeavingChannel(isLeaving: boolean) {
     this.activeEditChannelButton = false;
+    this.editChannelOverlayRef?.dispose();
+ 
     if(isLeaving) this.leaveChannelEmitter.emit();
-    this.overlayRef?.detach();
   }
-
-
 }
