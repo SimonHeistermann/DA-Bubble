@@ -1,1 +1,146 @@
-<p>register works!</p>
+<div class="auth__container">
+    <div class="auth__form__container">
+        <div class="auth__form__header">
+            <h1>Konto erstellen</h1>
+            <p>Mit deinem Namen und deiner E-Mail-Adresse hast du dein neues DABubble-Konto.</p>
+        </div>
+        <div class="auth__form__content">
+            <form
+                class="auth__form"
+                id="registerForm"
+                novalidate
+                aria-labelledby="register-form-title"
+            >
+                <h2 id="register-form-title" class="visually__hidden">Registrierungsformular</h2>
+                <div class="form__fields">
+                    <div class="name__fields">
+                        <div class="form__field">
+                            <div class="form__group" id="firstName-group">
+                                <div class="input__wrapper">
+                                    <label for="firstName">
+                                        <svg class="input__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                                            <circle cx="12" cy="7" r="4"></circle>
+                                        </svg>
+                                    </label>
+                                    <input
+                                        type="text"
+                                        id="firstName"
+                                        name="firstName"
+                                        placeholder="Vorname"
+                                        class="form__input"
+                                        autocomplete="given-name"
+                                        required
+                                    />
+                                </div>
+                                <div class="error" id="firstName-error" style="display: none;">
+                                    <small></small>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="form__field">
+                            <div class="form__group" id="lastName-group">
+                                <div class="input__wrapper">
+                                    <label for="lastName">
+                                        <svg class="input__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
+                                            <circle cx="12" cy="7" r="4"></circle>
+                                        </svg>
+                                    </label>
+                                    <input
+                                        type="text"
+                                        id="lastName"
+                                        name="lastName"
+                                        placeholder="Nachname"
+                                        class="form__input"
+                                        autocomplete="family-name"
+                                        required
+                                    />
+                                </div>
+                                <div class="error" id="lastName-error" style="display: none;">
+                                    <small></small>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form__field">
+                        <div class="form__group" id="email-group">
+                            <div class="input__wrapper">
+                                <label for="email">
+                                    <svg class="input__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
+                                        <polyline points="22,6 12,13 2,6"></polyline>
+                                    </svg>
+                                </label>
+                                <input
+                                    type="email"
+                                    id="email"
+                                    name="email"
+                                    placeholder="beispielname@email.com"
+                                    class="form__input"
+                                    autocomplete="email"
+                                    required
+                                />
+                            </div>
+                            <div class="error" id="email-error" style="display: none;">
+                                <small></small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form__field">
+                        <div class="form__group" id="password-group">
+                            <div class="input__wrapper">
+                                <label for="password">
+                                    <svg class="input__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                                        <circle cx="12" cy="16" r="1"></circle>
+                                        <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                                    </svg>
+                                </label>
+                                <input
+                                    type="password"
+                                    id="password"
+                                    name="password"
+                                    placeholder="Passwort"
+                                    class="form__input"
+                                    autocomplete="new-password"
+                                    required
+                                />
+                            </div>
+                            <div class="error" id="password-error" style="display: none;">
+                                <small></small>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form__field">
+                        <div class="form__group" id="confirmPassword-group">
+                            <div class="input__wrapper">
+                                <label for="confirmPassword">
+                                    <svg class="input__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
+                                        <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
+                                        <circle cx="12" cy="16" r="1"></circle>
+                                        <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
+                                    </svg>
+                                </label>
+                                <input
+                                    type="password"
+                                    id="confirmPassword"
+                                    name="confirmPassword"
+                                    placeholder="Passwort bestätigen"
+                                    class="form__input"
+                                    autocomplete="new-password"
+                                    required
+                                />
+                            </div>
+                            <div class="error" id="confirmPassword-error" style="display: none;">
+                                <small></small>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="form__bottom">
+                </div>
+            </form>
+        </div>
+    </div>
+</div>

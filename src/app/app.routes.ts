@@ -13,7 +13,7 @@ export const routes: Routes = [
   { 
     path: 'auth',
     component: AuthLayoutComponent,
-    canActivate: [NoAuthGuard], 
+    // canActivate: [NoAuthGuard], 
     children: [
       {
         path: 'login',
