@@ -1,7 +1,7 @@
-<div class="input-container" [class.focused]="isTextareaFocused">
+<div class="input-container scrollbar__none" [class.focused]="isTextareaFocused">
     <textarea 
          autoResize
-        class="scrollbar__none" name="message" id="message" 
+        class="scrollbar" name="message" id="message" 
         placeholder="Nachricht an #Entwicklerteam"  
         (focus)="isTextareaFocused = true" (blur)="isTextareaFocused = false"></textarea>
     <div class="input-icons">

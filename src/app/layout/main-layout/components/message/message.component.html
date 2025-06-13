@@ -28,8 +28,8 @@
         </div>
     </div>
     <div class="container-body-input scrollbar__none">
-        <div class="container-body">
-            <app-message-box></app-message-box>
+        <div class="container-body scrollbar__none" #containerBody>
+            <app-message-box [channel]="channel" [currentUser]="currentUser"></app-message-box>
         </div>
         <div class="container-input">
             <app-input></app-input>

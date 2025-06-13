@@ -34,7 +34,7 @@ export class AutoResizeDirective implements AfterViewInit{
 
   private applyPassedParameter(mirror: HTMLDivElement) {
     mirror.style.fontSize = this.styles.fontSize || '16px';
-    mirror.style.lineHeight = this.styles.lineHeight || '30px';
+    mirror.style.lineHeight = this.styles.lineHeight || '20px';
     mirror.style.padding = this.styles.padding || '0 12px';
 
     for (const [key, value] of Object.entries(this.styles)) {

@@ -2,11 +2,10 @@
 @use './../../../../../../styles.scss' as *;
 
 .input-container {
-
+    
     position: relative;
-    @include displayFlex($fd: column);
-    width: calc(100% - 60px);
-    margin: 30px;
+    width: calc(100% - 40px);
+    margin: 20px;
     margin-bottom: 20px;
     margin-top: 0;
     border: 1px solid #ADB0D9;
@@ -29,9 +28,11 @@ textarea {
     border: none;
     background-color: #fff;
     color: #686868;
-    height: 30px; 
-    line-height: 30px;
-
+    height: 20px; 
+    line-height: 20px;
+    
+    max-height: 60px;
+    overflow-y: scroll;
 
     &:focus {
         outline: none;

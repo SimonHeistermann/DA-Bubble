@@ -41,15 +41,11 @@ export class SidebarComponent implements OnInit, OnDestroy, AfterViewInit {
   router = inject(Router);
 
   ngOnInit(): void {
-    console.log('sidebar init');
-    
     this.subCurrentUser();
   }
 
   ngAfterViewInit() {
-   
     this.checkOverflow();
-    
   }
 
   subCurrentUser(){
@@ -83,8 +79,6 @@ export class SidebarComponent implements OnInit, OnDestroy, AfterViewInit {
         this.channels.push(...data);
         
         if (this.channels.length > 0) {
-          console.log('channel updatged', this.currentChannelIndex);
-          
           this.clickChannelNameEmitter.emit(this.channels[this.currentChannelIndex]);
         }
       })

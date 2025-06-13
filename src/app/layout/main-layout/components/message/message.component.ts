@@ -1,4 +1,4 @@
-import { AfterViewInit, ChangeDetectionStrategy, Component, EventEmitter, inject, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
+import { AfterViewChecked, AfterViewInit, ChangeDetectionStrategy, Component, EventEmitter, inject, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
 import { InputComponent } from '../shared/input/input.component';
 import { CommonModule } from '@angular/common';
 import { Channel } from '../../../../core/models/channel.interface';
@@ -31,7 +31,7 @@ import { MessageBoxComponent } from './message-box/message-box.component';
   styleUrl: './message.component.scss',
   animations: [],
 })
-export class MessageComponent implements OnInit, OnChanges, AfterViewInit{
+export class MessageComponent implements OnInit, OnChanges, AfterViewInit, AfterViewChecked{
   @ViewChild('addMember') addMemberRef!: ElementRef;
   @ViewChild(AddChannelUserComponent) addChannelUserComp!: AddChannelUserComponent;
 
@@ -42,6 +42,8 @@ export class MessageComponent implements OnInit, OnChanges, AfterViewInit{
   @ViewChild('editChannelTemplate') editChannelTemplate!: TemplateRef<any>;
   @ViewChild('editChannel') editChannelRef!: ElementRef;
 
+  @ViewChild('containerBody') private containerBody!: ElementRef;
+
   userListOverlayRef!: OverlayRef;
   editChannelOverlayRef!: OverlayRef;
   overlayService = inject(OverlayService);
@@ -50,7 +52,6 @@ export class MessageComponent implements OnInit, OnChanges, AfterViewInit{
   @Input() channel: Channel | null = null;
 
   @Output() leaveChannelEmitter = new EventEmitter<void>();
-
   private subscriptions = new Subscription();
   showHeader: 'direct' | 'channel' | 'new' = 'channel';
   activeAddChannelUserButton = false;
@@ -73,6 +74,21 @@ export class MessageComponent implements OnInit, OnChanges, AfterViewInit{
     
     this.addChannelUserComp.addMemberRef = this.addMemberRef;
     this.channelUserListComp.userListRef = this.userListRef;
+
+    this.scrollToBottom();
+  }
+
+  ngAfterViewChecked() {
+    
+  }
+
+  scrollToBottom(): void {
+    try {
+      const el = this.containerBody.nativeElement;
+      el.scrollTop = el.scrollHeight;
+    } catch(err) {
+      console.error('Scroll error:', err);
+    }
   }
 
   subCurrentUser(){
@@ -94,7 +110,6 @@ export class MessageComponent implements OnInit, OnChanges, AfterViewInit{
     if (changes['channel'] && changes['channel'].currentValue) {
       this.onChannelChanged(changes['channel'].currentValue);
     }
-    console.log('changes in message', changes);
     
   }
 
@@ -117,17 +132,12 @@ export class MessageComponent implements OnInit, OnChanges, AfterViewInit{
 
   filterOutCurrentUser() {
     this.allUsers = this.allUsers.filter(u => u.id !== this.currentUser?.id);
-    console.log(this.allUsers);
-    
   }
  
 
   ngOnDestroy(): void {
     this.subscriptions.unsubscribe();
   }
-
-  
-
 
   openEditChannelOverlay(){
     this.activeEditChannelButton = true;

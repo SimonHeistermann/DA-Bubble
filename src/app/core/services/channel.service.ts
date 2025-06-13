@@ -9,15 +9,10 @@ import { Unsubscribe } from "firebase/auth";
 @Injectable({
     providedIn: 'root'
 })
-export class ChannelService implements OnDestroy{
+export class ChannelService{
     private readonly CHANNEL_COL_NAME = 'channels';
     firestore = inject(Firestore);
     dataService = inject(DataService);
-    getUsersUnsub?: () => void;
-
-    constructor() {
-
-    }
 
     updateChannel(docId: string, data: ChannelData): Observable<void> {
         return from(
@@ -56,25 +51,5 @@ export class ChannelService implements OnDestroy{
     getChannelByName(name: string, callback: (data: Channel[]) => void){
         return this.dataService.subscribeToCollection(this.CHANNEL_COL_NAME, callback, where('name', '==',  name)); 
     }
-  
-    createTimestamp(): Timestamp {
-        return Timestamp.now();
-    }
 
-    getCollectionRef(collectionName: string): CollectionReference {
-        return collection(this.firestore, collectionName);
-    }
-
-    getDocRef(collectionName: string, docId: string): DocumentReference {
-        return doc(this.firestore, collectionName, docId);
-    }
-
-    createQuery(collectionName: string, ...constraints: QueryConstraint[]) {
-        const colRef = collection(this.firestore, collectionName);
-        return query(colRef, ...constraints);
-    }
-
-    ngOnDestroy(): void {
-        this.getUsersUnsub?.();
-    }
 }
