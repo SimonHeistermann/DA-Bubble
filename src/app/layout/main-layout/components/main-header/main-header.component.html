@@ -3,9 +3,14 @@
 
     <input type="text" class="search-field">
 
-    <div class="profile-container">
+    <div class="profile-container" (click)="currentUser && showProfile(currentUser)">
         <span>{{currentUser?.displayName}}</span>
-        <img src="/icons/avatars/avatar_1.png" class="avatar">
+        <!-- <img src="/icons/avatars/avatar_1.png" class="avatar"> -->
+        <div style="position: relative;">
+            <img src="{{ currentUser?.photoURL }}" class="avatar">
+            <span class="show-status"></span>
+        </div>
         <img src="/icons/arrow-dwn.png">
     </div>
+
 </div>

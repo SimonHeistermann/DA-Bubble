@@ -169,3 +169,14 @@ input:focus, textarea:focus {
   --fontfamily-nunito: #{fonts.$font-family-nunito};
   --fontfamily-figtree: #{fonts.$font-family-figtree};
 }
+
+
+.profile-dialog {
+   position: absolute !important;
+    top: 100px;
+    right: 300px;
+}
+
+.test {
+  width: 800px !important;
+}

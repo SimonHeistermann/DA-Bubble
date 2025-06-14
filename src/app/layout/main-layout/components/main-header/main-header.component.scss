@@ -7,8 +7,6 @@
     gap: 45px;
 }
 
-
-
 .search-field {
     background-color: #FFFFFF !important;
     display: flex;
@@ -33,9 +31,21 @@
     flex-direction: row;
     align-items: center;
     gap: 20px;
+    cursor: pointer;
 }
 
 .avatar {
     height: 70px;
     border-radius: 50%;
+}
+
+.show-status {
+    position: absolute;
+    border-radius: 50%;
+    bottom: 6%;
+    right: 10%;
+    width: 14px;
+    height: 14px;
+    background-color: var(--green);
+    border: 2px solid var(--white);
 }
