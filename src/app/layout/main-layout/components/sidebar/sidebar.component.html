@@ -1,7 +1,7 @@
 <section class="devspace" [@toggleMarginRight20]="showSelf ? 'open' : 'closed'">
 
     <section class="devspace-wrapper">
-        <section class="devspace-content scrollbar" #devspaceContent [style.overflow-y]="isOverflowing ? 'auto' : 'hidden'">
+        <ngx-simplebar class="devspace-content">
             <div class="devspace-head">
                 <div class="dev-logo-cont">
                     <img src="/icons/devspaceIcon.png">
@@ -25,7 +25,7 @@
                         </div>
                         <img class="add-btn" src="/icons/add.png" (click)="clickAddChannel()">
                     </div>
-                    <div class="channel-names" [@toggleMarginTop25]="openChannel ? 'open' : 'closed'" (@toggleMarginTop25.done)="onSectionAnimationDone()">
+                    <div class="channel-names" [@toggleMarginTop25]="openChannel ? 'open' : 'closed'">
                         <ul>
                             @for(channel of channels; let index = $index; track $index) {
                                 <li class="channel-li pointer" [class.selected]="index === currentChannelIndex"  (click)="clickChannelName(index, channel)">
@@ -58,7 +58,7 @@
                         </div>
         
                     </div>
-                    <div class="users" [@toggleMarginTop25]="openMessage ? 'open' : 'closed'" (@toggleMarginTop25.done)="onSectionAnimationDone()">
+                    <div class="users" [@toggleMarginTop25]="openMessage ? 'open' : 'closed'">
                         <ul>
                             <li class="current-user pointer">
                                 <div class="li-content">
@@ -100,7 +100,7 @@
         
                 </section>
             </div>
-        </section>
+        </ngx-simplebar>
     </section>
 
 </section>

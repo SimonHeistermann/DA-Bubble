@@ -1,11 +1,12 @@
 import { AfterViewInit, Component, ElementRef, EventEmitter, Input, Output, ViewChild } from '@angular/core';
 import { User } from '../../../../../core/models/user.interface';
 import { CommonModule } from '@angular/common';
+import { SimplebarAngularModule } from 'simplebar-angular';
 
 @Component({
   selector: 'app-user-list',
   standalone: true,
-  imports: [CommonModule],
+  imports: [CommonModule, SimplebarAngularModule],
   templateUrl: './user-list.component.html',
   styleUrl: './user-list.component.scss'
 })

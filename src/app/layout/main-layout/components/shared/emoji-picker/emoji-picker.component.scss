@@ -1,2 +1,70 @@
 
 @use './../../../../../../styles.scss' as *;
+
+.emoji-picker {
+    width: 332px;
+    box-shadow: 0 0 5px rgba($color: #000000, $alpha: .2);
+    background-color: var(--white);
+    padding: 20px;
+    padding-right: 10px;
+    border-radius: 30px;
+    
+    .content-header {
+        width: 100%;
+        margin-bottom: 10px;
+        @include displayFlex($jc: space-between);
+
+        .content-title {
+            font-weight: 700;
+            font-size: 24px;
+        }
+
+        .close {
+            padding: 5px;
+            cursor: pointer;  
+            background-color: var(--white);  
+            border-radius: 50%;
+
+            .close-content {
+                width: 24px;
+                height: 24px;
+                background: {
+                    image: url('/icons/close.png');
+                };
+            }
+
+            &:hover {
+                background: var(--bg-color);
+                .close-content {
+                    background: {
+                        image: url('/icons/close_hover.png');
+                        
+                    };
+                }
+            }
+        }
+    }
+
+    .emoji-container {
+        @include displayFlex($g: 5px, $jc: flex-start);
+        flex-wrap: wrap;
+        .emoji {
+            cursor: pointer;
+            padding: 5px;
+            border-radius: 50%;
+            
+            span {
+                display: inline-block;
+                @include displayFlex();
+                width: 20px;
+                height: 20px;
+
+                
+            }
+            &:hover {
+                background-color: var(--bg-color);
+            }
+        }
+    }
+    
+}

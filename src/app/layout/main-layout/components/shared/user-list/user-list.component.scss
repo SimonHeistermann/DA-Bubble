@@ -9,31 +9,13 @@
     border-bottom-left-radius: 20px;
     border-top-right-radius: 20px;
     max-height: 30vh;
-    
-    overflow-y: hidden;
     scrollbar-width: thin;
     scrollbar-color: var(--bg-color) transparent;
 
    
 
-    &::-webkit-scrollbar {
-        width: 8px;
-    }
-    &::-webkit-scrollbar-track {
-        background: transparent;
-        border-radius: 4px;
-    }
-    
-    &::-webkit-scrollbar-thumb {
-        background: var(--bg-color);
-        border-radius: 4px;
-    }
-    
-    &::-webkit-scrollbar-thumb:hover {
-        background: #555;
-    }
-
     ul {
+        width: 200px;
         @include displayFlex($fd: column, $g: 15px);
         list-style: none;
 

@@ -4,7 +4,7 @@
             <div class="divider"></div>
             <div class="data">Oktober, 14 Janur</div>
         </div>
-        <div class="message-body">
+        <div class="message-body" [class.active]="clickedMessageIndex === 0">
             <div class="avatar">
                 <img src="icons/avatars/avatar_1.png" alt="">
             </div>
@@ -20,20 +20,22 @@
                 </div>
                 <div class="message-content-bottom">
                     <div class="emoji-wrapper">
-                        <div class="emoji-picker-trigger pointer"></div>
+                        <div class="emoji-picker-trigger pointer" #emojiTriggerAtLeft (click)="showEmojiPicker(0, 'left')"></div>
                         <div class="emojis">
                             <div class="emoji-div pointer">
                                 <app-emoji [emoji]="'thumbs_up'"></app-emoji>
+                                 <!-- <span class="emoji-code">👍</span> -->
                                 <span>1</span>
                             </div>
                             <div class="emoji-div pointer">
-                                <app-emoji [emoji]="'rocket'"></app-emoji>
+                                <!-- <app-emoji [emoji]="'rocket'"></app-emoji> -->
+                                <span class="emoji-code">👋</span>
                                 <span>1</span>
                             </div>
                         </div>
                     </div>
                     <div class="thread-wrapper">
-                        <span class="answer">2 Antworte(n)</span>
+                        <span class="answer pointer">2 Antworte(n)</span>
                         <span class="last-answer-time">Letzte Antwort 14:56</span>
                     </div>
                 </div>
@@ -47,7 +49,7 @@
                         <span class="thumbs-up pointer"></span>
                     </li>
                     <li>
-                        <span class="emoji pointer"></span>
+                        <span class="emoji pointer" #emojiTriggerAtRight (click)="showEmojiPicker(0, 'right')"></span>
                     </li>
                     <li>
                         <span class="answer pointer"></span>
@@ -64,7 +66,7 @@
             </div>
         </div>
 
-        <div class="message-body reverse">
+        <div class="message-body reverse"  [class.active]="clickedMessageIndex === 1">
             <div class="avatar">
                 <img src="icons/avatars/avatar_1.png" alt="">
             </div>
@@ -80,7 +82,7 @@
                 </div>
                 <div class="message-content-bottom">
                     <div class="emoji-wrapper">
-                        <div class="emoji-picker-trigger pointer"></div>
+                        <div class="emoji-picker-trigger pointer" #emojiTriggerAtRight (click)="showEmojiPicker(1, 'right')"></div>
                         <div class="emojis">
                             <div class="emoji-div pointer">
                                 <app-emoji [emoji]="'thumbs_up'"></app-emoji>
@@ -93,7 +95,7 @@
                         </div>
                     </div>
                     <div class="thread-wrapper">
-                        <span class="answer">2 Antworte(n)</span>
+                        <span class="answer pointer">2 Antworte(n)</span>
                         <span class="last-answer-time">Letzte Antwort 14:56</span>
                     </div>
                 </div>
@@ -107,7 +109,7 @@
                         <span class="thumbs-up pointer"></span>
                     </li>
                     <li>
-                        <span class="emoji pointer"></span>
+                        <span class="emoji pointer" #emojiTriggerAtLeft (click)="showEmojiPicker(1, 'left')"></span>
                     </li>
                     <li>
                         <span class="answer pointer"></span>
@@ -126,3 +128,8 @@
     </div>
 
 </div>
+
+
+<ng-template #emojiPickerTemplate>
+    <app-emoji-picker (closeOverlayEmitter)="closeEmojiPickerOverlay()"></app-emoji-picker>
+</ng-template>

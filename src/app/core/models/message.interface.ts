@@ -1,7 +1,6 @@
 import { Timestamp } from 'firebase/firestore';
 
-export interface Message {
-    id: string;          
+export interface Message {         
     authorId: string;                
     content: string;
     createdAt?: Timestamp;
@@ -13,6 +12,10 @@ export interface Message {
     type: 'channel' | 'private';
     channelID?: string;
     recipientID?: string;
+}
+
+export interface MessageData extends Message{
+    id: string; 
 }
 
 export interface ThreadMessage {

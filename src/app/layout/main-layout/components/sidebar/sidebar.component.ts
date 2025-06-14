@@ -7,18 +7,19 @@ import { User } from '../../../../core/models/user.interface';
 import { AuthService } from '../../../../core/services/auth-service/auth.service';
 import { UserService } from '../../../../core/services/user-service/user.service';
 import { ActivatedRoute, Router } from '@angular/router';
+import { SimplebarAngularModule } from 'simplebar-angular';
 import { CommonModule } from '@angular/common';
 
 @Component({
   selector: 'app-sidebar',
-  imports: [CommonModule],
+  imports: [SimplebarAngularModule, CommonModule],
+  standalone: true,
   templateUrl: './sidebar.component.html',
   styleUrl: './sidebar.component.scss',
   animations: [toggleMarginTop25Animation, toggleMarginRight20Animation],
 
 })
 export class SidebarComponent implements OnInit, OnDestroy, AfterViewInit {
-  @ViewChild("devspaceContent") devSpaceContentRef!:ElementRef<HTMLElement>;
   private subscriptions = new Subscription();
   channelService = inject(ChannelService);
   authService = inject(AuthService);
@@ -45,7 +46,7 @@ export class SidebarComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   ngAfterViewInit() {
-    this.checkOverflow();
+    // this.checkOverflow();
   }
 
   subCurrentUser(){
@@ -88,12 +89,10 @@ export class SidebarComponent implements OnInit, OnDestroy, AfterViewInit {
   clickChannelHead(){
     
     this.openChannel = !this.openChannel;
-    this.checkOverflow();
   }
 
   clickMessageHead(){
     this.openMessage = !this.openMessage;
-    this.checkOverflow();
   }
 
   clickAddChannel() {
@@ -111,16 +110,4 @@ export class SidebarComponent implements OnInit, OnDestroy, AfterViewInit {
     this.subscriptions.unsubscribe();
   }
 
-  
-  onSectionAnimationDone() {
-    this.checkOverflow();
-  }
-
-  checkOverflow() {
-    const el = this.devSpaceContentRef.nativeElement;
-    
-    setTimeout(()=>{
-      this.isOverflowing = (el.scrollHeight - el.clientHeight) > 2;
-    })
-  }
 }

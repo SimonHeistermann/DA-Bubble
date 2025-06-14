@@ -10,6 +10,11 @@ import { FormsModule } from '@angular/forms';
   styleUrl: './input.component.scss'
 })
 export class InputComponent {
-  input_message = '';
+  inputMessage = '';
   isTextareaFocused = false;
+
+  // @Output sendMessageEmitter = new Event();
+  sendMessage() {
+
+  }
 }

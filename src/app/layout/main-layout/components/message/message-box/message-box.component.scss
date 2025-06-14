@@ -95,6 +95,12 @@
                                 border: 1px solid var(--purple-1);
                                 padding: 3px 8px;
                                 border-radius: 20px;
+
+                                .emoji-code {
+                                    width: 20px;
+                                    height: 20px;
+                                    font-size: 16px;
+                                }
                             }
                         }
                     }
@@ -171,7 +177,7 @@
                 }
             }
 
-            &:hover{
+            &:hover, &.active{
                 background-color: var(--bg-color);
 
                 .message-content {
@@ -186,6 +192,7 @@
                     display: block;
                 }
             }
+            
         }
         .message-body.reverse {
             @include displayFlex($g: 20px, $ai: flex-start);

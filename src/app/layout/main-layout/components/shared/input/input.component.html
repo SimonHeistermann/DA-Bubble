@@ -3,7 +3,8 @@
          autoResize
         class="scrollbar" name="message" id="message" 
         placeholder="Nachricht an #Entwicklerteam"  
-        (focus)="isTextareaFocused = true" (blur)="isTextareaFocused = false"></textarea>
+        (focus)="isTextareaFocused = true" (blur)="isTextareaFocused = false" 
+        [(ngModel)]="inputMessage"></textarea>
     <div class="input-icons">
         <div class="input-icons-left">
             <span class="emoji pointer">
@@ -13,7 +14,7 @@
 
             </span>
         </div>
-        <span class="send-button pointer">
+        <span class="send-button pointer" (click)="sendMessage()">
 
         </span>
     </div>

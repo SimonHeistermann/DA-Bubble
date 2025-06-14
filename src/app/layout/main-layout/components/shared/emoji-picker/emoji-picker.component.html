@@ -1,1 +1,18 @@
-<p>emoji-picker works!</p>
+<div class="emoji-picker">
+    <div class="content-header">
+        <h3 class="content-title">Emojis</h3>
+        <div class="close" (click)="closeOverlay()">
+            <div class="close-content"></div>
+        </div>
+    </div>
+    <ngx-simplebar style="height: 40vh;">
+        <div class="emoji-container">
+            @for (emoji of allEmoji; let index = $index; track $index) {
+                <div class="emoji">
+                    <span>{{emoji}}</span>
+                </div>
+            }
+        </div>
+    </ngx-simplebar>
+    
+</div>

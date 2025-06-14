@@ -1,28 +1,30 @@
-<div #listContainer class="ul-list-container" [style.overflow-y]="isOverflowing ? 'auto' : 'hidden'">
-    <ul>
-        @for(u of dataSource; let index = $index; track $index) {
-          
-            <li class="pointer" (click)="clickLi(u)">
+<ngx-simplebar>
+    <div class="ul-list-container" >
+        <ul>
+            @for(u of dataSource; let index = $index; track $index) {
             
-           
-                <div class="li-content">
-                    <div class="avatar-div">
-                        <img [src]="u?.photoURL?.startsWith('http') ? '/icons/avatars/avatar_1.png' : u?.photoURL">
-                        @if(!u.isActive) {
-                            <span class="active-status offline"></span>
-                        } @else {
-                            <span class="active-status"></span>
-                        }
-                       
+                <li class="pointer" (click)="clickLi(u)">
+                
+            
+                    <div class="li-content">
+                        <div class="avatar-div">
+                            <img [src]="u?.photoURL?.startsWith('http') ? '/icons/avatars/avatar_1.png' : u?.photoURL">
+                            @if(!u.isActive) {
+                                <span class="active-status offline"></span>
+                            } @else {
+                                <span class="active-status"></span>
+                            }
+                        
+                        </div>
+                        <span class="name">
+                            {{ u.displayName }}
+                        </span>
                     </div>
-                    <span class="name">
-                        {{ u.displayName }}
-                    </span>
-                </div>
-            </li>
-        } @empty {
-            <li class="no-li">Keine Mitglieder gefunden</li>
-        }
-        
-    </ul>
-</div>
+                </li>
+            } @empty {
+                <li class="no-li">Keine Mitglieder gefunden</li>
+            }
+            
+        </ul>
+    </div>
+</ngx-simplebar>
