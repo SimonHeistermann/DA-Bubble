@@ -2,7 +2,7 @@
     <textarea 
          autoResize
         class="scrollbar" name="message" id="message" 
-        placeholder="Nachricht an #Entwicklerteam"  
+        placeholder="Nachricht an #{{placeHolder}}"  
         (focus)="isTextareaFocused = true" (blur)="isTextareaFocused = false" 
         [(ngModel)]="inputMessage"></textarea>
     <div class="input-icons">

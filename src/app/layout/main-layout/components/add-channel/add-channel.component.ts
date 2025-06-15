@@ -49,7 +49,7 @@ export class AddChannelComponent implements OnDestroy, OnChanges {
   errMsg = '';
   
   channel:Partial<ChannelData> = {
-    name: 'New Channel',
+    name: '',
     description: '',
     createdBy: '',
     userIDs: []
@@ -108,7 +108,7 @@ export class AddChannelComponent implements OnDestroy, OnChanges {
         },
         complete: () => {
           console.log('Add channel operation completed.');
-          this.closeOverlayEmitter.emit();
+          this.closeOverlay()
         }
       })
     )
@@ -210,10 +210,27 @@ export class AddChannelComponent implements OnDestroy, OnChanges {
   }
 
   closeOverlay() {
-    this.showOverlay = false;
+    this.clearData();
     this.closeOverlayEmitter.emit();
   }
 
+  clearData() {
+    this.showOverlay = false;
+    this.showAddUserContent = false;
+    this.firstCbActivated = true;
+
+    this.channel = {
+      name: '',
+      description: '',
+      createdBy: '',
+      userIDs: []
+    };
+    this.filteredUsers = [];
+    this.tagIDs = [];
+    this.showUserList = false;
+    this.showChannelNameError = false;
+    this.showChooseNameInput = false;
+  }
 
   ngOnDestroy(): void {
     this.subscriptions.unsubscribe();

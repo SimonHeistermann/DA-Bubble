@@ -1,4 +1,4 @@
-import { Component } from '@angular/core';
+import { Component, EventEmitter, Input, Output } from '@angular/core';
 import { AutoResizeDirective } from '../../../../../core/directives/auto-resize.directive';
 import { FormsModule } from '@angular/forms';
 
@@ -11,10 +11,13 @@ import { FormsModule } from '@angular/forms';
 })
 export class InputComponent {
   inputMessage = '';
+  @Input() placeHolder:string = '';
   isTextareaFocused = false;
 
-  // @Output sendMessageEmitter = new Event();
+  @Output() sendMessageEmitter = new EventEmitter<string>();
   sendMessage() {
-
+   
+    this.sendMessageEmitter.emit(this.inputMessage.trim());
+    this.inputMessage = '';
   }
 }

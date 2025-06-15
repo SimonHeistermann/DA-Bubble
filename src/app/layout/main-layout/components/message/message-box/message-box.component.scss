@@ -14,8 +14,9 @@
             padding: 0 10px;
             width: 100%;
             .divider {
-                height: 1px;
-                width: calc(100% - 20px);
+                height: .5px;
+                width: calc(100% - 40px);
+                margin-left: 10px;
                 background-color: var(--light-purple);
                 position: absolute;
                 top: 50%;
@@ -36,6 +37,9 @@
                 background-color: var(--white);
 
                 
+            }
+            &:not(:first-of-type) {
+                margin-top: 10px;
             }
         }
         .message-body {
@@ -194,7 +198,7 @@
             }
             
         }
-        .message-body.reverse {
+        .message-body.reversed {
             @include displayFlex($g: 20px, $ai: flex-start);
             justify-content: flex-start;
             flex-direction: row-reverse;

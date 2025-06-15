@@ -54,12 +54,12 @@ export class MainLayoutContentComponent implements AfterViewInit, OnInit  {
   }
 
   onAddChannel() {
-    console.log('add channel overlay');
-    
     this.showAddChannelOverlay = true;
   }
 
   onClickChannelName(c: Channel){
+    console.log('channel clicked:', c);
+    
     this.clickedChannel = c;
   }
 

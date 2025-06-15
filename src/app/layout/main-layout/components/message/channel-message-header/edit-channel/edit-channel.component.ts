@@ -1,14 +1,14 @@
 import { Component, EventEmitter, inject, Input, OnChanges, OnDestroy, Output, SimpleChanges } from '@angular/core';
-import { slideFadeInAnimation } from '../../../animations/slide.animation';
+import { slideFadeInAnimation } from '../../../../animations/slide.animation';
 import { CommonModule } from '@angular/common';
-import { padding20Animation } from '../../../animations/padding.animation';
-import { AutoResizeDirective } from '../../../../../core/directives/auto-resize.directive';
-import { Channel } from '../../../../../core/models/channel.interface';
+import { padding20Animation } from '../../../../animations/padding.animation';
+import { AutoResizeDirective } from '../../../../../../core/directives/auto-resize.directive';
+import { Channel } from '../../../../../../core/models/channel.interface';
 import { FormsModule } from '@angular/forms';
 import { Subscription } from 'rxjs';
-import { UserService } from '../../../../../core/services/user-service/user.service';
-import { User } from '../../../../../core/models/user.interface';
-import { ChannelService } from '../../../../../core/services/channel.service';
+import { UserService } from '../../../../../../core/services/user-service/user.service';
+import { User } from '../../../../../../core/models/user.interface';
+import { ChannelService } from '../../../../../../core/services/channel.service';
 
 
 @Component({

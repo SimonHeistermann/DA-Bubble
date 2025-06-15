@@ -1,18 +1,18 @@
 import { Component, ElementRef, EventEmitter, inject, Input, OnDestroy, Output, TemplateRef, ViewChild, ViewContainerRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
-import { ChannelService } from '../../../../../core/services/channel.service';
-import { verticalExpandCollapseAnimation } from '../../../animations/expand-collapse.animation';
-import { RichtextEditorComponent } from '../../shared/richtext-editor/richtext-editor.component';
-import { UserListComponent } from '../../shared/user-list/user-list.component';
-import { User } from '../../../../../core/models/user.interface';
+import { ChannelService } from '../../../../../../core/services/channel.service';
+import { verticalExpandCollapseAnimation } from '../../../../animations/expand-collapse.animation';
+import { RichtextEditorComponent } from '../../../shared/richtext-editor/richtext-editor.component';
+import { UserListComponent } from '../../../shared/user-list/user-list.component';
+import { User } from '../../../../../../core/models/user.interface';
 import { Subscription } from 'rxjs';
-import { AuthService } from '../../../../../core/services/auth-service/auth.service';
-import { UserService } from '../../../../../core/services/user-service/user.service';
-import { Channel, ChannelData } from '../../../../../core/models/channel.interface';
-import { slideFadeInAnimation } from '../../../animations/slide.animation';
+import { AuthService } from '../../../../../../core/services/auth-service/auth.service';
+import { UserService } from '../../../../../../core/services/user-service/user.service';
+import { Channel, ChannelData } from '../../../../../../core/models/channel.interface';
+import { slideFadeInAnimation } from '../../../../animations/slide.animation';
 import { OverlayRef } from '@angular/cdk/overlay';
-import { OverlayService } from '../../../../../core/services/overlay.service';
+import { OverlayService } from '../../../../../../core/services/overlay.service';
 
 
 @Component({

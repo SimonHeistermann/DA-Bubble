@@ -1,10 +1,10 @@
 import { Component, ElementRef, EventEmitter, inject, Input, Output, TemplateRef, ViewChild, ViewContainerRef } from '@angular/core';
-import { User } from '../../../../../core/models/user.interface';
-import { slideFadeInAnimation } from '../../../animations/slide.animation';
-import { ProfileComponent } from '../../shared/profile/profile.component';
+import { User } from '../../../../../../core/models/user.interface';
+import { slideFadeInAnimation } from '../../../../animations/slide.animation';
+import { ProfileComponent } from '../../../shared/profile/profile.component';
 import { CommonModule } from '@angular/common';
 import { OverlayRef } from '@angular/cdk/overlay';
-import { OverlayService } from '../../../../../core/services/overlay.service';
+import { OverlayService } from '../../../../../../core/services/overlay.service';
 
 @Component({
   selector: 'app-channel-user-list',

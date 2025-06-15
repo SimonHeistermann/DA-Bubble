@@ -9,6 +9,7 @@ import { UserService } from '../../../../core/services/user-service/user.service
 import { ActivatedRoute, Router } from '@angular/router';
 import { SimplebarAngularModule } from 'simplebar-angular';
 import { CommonModule } from '@angular/common';
+import { MessageService } from '../../../../core/services/message.service';
 
 @Component({
   selector: 'app-sidebar',
@@ -19,11 +20,12 @@ import { CommonModule } from '@angular/common';
   animations: [toggleMarginTop25Animation, toggleMarginRight20Animation],
 
 })
-export class SidebarComponent implements OnInit, OnDestroy, AfterViewInit {
+export class SidebarComponent implements OnInit, OnDestroy {
   private subscriptions = new Subscription();
   channelService = inject(ChannelService);
   authService = inject(AuthService);
   userService = inject(UserService);
+  messageService = inject(MessageService)
   route = inject(ActivatedRoute);
   channels: Channel[] = [];
   allUsers: User[] = [];
@@ -43,10 +45,25 @@ export class SidebarComponent implements OnInit, OnDestroy, AfterViewInit {
 
   ngOnInit(): void {
     this.subCurrentUser();
+    this.subMessagesInAllChannel();
   }
 
-  ngAfterViewInit() {
-    // this.checkOverflow();
+  subMessagesInAllChannel() {
+    for (let index = 0; index < this.channels.length; index++) {
+      const channel = this.channels[index];
+      this.subscriptions.add(
+      this.messageService.getChannelMessageOrderByCreatedAt(channel.id, (data) => {
+       
+        // this.messages.push(...data);
+        
+        // if (this.messages.length > 0) {
+        //   console.log('messaged updatged', this.messages);
+        //   this.markChannelAsSeen();
+        // }
+      })
+    );
+    }
+    
   }
 
   subCurrentUser(){
@@ -57,6 +74,8 @@ export class SidebarComponent implements OnInit, OnDestroy, AfterViewInit {
     this.subscriptions.add(
       this.userService.currentUser$.subscribe(user => {
         this.currentUser = user;
+        console.log('sidebar-currentuser:', this.currentUser);
+        
         this.subAllUsers();
         this.subAllChannels();
       })
@@ -76,10 +95,12 @@ export class SidebarComponent implements OnInit, OnDestroy, AfterViewInit {
     
     this.subscriptions.add(
       this.channelService.getChannelsOrderByCreatedAt(this.currentUser.id, (data) => {
-        this.channels.length=0;
-        this.channels.push(...data);
+        
+        this.channels = [...data];
         
         if (this.channels.length > 0) {
+          console.log(this.channels);
+          
           this.clickChannelNameEmitter.emit(this.channels[this.currentChannelIndex]);
         }
       })
@@ -87,7 +108,6 @@ export class SidebarComponent implements OnInit, OnDestroy, AfterViewInit {
   }
 
   clickChannelHead(){
-    
     this.openChannel = !this.openChannel;
   }
 

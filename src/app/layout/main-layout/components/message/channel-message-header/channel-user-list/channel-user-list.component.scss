@@ -1,5 +1,5 @@
-@use './../../../../../../styles/colors.scss' as *;
-@use './../../../../../../styles.scss' as *;
+
+@use './../../../../../../../styles.scss' as *;
 
 .overlay-content {
     @include displayFlex($fd: column);

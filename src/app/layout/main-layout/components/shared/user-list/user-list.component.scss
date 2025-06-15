@@ -1,26 +1,25 @@
 
 @use './../../../../../../styles.scss' as *;
 
+.simple-bar {
+     max-height: 30vh;
+     width: 300px;
+    padding-bottom: 3px !important;
+}
+
 .ul-list-container {
-    width: fit-content;
-    padding: 0 40px;
     
     border-bottom-right-radius: 20px;
     border-bottom-left-radius: 20px;
     border-top-right-radius: 20px;
-    max-height: 30vh;
-    scrollbar-width: thin;
-    scrollbar-color: var(--bg-color) transparent;
 
-   
 
     ul {
-        width: 200px;
         @include displayFlex($fd: column, $g: 15px);
         list-style: none;
 
         li {
-            width: 100%;
+            width: calc(100% - 20px);
             padding: 5px 10px;
             border-radius: 35px;
             

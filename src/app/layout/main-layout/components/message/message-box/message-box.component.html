@@ -1,130 +1,90 @@
 <div class="message-container">
     <div class="message ">
-        <div class="data-divider">
-            <div class="divider"></div>
-            <div class="data">Oktober, 14 Janur</div>
-        </div>
-        <div class="message-body" [class.active]="clickedMessageIndex === 0">
-            <div class="avatar">
-                <img src="icons/avatars/avatar_1.png" alt="">
-            </div>
-            <div class="message-content">
-                <div class="message-content-top">
-                    <span class="name">Noah Braun</span>
-                    <span class="time">14:25 Uhr</span>
-                </div>
-                <div class="message-content-middle">
-                    <p>
-                        Welche Version ia aktuell von Angular? 
-                    </p>
-                </div>
-                <div class="message-content-bottom">
-                    <div class="emoji-wrapper">
-                        <div class="emoji-picker-trigger pointer" #emojiTriggerAtLeft (click)="showEmojiPicker(0, 'left')"></div>
-                        <div class="emojis">
-                            <div class="emoji-div pointer">
-                                <app-emoji [emoji]="'thumbs_up'"></app-emoji>
-                                 <!-- <span class="emoji-code">👍</span> -->
-                                <span>1</span>
+         @for (message of messages; let index = $index; track message.id) {
+             @if (allUsers.length) {
+                 @if (message.createdAt) {
+                    @if (shouldShowDateDivider(index)) {
+                        <div class="data-divider">
+                            <div class="divider"></div>
+                                <div class="data">{{ dateService.getGermanFullDate(message.createdAt) }}</div>
+                        
+                        </div>
+                    }
+                 }
+                <div class="message-body" [class.active]="clickedMessageIndex === 0" [class.reversed]="currentUser?.id === message.authorID">
+                    <div class="avatar">
+                        <img [src]="findURLByUserId(message.authorID)">
+                    </div>
+                    <div class="message-content">
+                        <div class="message-content-top">
+                            <span class="name">{{ message.authorName }}</span>
+                            @if (message.createdAt) {
+                                 <span class="time">{{ dateService.getHoursAndMinutes(message.createdAt) }} Uhr</span>
+                            }
+                           
+                        </div>
+                        <div class="message-content-middle">
+                            <p>
+                                {{ message.content }}
+                            </p>
+                        </div>
+                        <div class="message-content-bottom">
+                            <div class="emoji-wrapper">
+                                <div class="emoji-picker-trigger pointer" #emojiTriggerAtLeft (click)="showEmojiPicker(0, 'left')"></div>
+                                <div class="emojis">
+                                    <div class="emoji-div pointer">
+                                        <app-emoji [emoji]="'thumbs_up'"></app-emoji>
+                                        <!-- <span class="emoji-code">👍</span> -->
+                                        <span>1</span>
+                                    </div>
+                                    <div class="emoji-div pointer">
+                                        <!-- <app-emoji [emoji]="'rocket'"></app-emoji> -->
+                                        <span class="emoji-code">👋</span>
+                                        <span>1</span>
+                                    </div>
+                                </div>
                             </div>
-                            <div class="emoji-div pointer">
-                                <!-- <app-emoji [emoji]="'rocket'"></app-emoji> -->
-                                <span class="emoji-code">👋</span>
-                                <span>1</span>
+                            <div class="thread-wrapper">
+                                <span class="answer pointer">
+                                    {{ message.threadCount }} 
+                                    <span>
+                                    Antwort<ng-container *ngIf="message.threadCount > 1">en</ng-container>
+                                    </span>
+                                </span>
+                                <span class="last-answer-time">Letzte Antwort 14:56</span>
                             </div>
                         </div>
                     </div>
-                    <div class="thread-wrapper">
-                        <span class="answer pointer">2 Antworte(n)</span>
-                        <span class="last-answer-time">Letzte Antwort 14:56</span>
+                    <div class="reaction-bar">
+                        <ul>
+                            <li>
+                                <span class="check-mark pointer"></span>
+                            </li>
+                            <li>
+                                <span class="thumbs-up pointer"></span>
+                            </li>
+                            <li>
+                                <span class="emoji pointer" #emojiTriggerAtRight (click)="showEmojiPicker(0, 'right')"></span>
+                            </li>
+                            <li>
+                                <span class="answer pointer"></span>
+                            </li>
+                            <li>
+                                <span class="option pointer">
+                                    <p class="edit-message">
+                                        Nachricht bearbeiten
+                                    </p>
+                                </span>
+                                
+                            </li>
+                        </ul>
                     </div>
-                </div>
-            </div>
-            <div class="reaction-bar">
-                <ul>
-                    <li>
-                        <span class="check-mark pointer"></span>
-                    </li>
-                    <li>
-                        <span class="thumbs-up pointer"></span>
-                    </li>
-                    <li>
-                        <span class="emoji pointer" #emojiTriggerAtRight (click)="showEmojiPicker(0, 'right')"></span>
-                    </li>
-                    <li>
-                        <span class="answer pointer"></span>
-                    </li>
-                    <li>
-                        <span class="option pointer">
-                            <p class="edit-message">
-                                Nachricht bearbeiten
-                            </p>
-                        </span>
-                        
-                    </li>
-                </ul>
-            </div>
-        </div>
+                </div>  
+            }  
+        }
+        
 
-        <div class="message-body reverse"  [class.active]="clickedMessageIndex === 1">
-            <div class="avatar">
-                <img src="icons/avatars/avatar_1.png" alt="">
-            </div>
-            <div class="message-content">
-                <div class="message-content-top">
-                    <span class="name">Noah Braun</span>
-                    <span class="time">14:25 Uhr</span>
-                </div>
-                <div class="message-content-middle">
-                    <p>
-                        Welche Version ia aktuell von Angular? 
-                    </p>
-                </div>
-                <div class="message-content-bottom">
-                    <div class="emoji-wrapper">
-                        <div class="emoji-picker-trigger pointer" #emojiTriggerAtRight (click)="showEmojiPicker(1, 'right')"></div>
-                        <div class="emojis">
-                            <div class="emoji-div pointer">
-                                <app-emoji [emoji]="'thumbs_up'"></app-emoji>
-                                <span>1</span>
-                            </div>
-                            <div class="emoji-div pointer">
-                                <app-emoji [emoji]="'rocket'"></app-emoji>
-                                <span>1</span>
-                            </div>
-                        </div>
-                    </div>
-                    <div class="thread-wrapper">
-                        <span class="answer pointer">2 Antworte(n)</span>
-                        <span class="last-answer-time">Letzte Antwort 14:56</span>
-                    </div>
-                </div>
-            </div>
-            <div class="reaction-bar">
-                <ul>
-                    <li>
-                        <span class="check-mark pointer"></span>
-                    </li>
-                    <li>
-                        <span class="thumbs-up pointer"></span>
-                    </li>
-                    <li>
-                        <span class="emoji pointer" #emojiTriggerAtLeft (click)="showEmojiPicker(1, 'left')"></span>
-                    </li>
-                    <li>
-                        <span class="answer pointer"></span>
-                    </li>
-                    <li>
-                        <span class="option pointer">
-                            <p class="edit-message">
-                                Nachricht bearbeiten
-                            </p>
-                        </span>
-                        
-                    </li>
-                </ul>
-            </div>
-        </div>
+        
     </div>
 
 </div>

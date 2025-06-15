@@ -27,7 +27,7 @@
                     </div>
                     <div class="channel-names" [@toggleMarginTop25]="openChannel ? 'open' : 'closed'">
                         <ul>
-                            @for(channel of channels; let index = $index; track $index) {
+                            @for(channel of channels; let index = $index; track channel.id) {
                                 <li class="channel-li pointer" [class.selected]="index === currentChannelIndex"  (click)="clickChannelName(index, channel)">
                                     <div class="channel-li-content">
                                         <div class="tag"></div>

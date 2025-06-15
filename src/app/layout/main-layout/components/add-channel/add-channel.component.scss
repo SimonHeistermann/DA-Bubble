@@ -4,7 +4,7 @@
 @use './../../../../../styles/overlay.scss' as *;
 
 .content-scroll {
-    max-height: 45vh;
+    max-height: 50vh;
     width: 100%;
     overflow-y: scroll;
 }
