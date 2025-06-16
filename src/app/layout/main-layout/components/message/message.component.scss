@@ -2,6 +2,7 @@
 @use './../../../../../styles.scss' as *;
 @use './../../../../../styles/overlay.scss' as *;
 .main-content {
+    
     display: flex;
     flex-direction: column;
     align-items: center;
@@ -43,6 +44,8 @@
             flex-shrink: 0;
             width: 100%;
         }
+
+        // test
     }
     
 }
