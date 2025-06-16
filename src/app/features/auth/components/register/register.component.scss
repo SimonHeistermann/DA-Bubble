@@ -5,17 +5,35 @@
     background-color: white;
     padding: 32px 48px;
     border-radius: 30px;
+    position: relative;
+}
+
+.back__arrow {
+    position: absolute;
+    top: 32px;
+    left: 32px;
+    width: 40px;
+    height: 40px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    background-image: url('/icons/arrow_left_default.png');
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+
+    &:hover {
+        transform: translateX(-2px);
+        background-image: url('/icons/arrow_left_hover.png');
+    }
 }
 
 .auth__form__container {
     width: 100%;
-    @include displayFlex($g: 24px);
-    flex-direction: column;
+    @include displayFlex($g: 24px, $fd: column);
 }
 
 .auth__form__header {
-    @include displayFlex($ai: center, $jc: center, $g: 24px);
-    flex-direction: column;
+    @include displayFlex($ai: center, $jc: center, $g: 24px, $fd: column);
     text-align: center;
 }
 
@@ -40,14 +58,12 @@ p {
 
 .auth__form {
     width: 100%;
-    @include displayFlex($g: 7px);
-    flex-direction: column;
+    @include displayFlex($g: 7px, $fd: column);
 }
 
 .form__fields {
     width: 100%;
-    @include displayFlex($g: 7px);
-    flex-direction: column;
+    @include displayFlex($g: 7px, $fd: column);
 }
 
 .form__field {
@@ -106,9 +122,7 @@ label {
 .form__input {
     width: 100%;
     height: 24px;
-    font-family: 'Nunito', sans-serif;
-    font-size: 18px;
-    font-weight: 500;
+    @include fontNunito($fs: 18px, $fw: 500);
     transition: all 0.2s ease;
     background: transparent;
     border: unset;
@@ -125,16 +139,22 @@ label {
     cursor: not-allowed;
 }
 
+.honeypot {
+    position: absolute;
+    left: -9999px;
+    width: 1px;
+    height: 1px;
+    opacity: 0;
+    pointer-events: none;
+}
+
 .error {
     margin-top: 0.5rem;
 }
 
 .error small {
+    @include fontNunito($fs: 14px, $fw: 400, $lh: 100%);
     color: var(--pink);
-    font-family: 'Nunito', sans-serif;
-    font-size: 14px;
-    font-weight: 400;
-    line-height: 100%;
     display: block;
 }
 
@@ -148,106 +168,85 @@ label {
 
 .form__bottom {
     width: 100%;
-    display: flex;
-    gap: 24px;
-    flex-direction: column;
+    @include displayFlex($g: 24px, $fd: column, $ai: flex-end);
 }
 
-.link {
-    color: var(--purple-2);
-    font-family: 'Figtree', sans-serif;
-    font-weight: 400;
-    text-decoration: none;
-    cursor: pointer;
-    padding: 5px 15px;
-    border-radius: 30px;
-    height: 32px;
-    transition: color 0.2s ease, background-color 0.2s ease, font-weight 0.2s ease;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.link:hover {
-    color: var(--purple-1);
-    background-color: var(--bg-color);
-    font-weight: 500;
-}
-
-.divider {
+.privacy__section {
     width: 100%;
-    position: relative;
-    text-align: center;
 }
 
-.divider span {
-    font-family: 'Nunito', sans-serif;
-    font-size: 18px;
-    font-weight: 400;
-    color: black;
-    position: relative;
-    z-index: 1;
-    background-color: white;
-    padding: 5px 15px;
-}
 
-.divider::before {
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: 0;
-    right: 0;
-    height: 1px;
-    background-color: var(--light-purple);
-    z-index: 0;
-}
-
-.btn__google {
+.privacy__checkbox {
     width: 100%;
-    padding: 11px 32px;
-    background-color: var(--bg-color);
-    display: flex;
-    gap: 20px;
-    align-items: center;
-    justify-content: center;
-    height: 60px;
-    border: 1px solid transparent;
-    border-radius: 100px;
-    font-family: 'Nunito', sans-serif;
-    font-size: 18px;
-    font-weight: 400;
-    color: var(--purple-1);
-    overflow: hidden;
-    transition: color 0.2s ease, border 0.2s ease, transform 0.2s ease, font-weight 0.2s ease;
-    cursor: pointer;
-}
+    @include displayFlex($jc: flex-start, $g: 12px);
+    flex: 1;
 
-.btn__google .btn__icon {
-    width: 38px;
-    height: 38px;
-    background-image: url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iMTgiIGhlaWdodD0iMTgiIHZpZXdCb3g9IjAgMCAxOCAxOCIgZmlsbD0ibm9uZSIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj4KPHBhdGggZD0iTTE3LjY0IDkuMjA0NTVDMTcuNjQgOC41NjU5MSAxNy41ODM2IDcuOTUyMjcgMTcuNDggNy4zNjM2NEg5VjEwLjg0NTVING4wOTA5IDE0LjM2ODIgMTMuOTU0NSAxNi4wMjA1VjE4SDE2LjAyMDVDMTcuMDg4NiAxNi4wOTU1IDE3LjY0IDEyLjkyNzMgMTcuNjQgOS4yMDQ1NVoiIGZpbGw9IiM0Mjg1RjQiLz4KPHBhdGggZD0iTTkgMThDMTEuNDMgMTggMTMuNDY3MyAxNy4xOTQxIDE0Ljk1NjQgMTUuODA0N0wxNS43MzY0IDE0LjgxOEwxNi4wMjA0IDE0VjEyLjkyNzNMMTUuMzI3MyAxMy42MzY0QzE0LjEwNDUgMTQuNzc3MyAxMi41NDA5IDE1LjQwOTEgMTAuNzI3MyAxNS40MDkxVjE1LjQwOTFDMTAuNzI3MyAxNS40MDkxIDExLjMxODIgMTcuNjQgOSAxOFYxOFoiIGZpbGw9IiMzNEE4NTMiLz4KPHBhdGggZD0iTTMuOTgxODEgMTAuNzM2NEMzLjk4MTgxIDEwLjAwOTEgNC4xNTQ1NSA5LjMxODIgNC40NjM2NCA4LjcwOTFMMi4xNTQ1NSA2Ljg2MzY0VjZIMS4zNjM2NEMwLjQ5MDkwOSA3LjQ1NDU1IDAgMTAuNzM2NCAwIDEwLjczNjRWMTBDMCA5IDIuNzI3MjcgOS45IDQuNDYzNjQgOS4zNjM2NEw0LjQ5MDkxIDkuMzYzNjRWMTBMMy45ODE4MSAxMC43MzY0WiIgZmlsbD0iI0ZCQkMwNSIvPgo8cGF0aCBkPSJNOSAzLjU0NTQ2QzEwLjQzMTggMy41NDU0NiAxMS42MzY0IDQuMDQ1NDYgMTIuNTQ1NSA0LjkyNzI3TDE0LjgzNjQgMi42MzYzNkMxMy40NTQ1IDEuMzE4MTggMTEuNDI3MyAwLjQwOTA5IDkgMC40MDkwOUM1LjQ4MTgyIDAuNDA5MDkgMi40NzI3MyAyLjQzNjM2IDEuMzYzNjQgNS40MDkwOUwyLjUyNzI3IDcuMzYzNjRDMy42MzYzNiA0LjYzNjM2IDYuMDkwOTEgMy41NDU0NiA5IDMuNTQ1NDZWM1oiIGZpbGw9IiNFQTQzMzUiLz4KPC9zdmc+Cg==');
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
-    user-select: none;
-}
+    .custom__checkbox {
+        position: relative;
+        width: 24px;
+        height: 24px;
+        cursor: pointer;
 
-.btn__google:disabled {
-    opacity: 0.6;
-    cursor: not-allowed;
-    transform: none !important;
-}
+        input[type="checkbox"] {
+            opacity: 0;
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            margin: 0;
+            cursor: pointer;
+        }
 
-.btn__google:not(:disabled):hover {
-    font-weight: 700;
-    border: 1px solid var(--purple-1);
-    transform: translateY(-1px);
-}
+        .checkbox__icon {
+            width: 24px;
+            height: 24px;
+            background-image: url('/icons/checkbox_default.png');
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center;
+            transition: all 0.2s ease;
+        }
 
-.btn__google:not(:disabled):active {
-    font-weight: 500;
-    border: 1px solid var(--grey);
-    transform: translateY(0);
+        &:hover .checkbox__icon {
+            background-image: url('/icons/checkbox_hover.png');
+        }
+
+        input[type="checkbox"]:checked + .checkbox__icon {
+            background-image: url('/icons/checkbox_checked.png');
+        }
+
+        input[type="checkbox"]:checked:hover + .checkbox__icon {
+            background-image: url('/icons/checkbox_checked_hover.png');
+        }
+    }
+
+    .privacy__text {
+        color: var(--menu-color);
+        cursor: pointer;
+        @include fontNunito($fs: 16px, $fw: 400);
+
+        .privacy__link {
+            color: var(--purple-2);
+            @include fontFigtree($fw: 400);
+            @include displayFlex();
+            text-decoration: none;
+            cursor: pointer;
+            border-radius: 30px;
+            height: 32px;
+            padding: 5px;
+            transition: 
+                color 0.2s ease,
+                background-color 0.2s ease,
+                font-weight 0.2s ease;
+        
+            &:hover {
+                color: var(--purple-1);
+                background-color: var(--bg-color);
+                @include fontFigtree($fw: 500);
+                height: 32px;
+                padding: 5px 15px;
+            }
+        }
+    }
 }
 
 .btn {
@@ -266,20 +265,15 @@ label {
 }
 
 .btn__box {
-    display: flex;
-    gap: 30px;
+    @include displayFlex($g: 30px);
     width: 100%;
 }
 
 .btn__primary {
     padding: 12px 25px;
     height: 49px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-family: 'Nunito', sans-serif;
-    font-size: 18px;
-    font-weight: 700;
+    @include displayFlex();
+    @include fontNunito($fs: 18px, $fw: 700);
     color: white;
     background-color: var(--purple-1);
     border-radius: 25px;
@@ -301,46 +295,6 @@ label {
 
 .btn__primary:disabled {
     background-color: var(--grey);
-    cursor: not-allowed;
-    transform: none !important;
-}
-
-.btn__secondary {
-    padding: 12px 25px;
-    height: 49px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-family: 'Nunito', sans-serif;
-    font-size: 18px;
-    font-weight: 700;
-    color: var(--purple-1);
-    background-color: white;
-    border: 1px solid var(--purple-2);
-    border-radius: 25px;
-    transition: background-color 0.2s ease, border-color 0.2s ease, color 0.2s ease, transform 0.2s ease;
-    cursor: pointer;
-    flex: 1;
-}
-
-.btn__secondary:not(:disabled):hover {
-    background-color: var(--purple-3);
-    border: 1px solid var(--purple-3);
-    color: white;
-    transform: translateY(-1px);
-}
-
-.btn__secondary:not(:disabled):active {
-    background-color: var(--purple-1);
-    border: 1px solid var(--purple-1);
-    color: white;
-    transform: translateY(0);
-}
-
-.btn__secondary:disabled {
-    background-color: white;
-    color: var(--dark-grey);
-    border: 1px solid var(--grey);
     cursor: not-allowed;
     transform: none !important;
 }
@@ -377,8 +331,7 @@ form.submitting {
 }
 
 .name__fields {
-    display: flex;
-    gap: 15px;
+    @include displayFlex($g: 15px);
 }
 
 .name__fields .form__field {

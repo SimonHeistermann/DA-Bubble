@@ -1,7 +1,7 @@
 @use './../../../styles.scss' as *;
 
 .auth-layout {
-    height: 100vh;
+    min-height: 100vh;
     @include displayFlex($g: 8px);
     flex-direction: column;
 }

@@ -30,10 +30,12 @@
                   <input
                     type="email"
                     id="email"
+                    inputmode="email"
                     formControlName="email"
                     placeholder="beispielname@email.com"
                     class="form__input"
                     autocomplete="email"
+                    name="email"
                     [attr.aria-invalid]="isFieldInvalid('email')"
                     [attr.aria-describedby]="isFieldInvalid('email') ? 'email-error' : null"
                   />
@@ -56,6 +58,7 @@
                   <input
                     [type]="showPassword ? 'text' : 'password'"
                     id="password"
+                    name="password"
                     formControlName="password"
                     placeholder="Passwort"
                     class="form__input"
@@ -87,6 +90,7 @@
               class="btn btn__google"
               (click)="onGoogleSignIn()"
               [disabled]="loading"
+              aria-label="Mit Google anmelden"
             >
               <span class="btn__icon"></span>
               Anmelden mit Google

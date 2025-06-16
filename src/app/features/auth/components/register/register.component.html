@@ -1,4 +1,5 @@
 <div class="auth__container">
+    <div class="back__arrow" (click)="goBack()"></div>
     <div class="auth__form__container">
         <div class="auth__form__header">
             <h1>Konto erstellen</h1>
@@ -7,138 +8,206 @@
         <div class="auth__form__content">
             <form
                 class="auth__form"
-                id="registerForm"
+                [formGroup]="registerForm"
+                (ngSubmit)="onSubmit()"
+                [ngClass]="{ submitting: loading }"
                 novalidate
                 aria-labelledby="register-form-title"
             >
                 <h2 id="register-form-title" class="visually__hidden">Registrierungsformular</h2>
+                <div class="honeypot">
+                    <label for="website">Website (bitte leer lassen):</label>
+                    <input type="text" id="website" name="website" tabindex="-1" autocomplete="off">
+                </div>
+
                 <div class="form__fields">
                     <div class="name__fields">
                         <div class="form__field">
-                            <div class="form__group" id="firstName-group">
+                            <div 
+                                class="form__group" 
+                                id="firstName-group"
+                                [ngClass]="{
+                                    error__state: isFieldInvalid('firstName'),
+                                    has__content: hasFieldContent('firstName')
+                                }"
+                            >
                                 <div class="input__wrapper">
                                     <label for="firstName">
-                                        <svg class="input__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-                                            <circle cx="12" cy="7" r="4"></circle>
-                                        </svg>
+                                        <img class="input__icon" src="/icons/person_icon_black.png" draggable="false" />
                                     </label>
                                     <input
                                         type="text"
                                         id="firstName"
-                                        name="firstName"
+                                        formControlName="firstName"
                                         placeholder="Vorname"
                                         class="form__input"
                                         autocomplete="given-name"
-                                        required
+                                        [attr.aria-invalid]="isFieldInvalid('firstName')"
+                                        [attr.aria-describedby]="isFieldInvalid('firstName') ? 'firstName-error' : null"
                                     />
                                 </div>
-                                <div class="error" id="firstName-error" style="display: none;">
-                                    <small></small>
+                                <div class="error" *ngIf="getFieldError('firstName')" id="firstName-error">
+                                    <small>{{ getFieldError('firstName') }}</small>
                                 </div>
                             </div>
                         </div>
                         <div class="form__field">
-                            <div class="form__group" id="lastName-group">
+                            <div 
+                                class="form__group" 
+                                id="lastName-group"
+                                [ngClass]="{
+                                    error__state: isFieldInvalid('lastName'),
+                                    has__content: hasFieldContent('lastName')
+                                }"
+                            >
                                 <div class="input__wrapper">
                                     <label for="lastName">
-                                        <svg class="input__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                            <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
-                                            <circle cx="12" cy="7" r="4"></circle>
-                                        </svg>
+                                        <img class="input__icon" src="/icons/person_icon_black.png" draggable="false" />
                                     </label>
                                     <input
                                         type="text"
                                         id="lastName"
-                                        name="lastName"
+                                        formControlName="lastName"
                                         placeholder="Nachname"
                                         class="form__input"
                                         autocomplete="family-name"
-                                        required
+                                        [attr.aria-invalid]="isFieldInvalid('lastName')"
+                                        [attr.aria-describedby]="isFieldInvalid('lastName') ? 'lastName-error' : null"
                                     />
                                 </div>
-                                <div class="error" id="lastName-error" style="display: none;">
-                                    <small></small>
+                                <div class="error" *ngIf="getFieldError('lastName')" id="lastName-error">
+                                    <small>{{ getFieldError('lastName') }}</small>
                                 </div>
                             </div>
                         </div>
                     </div>
                     <div class="form__field">
-                        <div class="form__group" id="email-group">
+                        <div 
+                            class="form__group" 
+                            id="email-group"
+                            [ngClass]="{
+                                error__state: isFieldInvalid('email'),
+                                has__content: hasFieldContent('email')
+                            }"
+                        >
                             <div class="input__wrapper">
                                 <label for="email">
-                                    <svg class="input__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                        <path d="M4 4h16c1.1 0 2 .9 2 2v12c0 1.1-.9 2-2 2H4c-1.1 0-2-.9-2-2V6c0-1.1.9-2 2-2z"></path>
-                                        <polyline points="22,6 12,13 2,6"></polyline>
-                                    </svg>
+                                    <img class="input__icon" src="/icons/mail_icon_black.png" draggable="false" />
                                 </label>
                                 <input
                                     type="email"
                                     id="email"
-                                    name="email"
+                                    formControlName="email"
                                     placeholder="beispielname@email.com"
                                     class="form__input"
                                     autocomplete="email"
-                                    required
+                                    [attr.aria-invalid]="isFieldInvalid('email')"
+                                    [attr.aria-describedby]="isFieldInvalid('email') ? 'email-error' : null"
                                 />
                             </div>
-                            <div class="error" id="email-error" style="display: none;">
-                                <small></small>
+                            <div class="error" *ngIf="getFieldError('email')" id="email-error">
+                                <small>{{ getFieldError('email') }}</small>
                             </div>
                         </div>
                     </div>
                     <div class="form__field">
-                        <div class="form__group" id="password-group">
+                        <div 
+                            class="form__group" 
+                            id="password-group"
+                            [ngClass]="{
+                                error__state: isFieldInvalid('password'),
+                                has__content: hasFieldContent('password')
+                            }"
+                        >
                             <div class="input__wrapper">
                                 <label for="password">
-                                    <svg class="input__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                        <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
-                                        <circle cx="12" cy="16" r="1"></circle>
-                                        <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
-                                    </svg>
+                                    <img class="input__icon" src="/icons/lock_icon_black.png" draggable="false" />
                                 </label>
                                 <input
                                     type="password"
                                     id="password"
-                                    name="password"
+                                    formControlName="password"
                                     placeholder="Passwort"
                                     class="form__input"
                                     autocomplete="new-password"
-                                    required
+                                    [attr.aria-invalid]="isFieldInvalid('password')"
+                                    [attr.aria-describedby]="isFieldInvalid('password') ? 'password-error' : null"
                                 />
                             </div>
-                            <div class="error" id="password-error" style="display: none;">
-                                <small></small>
+                            <div class="error" *ngIf="getFieldError('password')" id="password-error">
+                                <small>{{ getFieldError('password') }}</small>
                             </div>
                         </div>
                     </div>
                     <div class="form__field">
-                        <div class="form__group" id="confirmPassword-group">
+                        <div 
+                            class="form__group" 
+                            id="confirmPassword-group"
+                            [ngClass]="{
+                                error__state: isFieldInvalid('confirmPassword'),
+                                has__content: hasFieldContent('confirmPassword')
+                            }"
+                        >
                             <div class="input__wrapper">
                                 <label for="confirmPassword">
-                                    <svg class="input__icon" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2">
-                                        <rect x="3" y="11" width="18" height="11" rx="2" ry="2"></rect>
-                                        <circle cx="12" cy="16" r="1"></circle>
-                                        <path d="M7 11V7a5 5 0 0 1 10 0v4"></path>
-                                    </svg>
+                                    <img class="input__icon" src="/icons/lock_icon_black.png" draggable="false" />
                                 </label>
                                 <input
                                     type="password"
                                     id="confirmPassword"
-                                    name="confirmPassword"
+                                    formControlName="confirmPassword"
                                     placeholder="Passwort bestätigen"
                                     class="form__input"
                                     autocomplete="new-password"
-                                    required
+                                    [attr.aria-invalid]="isFieldInvalid('confirmPassword')"
+                                    [attr.aria-describedby]="isFieldInvalid('confirmPassword') ? 'confirmPassword-error' : null"
                                 />
                             </div>
-                            <div class="error" id="confirmPassword-error" style="display: none;">
-                                <small></small>
+                            <div class="error" *ngIf="getFieldError('confirmPassword')" id="confirmPassword-error">
+                                <small>{{ getFieldError('confirmPassword') }}</small>
                             </div>
                         </div>
                     </div>
                 </div>
                 <div class="form__bottom">
+                    <div class="privacy__section">
+                        <div class="privacy__checkbox">
+                            <div class="custom__checkbox">
+                                <input 
+                                    type="checkbox" 
+                                    id="privacyPolicy" 
+                                    formControlName="privacyPolicy"
+                                    [attr.aria-invalid]="isFieldInvalid('privacyPolicy')"
+                                    [attr.aria-describedby]="isFieldInvalid('privacyPolicy') ? 'privacy-error' : null"
+                                >
+                                <div class="checkbox__icon"></div>
+                            </div>
+                            <label for="privacyPolicy" class="privacy__text">
+                                Ich stimme der <a href="#" class="privacy__link">Datenschutzerklärung</a> zu.
+                            </label>
+                        </div>
+                        <div class="error privacy__error" *ngIf="getFieldError('privacyPolicy')" id="privacy-error">
+                            <small>{{ getFieldError('privacyPolicy') }}</small>
+                        </div>
+                    </div>
+
+                    <button 
+                        type="submit" 
+                        class="btn btn__primary" 
+                        [disabled]="!canProceed"
+                        [attr.aria-busy]="loading"
+                    >
+                        <span *ngIf="!loading">
+                            Weiter
+                        </span>
+                        <span *ngIf="loading">
+                            Wird verarbeitet...
+                            <div class="loading__spinner"></div>
+                        </span>
+                    </button>
+                </div>
+                <div class="error" *ngIf="errorMessage" style="text-align: center; margin-top: 1rem;">
+                    <small>{{ errorMessage }}</small>
                 </div>
             </form>
         </div>

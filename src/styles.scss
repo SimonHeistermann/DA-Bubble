@@ -124,8 +124,8 @@ input:focus, textarea:focus {
 }
 
 .scrollbar__none {
-  scrollbar-width: none;  /* Firefox */
-  -ms-overflow-style: none; /* IE 10+ */
+  scrollbar-width: none; 
+  -ms-overflow-style: none;
   &::-webkit-scrollbar {
       display: none;
   }
