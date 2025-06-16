@@ -10,7 +10,7 @@
             </app-sidebar>
         </div>
         <div class="message">
-            <app-message #message [channel]="clickedChannel" (leaveChannelEmitter)="onLeaveChannel()"></app-message>
+            <app-message #message [channel]="clickedChannel"  (leaveChannelEmitter)="onLeaveChannel()"></app-message>
         </div>
     </div>
     <div class="overlay-bar" [ngClass]="{'show-menu': showSidebar, 'hide-menu': !showSidebar}" #overlay (click)="toggleMenu()">

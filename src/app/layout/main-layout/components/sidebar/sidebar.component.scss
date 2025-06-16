@@ -235,17 +235,39 @@
                         width: calc(100% - 40px);
                         border-radius: 30px;
                         padding: 4px 20px;
-                        @include displayFlex($jc: flex-start, $g: 10px);
-
-                        .tag {
-                            width: 24px;
+                        @include displayFlex($jc: space-between, $g: 10px);
+                        .tag-channel-name {
+                            @include displayFlex($jc: flex-start, $g: 10px);
+                             .tag {
+                                width: 24px;
+                                height: 24px;
+                                background-image: url('/icons/tag.png');
+                            }
+                        }
+                       
+                        .banner {
+                            min-width: 24px;
                             height: 24px;
-                            background-image: url('/icons/tag.png');
+                            padding: 0 5px;
+                            color: var(--white);
+                            background-color: var(--red);
+                            border-radius: 50%;
+                            text-align: center;
+                            line-height: 24px;
                         }
 
                         &:hover {
                             background-color: var(--bg-color);
-
+                            .tag-channel-name {
+                               
+                                .tag {
+                                    background-image: url('/icons/tag_hover.png');
+                                }
+                                .channel-name {
+                                    font-weight: 700;
+                                    color: var(--purple-3);
+                                }
+                            }
                         }
 
                     }
@@ -254,12 +276,15 @@
                         .channel-li-content {
                             background-color: var(--bg-color);
 
-                            .tag {
-                                background-image: url('/icons/tag_click.png');
+                            .tag-channel-name {
+                               
+                                .tag {
+                                    background-image: url('/icons/tag_click.png');
+                                }
                             }
 
                             .channel-name {
-                                font-weight: 700;
+                                font-weight: 400;
                                 color: var(--purple-3);
                             }
                         }

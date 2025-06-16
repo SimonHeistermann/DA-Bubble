@@ -72,6 +72,13 @@ export class DataService {
     }
 
     /**
+     * Collection mit einmaligem Querz
+     */
+    subscribeToCollectionOnce(collectionName: string, callback: (data: any[]) => void, ...queryConstraints: any[]) {
+        return this.firebaseCore.getCollectionOnce(collectionName, callback, ...queryConstraints);
+    }
+
+    /**
      * Einzelnes Dokument überwachen
      */
     subscribeToDocument(collectionName: string, docId: string, callback: (data: any | null) => void) {

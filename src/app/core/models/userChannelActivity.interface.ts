@@ -1,11 +1,12 @@
 import { Timestamp } from "firebase/firestore";
 
-export interface userChannelActivityData {
+export interface UserChannelActivityData {
     channelID: string;
     userID: string;
-    lastSeenAt: Timestamp
+    createdAt: Timestamp;
+    updatedAt: Timestamp;
 }
 
-export interface userChannelActivity extends userChannelActivityData {
+export interface UserChannelActivity extends UserChannelActivityData {
     id: string;
 }

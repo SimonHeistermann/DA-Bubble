@@ -25,6 +25,7 @@ export class MainLayoutContentComponent implements AfterViewInit, OnInit  {
   showSidebar = true;
   showAddChannelOverlay = false;
   clickedChannel: Channel | null = null;
+  firstUnreadMessageId: string = '';
 
   ngOnInit() {
     
@@ -58,8 +59,6 @@ export class MainLayoutContentComponent implements AfterViewInit, OnInit  {
   }
 
   onClickChannelName(c: Channel){
-    console.log('channel clicked:', c);
-    
     this.clickedChannel = c;
   }
 

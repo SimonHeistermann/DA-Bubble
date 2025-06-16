@@ -30,8 +30,18 @@
                             @for(channel of channels; let index = $index; track channel.id) {
                                 <li class="channel-li pointer" [class.selected]="index === currentChannelIndex"  (click)="clickChannelName(index, channel)">
                                     <div class="channel-li-content">
-                                        <div class="tag"></div>
-                                        <span class="channel-name">{{channel.name}}</span>
+                                        <div class="tag-channel-name">
+                                            <div class="tag"></div>
+                                            <span class="channel-name">{{channel.name}}</span>
+                                        </div>
+                                        @if(newMessageMap[channel.id]) {
+                                             @if( newMessageMap[channel.id].unreadCount > 0) {
+                                                <span class="banner"> {{ newMessageMap[channel.id].unreadCount }}</span>
+                                            }
+                                          
+                                        }
+                                       
+                                       
                                     </div>
                                     
                                 </li>

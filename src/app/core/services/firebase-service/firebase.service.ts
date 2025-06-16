@@ -7,7 +7,8 @@ import {
 import { 
     doc, setDoc, getDoc, collection, query, where,
     orderBy, onSnapshot, addDoc, updateDoc, deleteDoc, Timestamp,
-    DocumentReference, CollectionReference, QueryConstraint
+    DocumentReference, CollectionReference, QueryConstraint,
+    getDocs
 } from 'firebase/firestore';
 import { Auth } from '@angular/fire/auth';
 import { Firestore } from '@angular/fire/firestore';
@@ -197,6 +198,28 @@ export class FirebaseService {
             });
         } catch (error) {
             console.error(`Error setting up subscription for ${collectionName}:`, error);
+            throw error;
+        }
+    }
+
+    async getCollectionOnce(
+        collectionName: string,
+        callback: (data: any[]) => void,
+        ...queryConstraints: QueryConstraint[]
+    ): Promise<void> {
+        try {
+            const colRef = collection(this.firestore, collectionName);
+            const q = query(colRef, ...queryConstraints);
+
+            const snapshot = await getDocs(q);
+            const data = snapshot.docs.map(doc => ({
+                id: doc.id,
+                ...doc.data()
+            }));
+
+            callback(data);
+        } catch (error) {
+            console.error(`Error getting documents once from ${collectionName}:`, error);
             throw error;
         }
     }

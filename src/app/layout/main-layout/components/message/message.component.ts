@@ -15,6 +15,8 @@ import { AuthService } from '../../../../core/services/auth-service/auth.service
 import { MessageBoxComponent } from './message-box/message-box.component';
 import { MessageService } from '../../../../core/services/message.service';
 import { ChannelMessageHeaderComponent } from './channel-message-header/channel-message-header.component';
+import { MessageData } from '../../../../core/models/message.interface';
+import { UserChannelActivityService } from '../../../../core/services/userChannelActivity.service';
 
 @Component({
   selector: 'app-message',
@@ -37,6 +39,7 @@ export class MessageComponent implements OnInit, AfterViewInit, AfterViewChecked
   authService = inject(AuthService);
   currentUser: User | null = null;
   messageService = inject(MessageService);
+  userChannelActivityService = inject(UserChannelActivityService);
 
   showAddChannelUserOverlay = false;
   showUserListOverlay = false;
@@ -53,10 +56,6 @@ export class MessageComponent implements OnInit, AfterViewInit, AfterViewChecked
     
   }
 
-  onReadMessage() {
-     this.scrollToBottom();
-  }
-
   scrollToBottom(): void {
     try {
       const el = this.containerBody.nativeElement;
@@ -68,6 +67,17 @@ export class MessageComponent implements OnInit, AfterViewInit, AfterViewChecked
       console.error('Scroll error:', err);
     }
   }
+
+  scrollToBottomWithoutAnimation(): void {
+  try {
+    const el = this.containerBody.nativeElement;
+    el.scrollTo({
+      top: el.scrollHeight
+    });
+  } catch (err) {
+    console.error('Scroll error:', err);
+  }
+}
 
   subCurrentUser(){
     const authUser = this.authService.currentUser;
@@ -88,6 +98,7 @@ export class MessageComponent implements OnInit, AfterViewInit, AfterViewChecked
   }
 
   onChannelChanged(channel: Channel) {
+ 
     this.channel = channel;
     const userIDs = this.channel.userIDs ?? [];
     if(this.channel.userIDs?.length === 0) return;
@@ -106,26 +117,34 @@ export class MessageComponent implements OnInit, AfterViewInit, AfterViewChecked
     this.subscriptions.unsubscribe();
   }
 
-  onSendMessage(msg: string) {
-    if (!this.currentUser || !this.channel) return;
-
-    let messsageData = {
-      authorID: this.currentUser.id,
-      authorName: this.currentUser.displayName,
+  buildMessageData(msg: string): MessageData {
+    return {
+      authorID: this.currentUser?.id || '',
+      authorName: this.currentUser?.displayName || '',
       content: msg,
       isEdited: false,
       threadCount: 0,
       type: 'channel' as 'channel',
       channelID: this.channel?.id
-    }
+    };
+  }
 
+  onReadMessage() {
+    this.scrollToBottomWithoutAnimation();
+  }
+
+  onSendMessage(msg: string) {
+    if (!this.currentUser || !this.channel) return;
+
+    let messsageData = this.buildMessageData(msg);
     this.subscriptions.add( this.messageService.addOneMessage(messsageData).subscribe(
       {
         next: (id: string) => {
-          console.log('Channel added with ID:', id);
+          if (this.currentUser && this.channel)
+            this.userChannelActivityService.markChannelMessageAsReadByCurrentUser(this.currentUser?.id, this.channel?.id);
         },
         complete:() => {
-          this.scrollToBottom();
+
         }
       }
     ))

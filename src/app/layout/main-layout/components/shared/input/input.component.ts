@@ -16,8 +16,11 @@ export class InputComponent {
 
   @Output() sendMessageEmitter = new EventEmitter<string>();
   sendMessage() {
-   
-    this.sendMessageEmitter.emit(this.inputMessage.trim());
-    this.inputMessage = '';
+    let message = this.inputMessage.trim();
+    if (message) {
+      this.sendMessageEmitter.emit(message);
+      this.inputMessage = '';
+    }
+    
   }
 }

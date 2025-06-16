@@ -1,7 +1,7 @@
 <div class="input-container scrollbar__none" [class.focused]="isTextareaFocused">
     <textarea 
          autoResize
-        class="scrollbar" name="message" id="message" 
+        class="scrollbar__none" name="message" id="message" 
         placeholder="Nachricht an #{{placeHolder}}"  
         (focus)="isTextareaFocused = true" (blur)="isTextareaFocused = false" 
         [(ngModel)]="inputMessage"></textarea>

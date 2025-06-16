@@ -44,7 +44,11 @@ export class MainLayoutComponent implements OnInit  {
   subAllChannelsBackUp() {
     if(!this.currentUser) return;
     this.subscriptions.add(
+      
+      
+
       this.channelService.getChannelsOrderByCreatedAt(this.currentUser.id, (data) => {
+        
         this.channels.length=0;
         this.channels.push(...data);
 
