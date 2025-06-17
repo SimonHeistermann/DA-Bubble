@@ -9,7 +9,7 @@
     width: 100%;
     border-radius: 30px;
     background-color: #FFFFFF;
-    height: calc(100vh - 130px);
+    height: calc(100vh - 136px);
 
 
     .container-head {
@@ -29,7 +29,7 @@
     }
     
     .container-body-input {
-        height: calc(100% - 54px);
+        height: calc(100% - 80px);
         overflow: hidden;
         width: 100%;
         @include displayFlex($fd: column);
@@ -44,8 +44,6 @@
             flex-shrink: 0;
             width: 100%;
         }
-
-        // test
     }
     
 }

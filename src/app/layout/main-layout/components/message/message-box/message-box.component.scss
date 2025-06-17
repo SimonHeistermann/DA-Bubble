@@ -2,7 +2,7 @@
 @use './../../../../../../styles.scss' as *;
 
 .message-container {
-    min-height: calc(100% - 20px);
+    min-height: calc(100%);
     @include displayFlex($ai: flex-end);
     .message {
 
@@ -16,6 +16,7 @@
                 height: 36px;
                 padding: 0 10px;
                 width: 100%;
+                 margin-top: 10px;
                 .divider {
                     height: .5px;
                     width: calc(100% - 40px);
@@ -41,9 +42,7 @@
 
                     
                 }
-                &:not(:first-of-type) {
-                    margin-top: 10px;
-                }
+           
             }
             
             .message-body {
@@ -88,34 +87,79 @@
                         
                 }
                 .message-content-bottom {
+                        width: 100%;
                         .emoji-wrapper {
-                            @include displayFlex($g: 10px, $jc: flex-start);
+                            width: 100%;
+                            @include displayFlex($g: 5px, $jc: flex-start, $ai: flex-start);
                             .emoji-picker-trigger {
                                 @include imgButton($wh: 40px, $url:'/icons/add_reaction.png');
+                                flex-shrink: 0;
                                 &:hover {
                                     background-image: url('/icons/add_reaction_hover.png');
                                 }
                             }
                             .emojis {
-                                @include displayFlex($g: 10px);
+                                @include displayFlex($g: 0px, $jc: flex-start);
+                                flex-wrap: wrap;
                                 .emoji-div {
-                                    @include displayFlex($g: 5px);
+                                    @include displayFlex($g: 4px);
                                     border: 1px solid var(--purple-1);
                                     padding: 3px 8px;
                                     border-radius: 20px;
+                                    position: relative;
+                                    margin-top: 5px;
+                                    margin-right: 5px;
+                                    margin-left: 0px;
+                                    width: 54px;
 
                                     .emoji-code {
                                         width: 20px;
                                         height: 20px;
                                         font-size: 16px;
                                     }
+                                    .reactions {
+                                        
+                                        width: 130px;
+                                        padding: 10px;
+                                        position: absolute;
+                                        bottom: 30px;
+                                        left: 50%;
+                                        border-radius: 20px;
+                                        border-bottom-left-radius: 0;
+                                        color: var(--white);
+                                        background-color: var(--purple-3);
+                                        z-index: 999;
+                                        @include displayFlex($fd: column, $g:5px);
+                                        display: none !important;
+                                        .name-div{
+                                            width: 100%;
+                                            @include displayFlex($fd: column, $g:2px);
+                                            span {
+                                                font-size: 15px;
+                                                text-align: center;
+                                                width: 100%;
+                                                white-space: nowrap;
+                                                text-overflow: ellipsis;
+                                                overflow: hidden;
+                                            }
+                                        }
+                                        .has-reacted {
+                                            font-size: 14px;
+                                        }
+                                    }
+                                    &:hover {
+                                        .reactions {
+                                            display: flex !important;
+                                        }
+                                    }
                                 }
                             }
                         }
 
                         .thread-wrapper {
+                            width: 100%;
                             margin-top: 5px;
-                            @include displayFlex($g:20px);
+                            @include displayFlex($g:20px, $jc: flex-start);
                             .answer {
                                 font-weight: 400px;
                                 font-size: 16px;
@@ -131,7 +175,7 @@
                             }
                         }
                 
-                }
+                    }
                 }
 
                 .reaction-bar {
@@ -245,7 +289,8 @@
                 }
                 .message-content-bottom {
                         .emoji-wrapper {
-                            @include displayFlex($g: 10px, $jc: flex-start, $fd: row-reverse);
+                            width: 100%;
+                            @include displayFlex($g: 5px, $jc: flex-start, $fd: row-reverse, $ai: flex-start);
                             .emoji-picker-trigger {
                                 @include imgButton($wh: 40px, $url:'/icons/add_reaction.png');
                                 &:hover {
@@ -253,19 +298,22 @@
                                 }
                             }
                             .emojis {
-                                @include displayFlex($g: 10px);
+                                @include displayFlex($g: 0px, $jc: flex-end);
                                 .emoji-div {
-                                    @include displayFlex($g: 5px);
+                                    @include displayFlex($g: 3px);
                                     border: 1px solid var(--purple-1);
                                     padding: 3px 8px;
+                                    margin-top: 5px;
                                     border-radius: 20px;
+                                    margin-left: 5px;
+                                    margin-right: 0;
                                 }
                             }
                         }
 
                         .thread-wrapper {
                             margin-top: 5px;
-                            @include displayFlex($g:20px, $fd: row-reverse);
+                            @include displayFlex($g:20px, $fd: row-revers, $jc: flex-end);
                             
                             .answer {
                                 font-weight: 400px;
@@ -334,7 +382,6 @@
 
             &:nth-child(1) {
                 margin-top: 10px;
-                margin-bottom: 10px;
             }
             &:last-of-type {
                 margin-bottom: 10px;

@@ -25,6 +25,16 @@ export class MessageService{
         );
     }
 
+    updateMessage(docId: string, data: MessageData): Observable<void> {
+        return from(
+            this.dataService.updateDocument(this.COL_NAME, docId, data)
+        ).pipe(
+            catchError(e => {
+                console.log('Error when updating message:', e);
+                throw e;
+            })
+        );
+    }
 
     getMessages(callback: (data: Message[]) => void){
         return this.dataService.subscribeToCollection(this.COL_NAME, callback); 

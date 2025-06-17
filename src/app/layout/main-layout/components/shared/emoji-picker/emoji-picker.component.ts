@@ -11,6 +11,7 @@ import { SimplebarAngularModule } from 'simplebar-angular';
 })
 export class EmojiPickerComponent {
   @Output() closeOverlayEmitter = new EventEmitter<void>();
+  @Output() selectedEojiEmitter = new EventEmitter<string>();
 
   emoji = '';
   allEmoji = [...emojis];
@@ -18,4 +19,9 @@ export class EmojiPickerComponent {
   closeOverlay(){
     this.closeOverlayEmitter.emit();
   }
+
+  clickEmoji(e: string) {
+    this.selectedEojiEmitter.emit(e);
+  }
 }
+

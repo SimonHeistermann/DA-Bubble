@@ -8,7 +8,8 @@ export interface MessageData {
     updatedAt?: Timestamp;
     isEdited: boolean;
     mentionIDs?: string[];               
-    threadCount: number;              
+    threadCount: number; 
+    lastAnswerTime?: Timestamp;            
     reactions?: MessageReactions;
     type: 'channel' | 'private';
     channelID?: string;
@@ -34,7 +35,5 @@ export interface ThreadMessage {
 export interface MessageReactions {
     [emoji: string]: {
       users: string[]; 
-      count: number;
-      emojiUrl?: string; 
     };
 }

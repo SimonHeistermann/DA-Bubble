@@ -8,7 +8,7 @@
     <ngx-simplebar style="height: 40vh;">
         <div class="emoji-container">
             @for (emoji of allEmoji; let index = $index; track $index) {
-                <div class="emoji">
+                <div class="emoji" (click)="clickEmoji(emoji)">
                     <span>{{emoji}}</span>
                 </div>
             }

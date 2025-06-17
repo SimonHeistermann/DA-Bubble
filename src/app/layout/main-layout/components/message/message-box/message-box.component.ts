@@ -4,7 +4,7 @@ import { EmojiPickerComponent } from '../../shared/emoji-picker/emoji-picker.com
 import { Channel } from '../../../../../core/models/channel.interface';
 import { User } from '../../../../../core/models/user.interface';
 import { Subscription } from 'rxjs';
-import { Message } from '../../../../../core/models/message.interface';
+import { Message, MessageData, MessageReactions } from '../../../../../core/models/message.interface';
 import { MessageService } from '../../../../../core/services/message.service';
 import { ConnectedPosition, OverlayRef } from '@angular/cdk/overlay';
 import { OverlayService } from '../../../../../core/services/overlay.service';
@@ -13,6 +13,7 @@ import { CommonModule } from '@angular/common';
 import { Timestamp } from 'firebase/firestore';
 import { UserChannelActivityService } from '../../../../../core/services/userChannelActivity.service';
 import { UserChannelActivity } from '../../../../../core/models/userChannelActivity.interface';
+import { object } from '@angular/fire/database';
 
 @Component({
   selector: 'app-message-box',
@@ -80,6 +81,12 @@ export class MessageBoxComponent implements OnInit, OnDestroy, AfterViewInit{
     return !this.dateService.isSameDay(currentDate, previousDate);
   }
 
+  convertReaction(mr: MessageReactions | undefined) {
+    if (!mr) return [];
+    const mrKeys= Object.keys(mr);
+    return mrKeys;
+  }
+
   buildFirstUnreadMessageId(activity: UserChannelActivity, messages: Message[]) {
       if(!activity?.updatedAt) return;
 
@@ -136,17 +143,23 @@ export class MessageBoxComponent implements OnInit, OnDestroy, AfterViewInit{
 
     this.subscriptions.add(
       this.messageService.getChannelMessageOrderByCreatedAt(this.channel.id, (data) => {
-          
-          
           if(data.length === 0 || data[0].channelID !== this.channel?.id) {
             this.messages = [];
             return;
           };
-          
-          this.messages = [...data];
-          this.subChannelUserActivity();
+
+          if(this.isNewMessage(data)) {
+             this.messages = [...data];
+             this.subChannelUserActivity();
+          }
       })
     );
+  }
+
+  isNewMessage(newMessages: Message[]) {
+     return this.messages.length === 0 ||
+        newMessages.length > this.messages.length ||
+        newMessages[newMessages.length - 1].id !== this.messages[this.messages.length - 1].id;
   }
 
   findURLByUserId(userID: string): string | ''{
@@ -172,20 +185,63 @@ export class MessageBoxComponent implements OnInit, OnDestroy, AfterViewInit{
       ];
   }
 
-  showEmojiPicker(index: number, pos: 'left' | 'right') {
-    const triggerRef = pos === 'right' ? this.emojiTriggerAtRightRefs.get(index) : this.emojiTriggerAtLeftRefs.get(index);
-    if (!triggerRef) return;
-
+  showEmojiPicker(event: MouseEvent, index: number, pos: 'left' | 'right') {
+    const trigger = event.currentTarget as HTMLElement;
+  
     this.clickedMessageIndex = index;
 
     this.emojiPickerOverlayRef = this.overlayService.openTemplateOverlay(
-      triggerRef, 
+      new ElementRef(trigger), 
       this.emojiPickerTemplate, 
       this.viewContainerRef, 
       this.buildPosition(pos),
     );
 
     this.emojiPickerOverlayRef.backdropClick().subscribe(() => this.closeEmojiPickerOverlay());
+  }
+
+  onSelectedEmoji(emojiStr: string){
+    this.clickEmoji(emojiStr,this.messages[this.clickedMessageIndex]);
+    this.clickedMessageIndex = -1;
+    this.emojiPickerOverlayRef?.dispose();
+    
+  }
+
+  clickEmoji(emojiStr: string, message: Message) {
+    if(!this.currentUser) return; 
+    const userName = this.currentUser.displayName;
+
+    let {id, ...messageData} = message;
+
+    this.updateMessageReaction(userName, emojiStr, messageData);
+    this.subUpdateMessage(id, messageData);
+  }
+
+  updateMessageReaction(userName: string, emojiStr: string, messageData: MessageData){
+    if (!messageData.reactions) messageData.reactions = {};
+
+    if (!messageData.reactions[emojiStr]) {
+      messageData.reactions[emojiStr] = {users: [userName]};
+    } else {
+      const reaction = messageData.reactions[emojiStr];
+      const index = reaction.users.indexOf(userName);
+      if (index === -1) {
+        reaction.users.push(userName);
+      } else {
+        reaction.users.splice(index, 1);
+        if(reaction.users.length == 0) delete messageData.reactions[emojiStr];
+      }
+    }
+  }
+
+  subUpdateMessage(id: string, messageData: MessageData) {
+    this.subscriptions.add(
+      this.messageService.updateMessage(id, messageData).subscribe({
+        next: () =>{
+          console.log('reactions updated');
+        }
+      })
+    );
   }
 
   closeEmojiPickerOverlay() {

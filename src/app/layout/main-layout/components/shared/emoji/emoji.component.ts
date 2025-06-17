@@ -23,10 +23,13 @@ export class EmojiComponent implements AfterContentInit {
   }
 
   ngAfterContentInit(): void {
+    this.findPath();
+  }
+
+  findPath() {
     const projected = this.el.nativeElement.textContent?.trim();
     const emojiKey = this.emoji ||  projected || '';
 
     this.emojiPath = this.emojiMapWithPath[emojiKey];
-    
   }
 }
