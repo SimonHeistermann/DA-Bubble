@@ -33,7 +33,7 @@ export const toggleMarginRight20Animation = trigger('toggleMarginRight20', [
   ]),
 ]);
 
-export const toggleMarginLeft20Animation = trigger('toggleMarginRight20', [
+export const toggleMarginLeft20Animation = trigger('toggleMarginLeft20', [
   state('closed', style({
     width: '0',
     opacity: 0,

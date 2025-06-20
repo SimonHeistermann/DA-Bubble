@@ -1,0 +1,15 @@
+<main class="main-content" [@toggleMarginLeft20]="showSelf ? 'open' : 'closed'">
+
+    <section>
+        <div class="thread-header">
+            <div class="title">
+                <span>Thread</span>
+                <img src="/icons/tag_click.png">
+                <p>Allgemein</p>
+            </div>
+
+            <img (click)="hideThreadContainer()" src="/icons/close.png">
+        </div>
+    </section>
+
+</main>
