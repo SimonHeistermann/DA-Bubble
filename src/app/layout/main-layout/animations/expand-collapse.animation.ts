@@ -42,7 +42,7 @@ export const toggleMarginLeft20Animation = trigger('toggleMarginLeft20', [
   state('open', style({
     width: '*',
     opacity: 1,
-    
+
     marginLeft: '20px',
   })),
 
