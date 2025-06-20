@@ -98,6 +98,7 @@ export class AddChannelComponent implements OnDestroy, OnChanges {
   }
 
   addOneChannelToDB() {
+    this.channel.createdBy = this.currentUser?.id;
     this.subscriptions.add(
       this.channelService.addOneChannel(this.channel).subscribe({
         next: (id: string) => {

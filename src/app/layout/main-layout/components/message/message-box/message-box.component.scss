@@ -276,15 +276,7 @@
                 }
                 .message-content-middle {
                         margin-top: 10px;
-                        p {
-                            font-weight: 400;
-                            font-size: 16px;
-                            padding: 10px 20px;
-                            border-radius: 20px;
-                            border-top-right-radius: 0;
-                            background-color: var(--purple-2);
-                            color: var(--white);
-                        }
+                        
                         
                 }
                 .message-content-bottom {
@@ -385,6 +377,44 @@
             }
             &:last-of-type {
                 margin-bottom: 10px;
+            }
+        }
+        .private-empty-content {
+            padding: 0 20px;
+            
+            .avatar-div {
+                width: 100%;
+                @include displayFlex($g: 10px, $jc: flex-start);
+                
+                img {
+                    width: 80px;
+                    height: 80px;
+                    border-radius: 50%;
+                }
+            }
+            p {
+                margin-top: 10px;
+                color: var(--grey);
+                .message-user-name {
+                    color: var(--purple-1);
+                }
+                .starter {
+                    font-weight: 600;
+                }
+            }
+        }
+        .channel-empty-content {
+            padding: 0 20px;
+            p {
+                margin-top: 10px;
+                color: var(--grey);
+            }
+            .empty-content-header {
+                @include displayFlex($g: 10px, $jc: flex-start);
+            }
+
+            .empty-content-name {
+                color: var(--purple-1)
             }
         }
     } 

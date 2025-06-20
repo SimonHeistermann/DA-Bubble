@@ -3,20 +3,45 @@
         <div class="new-message-to" *ngIf="showHeader == 'new'">
 
         </div>
-        <div class="channel-message">
-            <app-channel-message-header [channel]="channel"  *ngIf="showHeader == 'channel'"></app-channel-message-header>
+        <div class="channel-message" *ngIf="showHeader == 'channel'">
+            <app-channel-message-header [channel]="channel"></app-channel-message-header>
         </div>
         
         <div class="direct-message" *ngIf="showHeader == 'direct'">
-
+            <div class="avatar-div">
+                <img *ngIf="messageUser" [src]="messageUser.photoURL.startsWith('http') ? '/icons/avatars/avatar_1.png' : messageUser.photoURL">
+                
+                @if(!messageUser?.isActive) {
+                    <span class="active-status offline"></span>
+                } @else {
+                    <span class="active-status"></span>
+                }
+                
+            </div>
+            <span class="name">
+                {{ messageUser?.displayName }} 
+                @if (messageUser?.id === currentUser?.id) {
+                    (Du)
+                }
+            </span>
         </div>
     </div>
     <div class="container-body-input scrollbar__none">
         <div class="container-body scrollbar__none" #containerBody>
-            <app-message-box (readMessageEmitter)="onReadMessage()" [channel]="channel" [currentUser]="currentUser" [allUsers]="allUsers"></app-message-box>
+            <app-message-box 
+                [allUsersWithOutCurrentUser]="allUsersWithOutCurrentUser" 
+                [messageUser]="messageUser" 
+                [channel]="channel" 
+                [currentUser]="currentUser" 
+                [allUsers]="allUsers">
+            </app-message-box>
         </div>
         <div class="container-input">
-            <app-input (sendMessageEmitter)="onSendMessage($event)" [allChannelUser]="allUsersWithOutCurrentUser" [placeHolder]="this.channel?.name || ''"></app-input>
+            <app-input 
+                (sendMessageEmitter)="onSendMessage($event)" 
+                [allChannelUser]="allUsersWithOutCurrentUser" 
+                [placeHolder]="channel?.name ? '#' + (channel?.name ? channel?.name : '') : '@' +  (messageUser?.displayName ? messageUser?.displayName : '')">
+            </app-input>
         </div>
     </div>
 </main>

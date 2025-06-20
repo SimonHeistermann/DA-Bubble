@@ -14,6 +14,7 @@ export interface MessageData {
     type: 'channel' | 'private';
     channelID?: string;
     recipientID?: string;
+    conversationID?:string;
 }
 
 export interface Message extends MessageData{

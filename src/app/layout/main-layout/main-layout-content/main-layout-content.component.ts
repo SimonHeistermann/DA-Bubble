@@ -6,11 +6,11 @@ import { AddChannelComponent } from './../components/add-channel/add-channel.com
 import { Channel, CHANNEL_TOKEN } from '../../../core/models/channel.interface';
 import { SidebarComponent } from './../components/sidebar/sidebar.component';
 import { MessageComponent } from './../components/message/message.component';
-import { ActivatedRoute, RouterOutlet } from '@angular/router';
+import { ActivatedRoute, NavigationEnd, Router, RouterOutlet } from '@angular/router';
 import { User } from '../../../core/models/user.interface';
 import { AuthService } from '../../../core/services/auth-service/auth.service';
 import { UserService } from '../../../core/services/user-service/user.service';
-import { Subscription } from 'rxjs';
+import { filter, Subscription } from 'rxjs';
 import { ChannelService } from '../../../core/services/channel.service';
 
 @Component({
@@ -32,23 +32,33 @@ export class MainLayoutContentComponent implements AfterViewInit, OnInit  {
   showSidebar = true;
   showAddChannelOverlay = false;
   clickedChannel: Channel | null = null;
+  clickedUser: User | null = null;
   firstUnreadMessageId: string = '';
 
   currentUser: User | null = null;
-  allChannels: Channel[] = []
+  allChannels: Channel[] = [];
+  allUsers: User[] = [];
+
+  router = inject(Router);
 
 
   ngOnInit() {
+
     this.subCurrentUser();
   }
 
   ngAfterViewInit(): void {
-    this.route.paramMap.subscribe(params => {
-      const channelId = params.get('channelId');
-      if (channelId) {
-        this.handleChannelChange(channelId);
-      }
-    });
+    this.subscriptions.add(
+      this.route.paramMap.subscribe(params => {
+        const channelId = params.get('channelId');
+        const userId = params.get('userId');
+        if (channelId) {
+          this.handleChannelChange(channelId);
+        } else if (userId) {
+          this.handleUserChange(userId);
+        }
+      })
+    );
   }
 
   subCurrentUser(){
@@ -60,6 +70,7 @@ export class MainLayoutContentComponent implements AfterViewInit, OnInit  {
       this.userService.currentUser$.subscribe(user => {
         this.currentUser = user;
         this.subAllChannels();
+        this.subAllUsers();
       })
     );
   }
@@ -75,10 +86,26 @@ export class MainLayoutContentComponent implements AfterViewInit, OnInit  {
     );
   }
 
+  subAllUsers() {
+    if(!this.currentUser) return;
+    
+    this.subscriptions.add(
+      this.userService.allUsers$.subscribe(users => {
+        this.allUsers = users;
+      }));
+  }
+
   handleChannelChange(channelId: string) {
     const index = this.allChannels.findIndex(c => c.id === channelId);
     this.clickedChannel = this.allChannels[index];
    
+  }
+
+  handleUserChange(userId: string) {
+    const index = this.allUsers.findIndex(u => u.id === userId);
+    this.clickedUser = this.allUsers[index];
+    console.log(this.clickedUser);
+    
   }
 
   toggleMenu(){

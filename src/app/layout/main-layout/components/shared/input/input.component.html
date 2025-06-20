@@ -1,12 +1,12 @@
-<div class="input-container scrollbar__none" [class.focused]="isTextareaFocused" #userListTrigger>
-    <div class="user-list" *ngIf="showUserListOverlay">
-         <app-user-list (closeOverlayEmitter)="closeAtUserListOverlay()" (clickedUser)="onClickUser($event)"  [dataSource]="allChannelUser" [maxHeight]="'50vh'"></app-user-list>
+<div class="input-container scrollbar__none" [class.focused]="isTextareaFocused" #userListTrigger [ngStyle]="{'margin': editingMode ? '0' : '20px', 'width': editingMode ? '100%' : 'calc(100% - 40px)'}">
+    <div class="user-list" *ngIf="showUserListOverlay" [style.left]="editingMode ? '50%' : '20px'" [style.transform]="editingMode ? 'translateX(-50%)' : 'none'">
+         <app-user-list (closeOverlayEmitter)="closeAtUserListOverlay()" (clickedUser)="onClickUser($event)"  [dataSource]="allChannelUser" [maxHeight]="editingMode ? '25vh' : '50vh'" ></app-user-list>
     </div>
     <textarea 
         #textarea
          autoResize
         class="scrollbar__none" name="message" id="message" 
-        placeholder="Nachricht an #{{placeHolder}}"  
+        placeholder="Nachricht an {{placeHolder}}"  
         (focus)="isTextareaFocused = true" 
         (blur)="isTextareaFocused = false" 
         [(ngModel)]="inputMessage" 
@@ -18,19 +18,26 @@
             <span class="emoji pointer" #emojiPickerTrigger (click)="showEmojiPicker()">
 
             </span>
-            <span class="at pointer"  (click)="showUserList()">
+             @if (!editingMode) {
+                <span class="at pointer"  (click)="showUserList()">
+
+                </span>
+            }
+        </div>
+        @if (!editingMode) {
+            <span class="send-button pointer" (click)="sendMessage()">
 
             </span>
-        </div>
-        <span class="send-button pointer" (click)="sendMessage()">
-
-        </span>
+        } @else {
+            <div class="buttons">
+                <button class="break pointer" (click)="breakEditing()">Abbrechen</button>
+                <button class="save pointer" (click)="saveEditing()">Speichern</button>
+            </div>
+        }
+        
     </div>
 </div>
 
 <ng-template #emojiPickerTemplate>
     <app-emoji-picker (closeOverlayEmitter)="closeEmojiPickerOverlay()" (selectedEojiEmitter)="onSelectedEmoji($event)"></app-emoji-picker>
 </ng-template>
-
-    <!-- <app-user-list (closeOverlayEmitter)="closeAtUserListOverlay()"  [dataSource]="allChannelUser"></app-user-list> -->
-    <!-- <app-user-list (closeOverlayEmitter)="closeAtUserListOverlay()"  [dataSource]="allChannelUser" [tagIDs]="tagIDs" (clickedUser)="onClickedUser($event)"></app-user-list> -->

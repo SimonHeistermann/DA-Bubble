@@ -15,12 +15,14 @@ import { CommonModule } from '@angular/common';
   templateUrl: './input.component.html',
   styleUrl: './input.component.scss'
 })
-export class InputComponent implements AfterViewInit{
-  inputMessage = '';
+export class InputComponent{
+  @Input() editingMode = false;
+  inputMessage:string = '';
   @Input() placeHolder:string = '';
   allChannelUser: User[] = [];
   fullUserList: User[] = [];
   isTextareaFocused = false;
+  originalMessage = '';
 
   @ViewChild('emojiPickerTemplate') emojiPickerTemplate!: TemplateRef<any>;
   @ViewChild('emojiPickerTrigger') emojiPickerTrigger!: ElementRef;
@@ -37,8 +39,9 @@ export class InputComponent implements AfterViewInit{
   mentionActive = false;
   mentionStartIndex: number | null = null;  
 
-  ngAfterViewInit(): void {
-    // this.showUserList();
+  @Input() set originalInputMessage(msg: string | undefined) {
+    this.inputMessage = msg || '';
+    this.originalMessage = msg || '';
   }
 
   @Input('allChannelUser') set allChannelUserInput(users: User[]) {
@@ -55,22 +58,34 @@ export class InputComponent implements AfterViewInit{
     }
   }
 
+  @Output() breakEditingEmitter = new EventEmitter<void>();
+  breakEditing() {
+    this.breakEditingEmitter.emit();
+    this.inputMessage = this.originalInputMessage || '';
+  }
+
+  @Output() saveEditingEmitter = new EventEmitter<string>();
+  saveEditing() {
+    let message = this.inputMessage.trim();
+    if (message) {
+      this.saveEditingEmitter.emit(message);
+      this.inputMessage = '';
+    }
+  }
+
   typing() {
     const textarea = this.textareaRef.nativeElement;
     const cursorPos = textarea.selectionStart;
     const text = textarea.value;
 
-    // Check if there is an active "@" mention
     if (this.mentionActive && this.mentionStartIndex !== null) {
       if (cursorPos <= this.mentionStartIndex) {
-        // '@' has been deleted
         this.cancelMention();
         return;
       }
 
       const mentionText = text.slice(this.mentionStartIndex + 1, cursorPos);
       if (mentionText.includes(' ') || mentionText.includes('\n')) {
-        // User added space/newline, cancel mention
         this.cancelMention();
         return;
       }
@@ -128,8 +143,6 @@ export class InputComponent implements AfterViewInit{
     const textarea = this.textareaRef.nativeElement;
     const cursorPos = textarea.selectionStart;
     const text = this.inputMessage;
-
-    // Insert "@" at cursor
     this.inputMessage = text.slice(0, cursorPos) + '@' + text.slice(cursorPos);
 
     setTimeout(() => {
@@ -159,7 +172,7 @@ export class InputComponent implements AfterViewInit{
       textarea.focus();
     });
 
-    this.cancelMention(); // Reset mention state
+    this.cancelMention(); 
   }
 
   closeUserListOverlay(){
