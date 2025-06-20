@@ -80,7 +80,7 @@
                                     <div class="thread-wrapper">
                                         <span class="answer pointer">
                                             {{ message.threadCount }} 
-                                            <span>
+                                            <span class="answer-action pointer" (click)="showThreadContainer()">
                                             Antwort<ng-container *ngIf="message.threadCount > 1">en</ng-container>
                                             </span>
                                         </span>

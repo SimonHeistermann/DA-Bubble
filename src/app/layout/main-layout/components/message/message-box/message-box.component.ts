@@ -1,4 +1,4 @@
-import { AfterViewInit, ChangeDetectorRef, Component, ElementRef, EventEmitter, inject, Input, NgZone, OnDestroy, OnInit, Output, QueryList, SimpleChanges, TemplateRef, ViewChild, ViewChildren, ViewContainerRef } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, EventEmitter, inject, Input, NgZone, OnDestroy, OnInit, Output, QueryList, SimpleChanges, TemplateRef, ViewChild, ViewChildren, ViewContainerRef } from '@angular/core';
 import { EmojiComponent } from '../../shared/emoji/emoji.component';
 import { EmojiPickerComponent } from '../../shared/emoji-picker/emoji-picker.component';
 import { Channel } from '../../../../../core/models/channel.interface';
@@ -14,6 +14,7 @@ import { UserChannelActivityService } from '../../../../../core/services/userCha
 import { UserChannelActivity } from '../../../../../core/models/userChannelActivity.interface';
 import { ProfileComponent } from '../../shared/profile/profile.component';
 import { UserService } from '../../../../../core/services/user-service/user.service';
+import { ThreadService } from '../../../../../core/services/thread-service/thread.service';
 
 @Component({
   selector: 'app-message-box',
@@ -33,6 +34,7 @@ export class MessageBoxComponent implements OnInit, OnDestroy, AfterViewInit{
   unsubscribeChannelMessages: (() => void) | null = null;
   messageService = inject(MessageService);
   dateService = inject(DateService);
+  threadService = inject(ThreadService);
   userService = inject(UserService);
   userChannelActivityService = inject(UserChannelActivityService);
   userChannelActivity: UserChannelActivity | null = null;
@@ -52,6 +54,9 @@ export class MessageBoxComponent implements OnInit, OnDestroy, AfterViewInit{
 
   clickedMessageIndex = -1;
   isNewInChannel = true;
+
+  showThread = inject(ThreadService);
+  
   lastLoadedChannelId: string | null = null;
   selectedUser: User | null = null;
   
@@ -85,6 +90,14 @@ export class MessageBoxComponent implements OnInit, OnDestroy, AfterViewInit{
     return !this.dateService.isSameDay(currentDate, previousDate);
   }
 
+/*************  ✨ Windsurf Command ⭐  *************/
+  /**
+   * Takes a MessageReactions object and returns an array of reaction keys.
+   *
+   * If the MessageReactions object is undefined, an empty array is returned.
+   * Otherwise, the Object.keys() method is used to get an array of the object's own property names.
+   * @param mr the MessageReactions object to convert
+   */
   convertReaction(mr: MessageReactions | undefined) {
     if (!mr) return [];
     const mrKeys= Object.keys(mr);
@@ -304,5 +317,9 @@ export class MessageBoxComponent implements OnInit, OnDestroy, AfterViewInit{
     this.unsubscribeChannelMessages?.();
     this.subscriptions.unsubscribe();
   }
-  
+
+  showThreadContainer(){
+    this.threadService.show(); 
+  }
+
 }

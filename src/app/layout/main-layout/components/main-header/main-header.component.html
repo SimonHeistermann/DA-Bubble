@@ -5,7 +5,6 @@
 
     <div class="profile-container" (click)="currentUser && showProfile(currentUser)">
         <span>{{currentUser?.displayName}}</span>
-        <!-- <img src="/icons/avatars/avatar_1.png" class="avatar"> -->
         <div style="position: relative;">
             <img src="{{ currentUser?.photoURL }}" class="avatar">
             <span class="show-status"></span>
