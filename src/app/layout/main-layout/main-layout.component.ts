@@ -41,31 +41,6 @@ export class MainLayoutComponent implements OnInit  {
     );
   }
 
-  subAllChannelsBackUp() {
-    if(!this.currentUser) return;
-    this.subscriptions.add(
-      
-      
-
-      this.channelService.getChannelsOrderByCreatedAt(this.currentUser.id, (data) => {
-        
-        this.channels.length=0;
-        this.channels.push(...data);
-
-        const currentUrl = this.router.url;
-        const isAlreadyOnAChannel = currentUrl.includes('/dashboard/channels/');
-
-        
-        if (!isAlreadyOnAChannel && this.channels.length > 0) {
-          const firstChannelId = this.channels[0].id;
-        
-          this.router.navigate(['/dashboard/channels', firstChannelId]);
-        } else {
-          console.warn('No channels available');
-        }
-      })
-    );
-  }
 
   subAllChannels() {
     if(!this.currentUser) return;
@@ -83,7 +58,7 @@ export class MainLayoutComponent implements OnInit  {
         
           this.router.navigate(['/dashboard/channels', firstChannelId]);
         } else {
-          console.warn('No channels available');
+          
         }
       })
     );

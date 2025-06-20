@@ -13,7 +13,7 @@
                     }
 
                     <div class="message-body" [class.active]="clickedMessageIndex === index" [class.reversed]="currentUser?.id === message.authorID">
-                        <div class="avatar">
+                        <div class="avatar pointer" (click)="clickUserAvatar(message.authorID)">
                             <img [src]="findURLByUserId(message.authorID)">
                         </div>
                         <div class="message-content">
@@ -36,13 +36,13 @@
                                         <div class="emojis">
                                             @for (emo of convertReaction(message.reactions); let j = $index; track $index) {
                                                 @if(message.reactions[emo].users && message.reactions[emo].users.length > 0) {
-                                                    <div class="emoji-div pointer">
+                                                    <div class="emoji-div pointer" (click)="clickEmoji(emo, message)">
                                                         @switch (emo) {
                                                             @case ('check-mark') {
-                                                                 <app-emoji [emoji]="'checkmark'"></app-emoji>
+                                                                 <app-emoji [emoji]="'checkmark'" ></app-emoji>
                                                             }
                                                             @case ('thumbs-up') {
-                                                                <app-emoji [emoji]="'thumbs_up'"></app-emoji>
+                                                                <app-emoji [emoji]="'thumbs_up'" ></app-emoji>
                                                             }
                                                             @default {
                                                                 <span>{{emo}}</span>
@@ -57,7 +57,7 @@
                                                                     <app-emoji [emoji]="'checkmark'"></app-emoji>
                                                                 }
                                                                 @case ('thumbs-up') {
-                                                                    <app-emoji [emoji]="'thumbs_up'"></app-emoji>
+                                                                    <app-emoji [emoji]="'thumbs_up'" ></app-emoji>
                                                                 }
                                                                 @default {
                                                                     <span>{{emo}}</span>
@@ -105,7 +105,7 @@
                                     <span class="emoji pointer"  (click)="showEmojiPicker($event, index, currentUser?.id === message.authorID ? 'left' : 'right')"></span>
                                 </li>
                                 <li>
-                                    <span class="answer pointer"></span>
+                                    <span class="answer pointer" (click)="clickThreadMessage(index)"></span>
                                 </li>
                                 <li>
                                     <span class="option pointer">
@@ -132,3 +132,5 @@
 <ng-template #emojiPickerTemplate>
     <app-emoji-picker (closeOverlayEmitter)="closeEmojiPickerOverlay()" (selectedEojiEmitter)="onSelectedEmoji($event)"></app-emoji-picker>
 </ng-template>
+<app-profile [showOverlay]="showProfileOverlay" (closeOverlayEmitter)="showProfileOverlay = false; clickedMessageIndex = -1;" [currentUser]="selectedUser"></app-profile>
+

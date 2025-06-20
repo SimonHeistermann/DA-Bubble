@@ -1,7 +1,7 @@
-import { AfterViewChecked, AfterViewInit, ChangeDetectionStrategy, Component, EventEmitter, inject, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
+import { AfterViewChecked, AfterViewInit, ChangeDetectionStrategy, Component, EventEmitter, Inject, inject, InjectionToken, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
 import { InputComponent } from '../shared/input/input.component';
 import { CommonModule } from '@angular/common';
-import { Channel } from '../../../../core/models/channel.interface';
+import { Channel, CHANNEL_TOKEN } from '../../../../core/models/channel.interface';
 import { Subscription } from 'rxjs';
 import { UserService } from '../../../../core/services/user-service/user.service';
 import { forkJoin} from 'rxjs';
@@ -17,6 +17,10 @@ import { MessageService } from '../../../../core/services/message.service';
 import { ChannelMessageHeaderComponent } from './channel-message-header/channel-message-header.component';
 import { MessageData } from '../../../../core/models/message.interface';
 import { UserChannelActivityService } from '../../../../core/services/userChannelActivity.service';
+import { ActivatedRoute } from '@angular/router';
+import { ChannelService } from '../../../../core/services/channel.service';
+
+
 
 @Component({
   selector: 'app-message',
@@ -26,34 +30,58 @@ import { UserChannelActivityService } from '../../../../core/services/userChanne
   styleUrl: './message.component.scss',
   animations: [],
 })
-export class MessageComponent implements OnInit, AfterViewInit, AfterViewChecked{
+export class MessageComponent implements OnInit, AfterViewInit{
 
   @ViewChild('containerBody') private containerBody!: ElementRef;
-  @Input() channel: Channel | null = null;
+ 
   
   private subscriptions = new Subscription();
   showHeader: 'direct' | 'channel' | 'new' = 'channel';
   
   userService = inject(UserService);
+  channelService = inject(ChannelService);
   allUsers: User[] = [];
+  allUsersWithOutCurrentUser: User[] = [];
   authService = inject(AuthService);
   currentUser: User | null = null;
+  channel: Channel | null = null;
   messageService = inject(MessageService);
   userChannelActivityService = inject(UserChannelActivityService);
 
   showAddChannelUserOverlay = false;
   showUserListOverlay = false;
 
+  route = inject(ActivatedRoute);
+
+  constructor() {}
+
   ngOnInit(): void {
-    this.subCurrentUser();
+    // Subscribe once to paramMap changes
+    this.subscriptions.add(
+      this.route.paramMap.subscribe(params => {
+        const channelId = params.get('channelId');
+        if (channelId) {
+          this.loadChannel(channelId);
+        }
+      })
+    );
+  }
+
+  loadChannel(channelId: string) {
+    this.subscriptions.add(
+      this.channelService.getChannelById(channelId).subscribe({
+        next: (data) => {
+          if(data) {
+             this.channel = {...data};
+             this.subCurrentUser();
+          }
+        }
+      })
+    );
   }
 
   ngAfterViewInit(): void {
     this.scrollToBottom();
-  }
-
-  ngAfterViewChecked() {
-    
   }
 
   scrollToBottom(): void {
@@ -87,19 +115,13 @@ export class MessageComponent implements OnInit, AfterViewInit, AfterViewChecked
     this.subscriptions.add(
       this.userService.currentUser$.subscribe(user => {
         this.currentUser = user;
+        this.subChannelUsers();
       })
     );
   }
 
-  ngOnChanges(changes: SimpleChanges): void {
-    if (changes['channel'] && changes['channel'].currentValue) {
-      this.onChannelChanged(changes['channel'].currentValue);
-    }
-  }
-
-  onChannelChanged(channel: Channel) {
- 
-    this.channel = channel;
+  subChannelUsers() {
+    if(!this.channel) return;
     const userIDs = this.channel.userIDs ?? [];
     if(this.channel.userIDs?.length === 0) return;
 
@@ -108,12 +130,14 @@ export class MessageComponent implements OnInit, AfterViewInit, AfterViewChecked
       .subscribe( users => {
         this.allUsers = [];
         this.allUsers = users.filter((u): u is User => u !== null);
-        
+        this.allUsersWithOutCurrentUser = this.allUsers.filter(u => u.id !== this.currentUser?.id);
      })
     )
   }
 
   ngOnDestroy(): void {
+    console.log('ngOnDescrty, message component');
+    
     this.subscriptions.unsubscribe();
   }
 

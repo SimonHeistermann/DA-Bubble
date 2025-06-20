@@ -41,6 +41,7 @@ export class ChannelUserListComponent {
   set showOverlay(value: boolean) {
     this._showOverlay = value;
     if (value) {
+      
        this.openUserListOverlay();
     }
   }

@@ -168,6 +168,17 @@ export class FirebaseService {
         }
     }
 
+    async updateDocumentWithReturnedID(collectionName: string, docId: string, data: any): Promise<string> {
+        try {
+            const docRef = doc(this.firestore, collectionName, docId);
+            await updateDoc(docRef, data);
+            return docId;
+        } catch (error) {
+            console.error(`Error updating document in ${collectionName}:`, error);
+            throw error;
+        }
+    }
+
     async deleteDocument(collectionName: string, docId: string): Promise<void> {
         try {
             const docRef = doc(this.firestore, collectionName, docId);

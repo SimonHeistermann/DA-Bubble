@@ -52,4 +52,15 @@ export class ChannelService{
         return this.dataService.subscribeToCollection(this.CHANNEL_COL_NAME, callback, where('name', '==',  name)); 
     }
 
+    getChannelById(id: string): Observable<Channel>{
+        return from(
+            this.dataService.getDocument(this.CHANNEL_COL_NAME, id)
+        ).pipe(
+            catchError(e => {
+                console.log('Error when fetching channel by its ID:', e);
+                throw e;
+            })
+        );
+    }
+
 }

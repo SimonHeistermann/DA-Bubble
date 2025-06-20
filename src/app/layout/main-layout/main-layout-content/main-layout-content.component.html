@@ -5,12 +5,11 @@
             <app-sidebar 
                 #sidebar
                 (addChannel)="onAddChannel()" 
-                [showSelf]="showSidebar" 
-                (clickChannelNameEmitter)="onClickChannelName($event)">
+                [showSelf]="showSidebar">
             </app-sidebar>
         </div>
         <div class="message">
-            <app-message #message [channel]="clickedChannel"  (leaveChannelEmitter)="onLeaveChannel()"></app-message>
+            <router-outlet></router-outlet>
         </div>
     </div>
     <div class="overlay-bar" [ngClass]="{'show-menu': showSidebar, 'hide-menu': !showSidebar}" #overlay (click)="toggleMenu()">

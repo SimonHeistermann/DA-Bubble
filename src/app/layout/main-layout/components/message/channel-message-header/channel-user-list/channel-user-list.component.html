@@ -9,23 +9,25 @@
         </div>
         <div class="ul-wrapper scrollbar">
             <ul>
-                <li class="current-user">
-                    <div class="li-content">
-                        <div class="avatar-div">
-                            <img [src]="currentUser?.photoURL?.startsWith('http') ? '/icons/avatars/avatar_1.png' : currentUser?.photoURL">
-                        
-                            @if(!currentUser?.isActive) {
-                                <span class="active-status offline"></span>
-                            } @else {
-                                <span class="active-status"></span>
-                            }
+                @if (currentUser) {
+                    <li class="current-user">
+                        <div class="li-content">
+                            <div class="avatar-div">
+                                <img [src]="currentUser.photoURL.startsWith('http') ? '/icons/avatars/avatar_1.png' : currentUser.photoURL">
                             
+                                @if(!currentUser.isActive) {
+                                    <span class="active-status offline"></span>
+                                } @else {
+                                    <span class="active-status"></span>
+                                }
+                                
+                            </div>
+                            <span class="name">
+                                {{ currentUser.displayName }} (Du)
+                            </span>
                         </div>
-                        <span class="name">
-                            {{ currentUser?.displayName }} (Du)
-                        </span>
-                    </div>
-                </li>
+                    </li>
+                }
                 @for (user of allChannelUsers; let index = $index; track $index) {
                     <li class="pointer" [class.selected]="currentUserIndex == index">
                         <div class="li-content" (click)="showProfile(index)" >

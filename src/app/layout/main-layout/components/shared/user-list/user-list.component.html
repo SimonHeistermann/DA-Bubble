@@ -1,4 +1,4 @@
-<ngx-simplebar class="simple-bar" >
+<ngx-simplebar class="simple-bar" [ngStyle]="{'max-height': maxHeight ? maxHeight : '30vh'}">
     <div class="ul-list-container" >
         <ul>
             @for(u of dataSource; let index = $index; track $index) {

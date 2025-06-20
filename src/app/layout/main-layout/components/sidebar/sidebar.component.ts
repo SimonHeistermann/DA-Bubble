@@ -66,8 +66,6 @@ export class SidebarComponent implements OnInit, OnDestroy {
     );
   }
 
-
-
   buildNewMessageMap(messages: Message[], channel: Channel, channelID: string) {
     const activity = this.userChannelActivities.find(act => act.channelID === channel.id && act.userID === this.currentUser?.id);
     if(activity?.updatedAt) {
@@ -155,9 +153,7 @@ export class SidebarComponent implements OnInit, OnDestroy {
     if (this.currentUser) {
        this.userChannelActivityService.markChannelMessageAsReadByCurrentUser(this.currentUser?.id, channel.id);
     }
-   
     this.router.navigate(['/dashboard', 'channels', channel.id]);
-   
   }
 
   renewSubscriptions() {

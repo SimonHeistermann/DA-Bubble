@@ -298,7 +298,7 @@
                                 }
                             }
                             .emojis {
-                                @include displayFlex($g: 0px, $jc: flex-end);
+                                @include displayFlex($g: 0px, $jc: flex-start, $fd: row-reverse);
                                 .emoji-div {
                                     @include displayFlex($g: 3px);
                                     border: 1px solid var(--purple-1);

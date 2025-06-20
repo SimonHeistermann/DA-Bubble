@@ -9,7 +9,7 @@
                 </div>
             </div>
             <div class="img-wrapper">
-                <img src="{{ currentUser?.photoURL }}" alt="">
+                <img [src]="currentUser?.photoURL?.startsWith('http') ? '/icons/avatars/avatar_1.png' : currentUser?.photoURL" alt="">
             </div>
             <div class="name-wrapper">
                 <span>{{ currentUser?.displayName }}</span>

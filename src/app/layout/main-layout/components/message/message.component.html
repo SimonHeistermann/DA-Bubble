@@ -16,7 +16,7 @@
             <app-message-box (readMessageEmitter)="onReadMessage()" [channel]="channel" [currentUser]="currentUser" [allUsers]="allUsers"></app-message-box>
         </div>
         <div class="container-input">
-            <app-input (sendMessageEmitter)="onSendMessage($event)" [placeHolder]="this.channel?.name || ''"></app-input>
+            <app-input (sendMessageEmitter)="onSendMessage($event)" [allChannelUser]="allUsersWithOutCurrentUser" [placeHolder]="this.channel?.name || ''"></app-input>
         </div>
     </div>
 </main>

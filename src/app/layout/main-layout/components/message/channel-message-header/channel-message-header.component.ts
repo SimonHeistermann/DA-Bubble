@@ -99,9 +99,7 @@ export class ChannelMessageHeaderComponent implements AfterViewInit, OnInit {
   ngAfterViewInit(): void {
     this.addChannelUserComp.addMemberRef = this.addMemberRef;
     this.channelUserListComp.userListRef = this.userListRef;
-
   }
-
 
   openEditChannelOverlay(){
     this.activeEditChannelButton = true;

@@ -15,8 +15,10 @@ export class UserListComponent{
   @Output() clickedUser = new EventEmitter<any>();
   private _dataSource: User[] = [];
   @Input() tagIDs: string[] = [];
+  @Input() maxHeight = '30vh';
 
   isOverflowing = false;
+  
 
   clickLi(u: User) {
     this.clickedUser.emit(u);

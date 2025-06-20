@@ -11,9 +11,26 @@
     border: 1px solid #ADB0D9;
     border-radius: 20px;
     padding: 10px 10px 5px;
+
+    .user-list {
+        position: absolute;
+        left: 20px;
+        bottom: 100%;
+        overflow: hidden;
+        border-bottom-right-radius: 0;
+        border-top-right-radius: 20px;
+        border-top-left-radius: 20px;
+        border: 1px solid var(--light-purple);
+        padding: 10px 0;
+        background-color: var(--white);
+        z-index: 999;
+    }
+
     &.focused {
         border: 1px solid var(--purple-2);
     }
+
+
 }
 
 textarea {

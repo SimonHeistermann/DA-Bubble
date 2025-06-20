@@ -1,16 +1,24 @@
-<div class="input-container scrollbar__none" [class.focused]="isTextareaFocused">
+<div class="input-container scrollbar__none" [class.focused]="isTextareaFocused" #userListTrigger>
+    <div class="user-list" *ngIf="showUserListOverlay">
+         <app-user-list (closeOverlayEmitter)="closeAtUserListOverlay()" (clickedUser)="onClickUser($event)"  [dataSource]="allChannelUser" [maxHeight]="'50vh'"></app-user-list>
+    </div>
     <textarea 
+        #textarea
          autoResize
         class="scrollbar__none" name="message" id="message" 
         placeholder="Nachricht an #{{placeHolder}}"  
-        (focus)="isTextareaFocused = true" (blur)="isTextareaFocused = false" 
-        [(ngModel)]="inputMessage"></textarea>
+        (focus)="isTextareaFocused = true" 
+        (blur)="isTextareaFocused = false" 
+        [(ngModel)]="inputMessage" 
+        (input)="typing()"
+        (keydown)="onTextareaKeyDown($event)"
+        ></textarea>
     <div class="input-icons">
         <div class="input-icons-left">
-            <span class="emoji pointer">
+            <span class="emoji pointer" #emojiPickerTrigger (click)="showEmojiPicker()">
 
             </span>
-            <span class="at pointer">
+            <span class="at pointer"  (click)="showUserList()">
 
             </span>
         </div>
@@ -19,3 +27,10 @@
         </span>
     </div>
 </div>
+
+<ng-template #emojiPickerTemplate>
+    <app-emoji-picker (closeOverlayEmitter)="closeEmojiPickerOverlay()" (selectedEojiEmitter)="onSelectedEmoji($event)"></app-emoji-picker>
+</ng-template>
+
+    <!-- <app-user-list (closeOverlayEmitter)="closeAtUserListOverlay()"  [dataSource]="allChannelUser"></app-user-list> -->
+    <!-- <app-user-list (closeOverlayEmitter)="closeAtUserListOverlay()"  [dataSource]="allChannelUser" [tagIDs]="tagIDs" (clickedUser)="onClickedUser($event)"></app-user-list> -->
