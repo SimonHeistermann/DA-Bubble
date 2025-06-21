@@ -6,14 +6,14 @@ import { AddChannelComponent } from './../components/add-channel/add-channel.com
 import { Channel, CHANNEL_TOKEN } from '../../../core/models/channel.interface';
 import { SidebarComponent } from './../components/sidebar/sidebar.component';
 import { MessageComponent } from './../components/message/message.component';
-import { ActivatedRoute, RouterOutlet } from '@angular/router';
+import { ActivatedRoute, NavigationEnd, Router, RouterOutlet } from '@angular/router';
 import { ThreadContentComponent } from "../components/thread-content/thread-content.component";
 import { OverlayService } from '../../../core/services/overlay.service';
 import { ThreadService } from '../../../core/services/thread-service/thread.service';
 import { User } from '../../../core/models/user.interface';
 import { AuthService } from '../../../core/services/auth-service/auth.service';
 import { UserService } from '../../../core/services/user-service/user.service';
-import { Subscription } from 'rxjs';
+import { filter, Subscription } from 'rxjs';
 import { ChannelService } from '../../../core/services/channel.service';
 
 @Component({
@@ -36,22 +36,33 @@ export class MainLayoutContentComponent implements AfterViewInit, OnInit {
   showSidebar = true;
   showAddChannelOverlay = false;
   clickedChannel: Channel | null = null;
+  clickedUser: User | null = null;
   firstUnreadMessageId: string = '';
 
   currentUser: User | null = null;
-  allChannels: Channel[] = []
+  allChannels: Channel[] = [];
+  allUsers: User[] = [];
+
+  router = inject(Router);
 
 
-  ngOnInit() { 
+  ngOnInit() {
+
+    this.subCurrentUser();
   }
 
   ngAfterViewInit(): void {
-    this.route.paramMap.subscribe(params => {
-      const channelId = params.get('channelId');
-      if (channelId) {
-        this.handleChannelChange(channelId);
-      }
-    });
+    this.subscriptions.add(
+      this.route.paramMap.subscribe(params => {
+        const channelId = params.get('channelId');
+        const userId = params.get('userId');
+        if (channelId) {
+          this.handleChannelChange(channelId);
+        } else if (userId) {
+          this.handleUserChange(userId);
+        }
+      })
+    );
   }
 
   subCurrentUser(){
@@ -63,6 +74,7 @@ export class MainLayoutContentComponent implements AfterViewInit, OnInit {
       this.userService.currentUser$.subscribe(user => {
         this.currentUser = user;
         this.subAllChannels();
+        this.subAllUsers();
       })
     );
   }
@@ -78,14 +90,26 @@ export class MainLayoutContentComponent implements AfterViewInit, OnInit {
     );
   }
 
-  handleChannelChange(channelId: string) {
-    const sidebarRef = this.sidebarRef;
-    const index = sidebarRef.channels.findIndex(c => c.id === channelId);
+  subAllUsers() {
+    if(!this.currentUser) return;
+    
+    this.subscriptions.add(
+      this.userService.allUsers$.subscribe(users => {
+        this.allUsers = users;
+      }));
+  }
 
-    if (index !== -1) {
-      this.sidebarRef.currentChannelIndex = index;
-      this.clickedChannel = this.sidebarRef.channels[index];
-    }
+  handleChannelChange(channelId: string) {
+    const index = this.allChannels.findIndex(c => c.id === channelId);
+    this.clickedChannel = this.allChannels[index];
+   
+  }
+
+  handleUserChange(userId: string) {
+    const index = this.allUsers.findIndex(u => u.id === userId);
+    this.clickedUser = this.allUsers[index];
+    console.log(this.clickedUser);
+    
   }
 
   toggleMenu() {

@@ -51,11 +51,11 @@ export class MainLayoutComponent implements OnInit  {
 
         const currentUrl = this.router.url;
         const isAlreadyOnAChannel = currentUrl.includes('/dashboard/channels/');
+        const isNotUser = currentUrl.includes('/dashboard/users/');
 
-        
-        if (!isAlreadyOnAChannel && this.channels.length > 0) {
+        if (!isAlreadyOnAChannel && !isNotUser && this.channels.length > 0 ) {
           const firstChannelId = this.channels[0].id;
-        
+          
           this.router.navigate(['/dashboard/channels', firstChannelId]);
         } else {
           

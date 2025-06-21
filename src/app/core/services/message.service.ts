@@ -45,7 +45,21 @@ export class MessageService{
             this.COL_NAME, callback, 
             orderBy('createdAt', 'asc'),
             where('channelID', '==', currentChannelID),
+            where('type',  '==',  'channel')
         ); 
+    }
+
+    getPrivateMessageOrderByCreatedAt(conversationID: string, callback: (data: Message[]) => void){
+        return this.dataService.subscribeToCollection(
+            this.COL_NAME, callback, 
+            orderBy('createdAt', 'asc'),
+            where('conversationID', '==', conversationID),
+            where('type',  '==',  'private'),
+        ); 
+    }
+
+    buildConversationID(userID1: string, userID2: string): string {
+        return [userID1, userID2].sort().join('_');
     }
 
    

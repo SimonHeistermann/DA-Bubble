@@ -2,7 +2,7 @@ import { AfterViewChecked, AfterViewInit, ChangeDetectionStrategy, Component, Ev
 import { InputComponent } from '../shared/input/input.component';
 import { CommonModule } from '@angular/common';
 import { Channel, CHANNEL_TOKEN } from '../../../../core/models/channel.interface';
-import { Subscription } from 'rxjs';
+import { filter, Subscription } from 'rxjs';
 import { UserService } from '../../../../core/services/user-service/user.service';
 import { forkJoin} from 'rxjs';
 import { User } from '../../../../core/models/user.interface';
@@ -16,9 +16,10 @@ import { MessageBoxComponent } from './message-box/message-box.component';
 import { MessageService } from '../../../../core/services/message.service';
 import { ChannelMessageHeaderComponent } from './channel-message-header/channel-message-header.component';
 import { MessageData } from '../../../../core/models/message.interface';
-import { UserChannelActivityService } from '../../../../core/services/userChannelActivity.service';
-import { ActivatedRoute } from '@angular/router';
+import { UserChannelActivityService } from '../../../../core/services/userReadActivity.service';
+import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 import { ChannelService } from '../../../../core/services/channel.service';
+import { user } from '@angular/fire/auth';
 
 
 
@@ -30,7 +31,7 @@ import { ChannelService } from '../../../../core/services/channel.service';
   styleUrl: './message.component.scss',
   animations: [],
 })
-export class MessageComponent implements OnInit, AfterViewInit{
+export class MessageComponent implements OnInit{
 
   @ViewChild('containerBody') private containerBody!: ElementRef;
  
@@ -45,6 +46,7 @@ export class MessageComponent implements OnInit, AfterViewInit{
   authService = inject(AuthService);
   currentUser: User | null = null;
   channel: Channel | null = null;
+  messageUser: User | null = null;
   messageService = inject(MessageService);
   userChannelActivityService = inject(UserChannelActivityService);
 
@@ -53,21 +55,43 @@ export class MessageComponent implements OnInit, AfterViewInit{
 
   route = inject(ActivatedRoute);
 
-  constructor() {}
+  constructor() {
+   
+  }
 
   ngOnInit(): void {
-    // Subscribe once to paramMap changes
+    
     this.subscriptions.add(
       this.route.paramMap.subscribe(params => {
         const channelId = params.get('channelId');
+        const userId = params.get('userId');
         if (channelId) {
           this.loadChannel(channelId);
+          this.messageUser = null;
+        } else if (userId) {
+          this.loadUser(userId);
+          this.channel = null;
+        }
+      })
+    );
+  }
+
+  loadUser(userId:string) {
+    this.showHeader = 'direct';
+    this.subscriptions.add(
+      this.userService.getUserById(userId).subscribe({
+        next: (data) => {
+          if(data) {
+             this.messageUser = {...data};
+             this.subCurrentUser();
+          }
         }
       })
     );
   }
 
   loadChannel(channelId: string) {
+    this.showHeader = 'channel';
     this.subscriptions.add(
       this.channelService.getChannelById(channelId).subscribe({
         next: (data) => {
@@ -79,33 +103,6 @@ export class MessageComponent implements OnInit, AfterViewInit{
       })
     );
   }
-
-  ngAfterViewInit(): void {
-    this.scrollToBottom();
-  }
-
-  scrollToBottom(): void {
-    try {
-      const el = this.containerBody.nativeElement;
-      el.scrollTo({
-        top: el.scrollHeight,
-        behavior: 'smooth'
-      });
-    } catch(err) {
-      console.error('Scroll error:', err);
-    }
-  }
-
-  scrollToBottomWithoutAnimation(): void {
-  try {
-    const el = this.containerBody.nativeElement;
-    el.scrollTo({
-      top: el.scrollHeight
-    });
-  } catch (err) {
-    console.error('Scroll error:', err);
-  }
-}
 
   subCurrentUser(){
     const authUser = this.authService.currentUser;
@@ -136,12 +133,10 @@ export class MessageComponent implements OnInit, AfterViewInit{
   }
 
   ngOnDestroy(): void {
-    console.log('ngOnDescrty, message component');
-    
     this.subscriptions.unsubscribe();
   }
 
-  buildMessageData(msg: string): MessageData {
+  buildChannelMessageData(msg: string): MessageData {
     return {
       authorID: this.currentUser?.id || '',
       authorName: this.currentUser?.displayName || '',
@@ -153,25 +148,42 @@ export class MessageComponent implements OnInit, AfterViewInit{
     };
   }
 
-  onReadMessage() {
-    this.scrollToBottomWithoutAnimation();
+  buildPrivateMessageData(msg: string): MessageData {
+   
+    return {
+      authorID: this.currentUser?.id || '',
+      authorName: this.currentUser?.displayName || '',
+      content: msg,
+      isEdited: false,
+      threadCount: 0,
+      type: 'private' as 'private',
+      recipientID: this.messageUser?.id,
+      conversationID: this.messageService.buildConversationID(this.currentUser!.id, this.messageUser!.id)
+    };
   }
 
+
   onSendMessage(msg: string) {
-    if (!this.currentUser || !this.channel) return;
-
-    let messsageData = this.buildMessageData(msg);
-    this.subscriptions.add( this.messageService.addOneMessage(messsageData).subscribe(
-      {
-        next: (id: string) => {
-          if (this.currentUser && this.channel)
-            this.userChannelActivityService.markChannelMessageAsReadByCurrentUser(this.currentUser?.id, this.channel?.id);
-        },
-        complete:() => {
-
-        }
+    if ((this.currentUser && this.channel) || (this.currentUser && this.messageUser))  {
+      let messsageData ;
+      if(this.messageUser) {
+        messsageData = this.buildPrivateMessageData(msg);
+      } else {
+        messsageData = this.buildChannelMessageData(msg);
       }
-    ))
-   ;
+      
+      this.subscriptions.add( this.messageService.addOneMessage(messsageData).subscribe(
+        {
+          next: (id: string) => {
+            if (this.currentUser && this.channel)
+              this.userChannelActivityService.markMessageAsReadByCurrentUser(this.currentUser.id, this.channel.id);
+            if (this.currentUser && this.messageUser)
+              this.userChannelActivityService.markMessageAsReadByCurrentUser(this.currentUser.id, this.messageUser.id);
+          }
+        }
+      ));
+    }
+
+
   }
 }

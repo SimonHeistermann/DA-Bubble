@@ -2,29 +2,29 @@ import {inject, Injectable } from "@angular/core";
 import { where } from "firebase/firestore";
 import { DataService } from "./data-service/data.service";
 import { catchError, from, Observable } from "rxjs";
-import { UserChannelActivity, UserChannelActivityData } from "../models/userChannelActivity.interface";
+import { UserReadActivity, UserReadActivityData } from "../models/userReadActivity.interface";
 
 @Injectable({
     providedIn: 'root'
 })
 export class UserChannelActivityService{
-    private readonly COL_NAME = 'userChannelActivities';
+    private readonly COL_NAME = 'userReadActivities';
     dataService = inject(DataService);
 
-    markChannelMessageAsReadByCurrentUser(currentUserId: string, channelID: string) {
-        this.getUserChannelActivityByIDsOnce(currentUserId, channelID, (data: any) => {
+    markMessageAsReadByCurrentUser(currentUserId: string, activityID: string) {
+        this.getUserReadActivityByIDsOnce(currentUserId, activityID, (data: any) => {
         const activities = [...data];
         if(activities.length === 1) {
             const userChannelActivity = activities[0];
-            this.markAsSeenForExistedActivity({userID: currentUserId, channelID: channelID}, userChannelActivity.id);
+            this.markAsSeenForExistedActivity({userID: currentUserId, activityID: activityID}, userChannelActivity.id);
         } else if(activities.length === 0) {
-            this.markAsSeenForNewActivity({userID: currentUserId, channelID: channelID});
+            this.markAsSeenForNewActivity({userID: currentUserId, activityID: activityID});
         }
         })
     }
     
 
-    markAsSeenForExistedActivity(data: Partial<UserChannelActivityData>, id:string): Observable<void> {
+    markAsSeenForExistedActivity(data: Partial<UserReadActivityData>, id:string): Observable<void> {
         return from(
             this.dataService.updateDocument(this.COL_NAME, id, data)
         ).pipe(
@@ -35,7 +35,7 @@ export class UserChannelActivityService{
         );
     }
 
-    markAsSeenForNewActivity(data: Partial<UserChannelActivityData>): Observable<string> {
+    markAsSeenForNewActivity(data: Partial<UserReadActivityData>): Observable<string> {
         return from(
             this.dataService.addDocument(this.COL_NAME, data)
         ).pipe(
@@ -46,24 +46,24 @@ export class UserChannelActivityService{
         );
     }
 
-    getUserChannelActivities(callback: (data: any) => void) {
+    getUserReadActivities(callback: (data: any) => void) {
         return this.dataService.subscribeToCollection(
                 this.COL_NAME, callback, 
         ); 
     }
 
-    getUserChannelActivityByIDs(userID: string, channelID: string, callback: (data: any) => void) {
+    getUserReadActivityByIDs(userID: string, activityID: string, callback: (data: any) => void) {
         return this.dataService.subscribeToCollection(
                 this.COL_NAME, callback, 
-                where('channelID', '==', channelID),
+                where('activityID', '==', activityID),
                 where('userID', '==', userID),
         ); 
     }
 
-    getUserChannelActivityByIDsOnce(userID: string, channelID: string, callback: (data: any) => void) {
+    getUserReadActivityByIDsOnce(userID: string, activityID: string, callback: (data: any) => void) {
         return this.dataService.subscribeToCollectionOnce(
                 this.COL_NAME, callback, 
-                where('channelID', '==', channelID),
+                where('activityID', '==', activityID),
                 where('userID', '==', userID),
         ); 
     }

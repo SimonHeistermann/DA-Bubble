@@ -10,8 +10,8 @@ import { ActivatedRoute, Router } from '@angular/router';
 import { SimplebarAngularModule } from 'simplebar-angular';
 import { CommonModule } from '@angular/common';
 import { MessageService } from '../../../../core/services/message.service';
-import { UserChannelActivityService } from '../../../../core/services/userChannelActivity.service';
-import { UserChannelActivity, UserChannelActivityData } from '../../../../core/models/userChannelActivity.interface';
+import { UserChannelActivityService } from '../../../../core/services/userReadActivity.service';
+import { UserReadActivity, UserReadActivityData } from '../../../../core/models/userReadActivity.interface';
 import { user } from '@angular/fire/auth';
 import { Message } from '../../../../core/models/message.interface';
 
@@ -36,7 +36,7 @@ export class SidebarComponent implements OnInit, OnDestroy {
   
   channels: Channel[] = [];
   allUsers: User[] = [];
-  userChannelActivities: UserChannelActivity[] = []
+  userChannelActivities: UserReadActivity[] = [];
   currentUser: User | null = null;
   imgLoadStatus: Record<string, boolean> = {};
   isOverflowing = false;
@@ -49,6 +49,7 @@ export class SidebarComponent implements OnInit, OnDestroy {
   openMessage = true;
 
   public currentChannelIndex: number = 0;
+  public currentUserIndex: number | 'currentUser' = -1;
   
   newMessageMap: Record<string,{ unreadCount: number; firstUnreadMessageId?: string }> = {'': {unreadCount:0, firstUnreadMessageId: ''}};
   router = inject(Router);
@@ -59,15 +60,16 @@ export class SidebarComponent implements OnInit, OnDestroy {
 
   subUserChannelActivites() {
     this.subscriptions.add(
-      this.userChannelActivityService.getUserChannelActivities((data: any) => {
+      this.userChannelActivityService.getUserReadActivities((data: any) => {
          this.userChannelActivities = [...data];
          this.subMessagesInAllChannel();
+         this.subMessagesInAllPrivate();
       }) 
     );
   }
 
-  buildNewMessageMap(messages: Message[], channel: Channel, channelID: string) {
-    const activity = this.userChannelActivities.find(act => act.channelID === channel.id && act.userID === this.currentUser?.id);
+  buildNewMessageMap(messages: Message[], activityID: string) {
+    const activity = this.userChannelActivities.find(act => act.activityID === activityID && act.userID === this.currentUser?.id);
     if(activity?.updatedAt) {
         const unreadMessages = messages.filter(
           msg =>
@@ -75,10 +77,28 @@ export class SidebarComponent implements OnInit, OnDestroy {
             msg.createdAt.toMillis() > activity.updatedAt.toMillis() &&
             msg.authorID !== this.currentUser?.id
         );
-        this.newMessageMap[channelID] = {unreadCount: unreadMessages.length, firstUnreadMessageId: unreadMessages.length > 0 ? unreadMessages[0].id : undefined};
+        this.newMessageMap[activityID] = {unreadCount: unreadMessages.length, firstUnreadMessageId: unreadMessages.length > 0 ? unreadMessages[0].id : undefined};
         
     } else {
-        this.newMessageMap[channelID] = {unreadCount: messages.length, firstUnreadMessageId: messages.length > 0 ? messages[0].id : undefined};
+        this.newMessageMap[activityID] = {unreadCount: messages.length, firstUnreadMessageId: messages.length > 0 ? messages[0].id : undefined};
+    }
+  }
+
+  subMessagesInAllPrivate() {
+
+    let currentUserID = '';
+    if(this.currentUser != null) {
+       currentUserID = this.currentUser.id;
+    }
+    
+    for (let index = 0; index < this.allUsers.length; index++) {
+      const user = this.allUsers[index];
+      const userID = user.id;
+      this.subscriptions.add(
+        this.messageService.getPrivateMessageOrderByCreatedAt(this.messageService.buildConversationID(currentUserID, userID), (data) => {
+          this.buildNewMessageMap(data, userID);
+      }));
+      
     }
   }
 
@@ -90,7 +110,7 @@ export class SidebarComponent implements OnInit, OnDestroy {
       this.subscriptions.add(
         this.messageService.getChannelMessageOrderByCreatedAt(channel.id, (messages) => {
           if(this.currentUser !== null) {
-            this.buildNewMessageMap(messages, channel, channelID);
+            this.buildNewMessageMap(messages, channelID);
           }
         })
       );
@@ -105,9 +125,10 @@ export class SidebarComponent implements OnInit, OnDestroy {
     this.subscriptions.add(
       this.userService.currentUser$.subscribe(user => {
         this.currentUser = user;
+        
         this.subAllUsers();
         this.subAllChannels();
-        this.subUserChannelActivites();
+        
       })
     );
   }
@@ -117,6 +138,7 @@ export class SidebarComponent implements OnInit, OnDestroy {
       this.userService.allUsers$.subscribe(users => {
         this.allUsers = users;
         this.allUsers = this.allUsers.filter(u => u.id !== this.currentUser?.id);
+        this.subUserChannelActivites();
       }));
   }
 
@@ -150,10 +172,24 @@ export class SidebarComponent implements OnInit, OnDestroy {
 
   clickChannelName(index: number, channel: Channel) {
     this.currentChannelIndex = index;
+    this.currentUserIndex = -1;
     if (this.currentUser) {
-       this.userChannelActivityService.markChannelMessageAsReadByCurrentUser(this.currentUser?.id, channel.id);
+       this.userChannelActivityService.markMessageAsReadByCurrentUser(this.currentUser?.id, channel.id);
     }
     this.router.navigate(['/dashboard', 'channels', channel.id]);
+  }
+
+  clickUserName(index: number | 'currentUser', user: User | null) {
+    this.currentChannelIndex = -1;
+    this.currentUserIndex = index;
+    let id;
+    if(user && this.currentUser) {
+      id = user.id;
+      this.userChannelActivityService.markMessageAsReadByCurrentUser(this.currentUser?.id, user.id);
+    } else {
+      id = this.currentUser?.id;
+    }
+    this.router.navigate(['/dashboard', 'users', id]);
   }
 
   renewSubscriptions() {

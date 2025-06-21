@@ -16,6 +16,7 @@ export class UserListComponent implements AfterViewInit{
   private _dataSource: User[] = [];
   @Input() tagIDs: string[] = [];
   @Input() maxHeight = '30vh';
+  @Input() editingMode = false;
 
   isOverflowing = false;
   

@@ -57,6 +57,7 @@ export const routes: Routes = [
         component:  MainLayoutContentComponent, 
         children:[
           { path: 'channels/:channelId', component: MessageComponent },
+          { path: 'users/:userId', component: MessageComponent },
         ]}
     ]
   },

@@ -9,7 +9,7 @@
             </app-sidebar>
         </div>
         <div class="message">
-            <router-outlet></router-outlet>
+                <router-outlet></router-outlet>
         </div>
         <app-thread-content [showSelf]="(threadService.showThread$ | async) ?? false"></app-thread-content>
     </div>
