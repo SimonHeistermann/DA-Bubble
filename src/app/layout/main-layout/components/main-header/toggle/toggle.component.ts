@@ -34,7 +34,6 @@ export class ToggleComponent {
   }
 
   logOut() {
-    console.log(routes);
     this.authService.signOut();
   }
 

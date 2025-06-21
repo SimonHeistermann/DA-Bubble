@@ -49,7 +49,6 @@ export class MainHeaderComponent implements OnDestroy {
   }
 
   showProfile( user: User) {
-    console.log(user);
     this.dialog.open(ToggleComponent, {
       data: {
         user: user

@@ -11,9 +11,7 @@ export class ThreadService {
   private showThread = new BehaviorSubject<boolean>(false);
   showThread$ = this.showThread.asObservable();
 
-  toggleThread() {
-    this.showThread.next(true);
-  }
+  
 
   show() {
     this.showThread.next(true);
