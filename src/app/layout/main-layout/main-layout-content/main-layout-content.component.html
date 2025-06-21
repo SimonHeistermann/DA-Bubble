@@ -11,7 +11,7 @@
         <div class="message">
             <router-outlet></router-outlet>
         </div>
-        <app-thread-content *ngIf="threadService.showThread$ | async"></app-thread-content>
+        <app-thread-content [showSelf]="(threadService.showThread$ | async) ?? false"></app-thread-content>
     </div>
     <div class="overlay-bar" [ngClass]="{'show-menu': showSidebar, 'hide-menu': !showSidebar}" #overlay (click)="toggleMenu()">
         <img class="icon-show-menu">
