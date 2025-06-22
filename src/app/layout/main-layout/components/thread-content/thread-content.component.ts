@@ -17,12 +17,6 @@ export class ThreadContentComponent {
 
   threadService = inject(ThreadService);
 
-  constructor(){
-    this.threadService.show();
-  }
-
-
-
 
   hideThreadContainer() {
     this.threadService.hide();
