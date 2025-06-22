@@ -10,6 +10,8 @@
     border-radius: 30px;
     background-color: #FFFFFF;
     height: calc(100vh - 136px);
+    position: relative;
+    z-index: 0;
 }
 
 section {

@@ -315,6 +315,7 @@ export class MessageBoxComponent implements OnInit, OnDestroy, AfterViewInit{
     console.log('Go to thread message component:', this.messages[index]);
     
     this.threadMessageEmitter.emit(this.messages[index]);
+    this.threadService.show();
   }
 
   clickEditMessage(index: number){

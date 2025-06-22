@@ -193,9 +193,9 @@
                         @include displayFlex($g: 5px);
                         li {
                             @include displayFlex();
-                            span {
+                            // span {
 
-                            }
+                            // }
                             .check-mark {
                                 @include imgButton($wh:35px, $url:'/icons/check_mark.png');
                                 &:hover {
