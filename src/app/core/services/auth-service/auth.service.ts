@@ -22,6 +22,15 @@ export class AuthService {
   public loading$ = this.loadingSubject.asObservable();
   private authStateSubscription: Unsubscribe | null = null;
 
+  private readonly availableAvatars = [
+    '/icons/avatars/avatar_1.png',
+    '/icons/avatars/avatar_2.png',
+    '/icons/avatars/avatar_3.png',
+    '/icons/avatars/avatar_4.png',
+    '/icons/avatars/avatar_5.png',
+    '/icons/avatars/avatar_6.png'
+  ];
+
   constructor(
     private firebaseService: FirebaseService,
     private userService: UserService,
@@ -53,10 +62,16 @@ export class AuthService {
     const authUser = this.mapFirebaseUserToAuthUser(firebaseUser);
     this.currentUserSubject.next(authUser);
     const isNewUser = await this.syncUserToFirestore(firebaseUser);
-    
     if (isNewUser) {
       await this.addUserToAllgemeinChannel(firebaseUser.uid);
+      if (this.isGoogleSignIn(firebaseUser)) {
+        this.router.navigate(['/auth/choose-avatar']);
+      }
     }
+  }
+
+  private isGoogleSignIn(firebaseUser: FirebaseUser): boolean {
+    return firebaseUser.providerData.some(provider => provider.providerId === 'google.com');
   }
 
   private mapFirebaseUserToAuthUser(firebaseUser: FirebaseUser): AuthUser {
@@ -69,23 +84,30 @@ export class AuthService {
     };
   }
 
+  // ========== ZUFÄLLIGER AVATAR ==========
+
+  private getRandomAvatar(): string {
+    const randomIndex = Math.floor(Math.random() * this.availableAvatars.length);
+    return this.availableAvatars[randomIndex];
+  }
+
   // ========== FIRESTORE SYNC ==========
 
-  private async syncUserToFirestore(firebaseUser: FirebaseUser): Promise<boolean> {
+  private async syncUserToFirestore(firebaseUser: FirebaseUser, registerData?: RegisterData): Promise<boolean> {
     try {
       const existingUser = await this.getExistingUser(firebaseUser.uid);
       const now = Timestamp.now();
       
-      return await this.handleUserSync(firebaseUser, existingUser, now);
+      return await this.handleUserSync(firebaseUser, existingUser, now, registerData);
     } catch (error) {
       console.error('Error syncing user to Firestore:', error);
       return false;
     }
   }
 
-  private async handleUserSync(firebaseUser: FirebaseUser, existingUser: any, now: Timestamp): Promise<boolean> {
+  private async handleUserSync(firebaseUser: FirebaseUser, existingUser: any, now: Timestamp, registerData?: RegisterData): Promise<boolean> {
     if (!existingUser) {
-      await this.createNewUserInFirestore(firebaseUser, now);
+      await this.createNewUserInFirestore(firebaseUser, now, registerData);
       return true;
     } else {
       await this.updateUserLastSeen(firebaseUser.uid, now);
@@ -100,8 +122,8 @@ export class AuthService {
     );
   }
 
-  private async createNewUserInFirestore(firebaseUser: FirebaseUser, timestamp: Timestamp): Promise<void> {
-    const newUser: Omit<User, 'id'> = this.buildNewUserData(firebaseUser, timestamp);
+  private async createNewUserInFirestore(firebaseUser: FirebaseUser, timestamp: Timestamp, registerData?: RegisterData): Promise<void> {
+    const newUser: Omit<User, 'id'> = this.buildNewUserData(firebaseUser, timestamp, registerData);
     await this.firebaseService.setDocument(
       APP_CONSTANTS.COLLECTIONS.USERS,
       firebaseUser.uid,
@@ -109,16 +131,43 @@ export class AuthService {
     );
   }
 
-  private buildNewUserData(firebaseUser: FirebaseUser, timestamp: Timestamp): Omit<User, 'id'> {
-    const nameParts = this.splitDisplayName(firebaseUser.displayName);
-    return this.createUserDataObject(firebaseUser, timestamp, nameParts);
+  private buildNewUserData(firebaseUser: FirebaseUser, timestamp: Timestamp, registerData?: RegisterData): Omit<User, 'id'> {
+    if (registerData) {
+      return this.createUserDataFromRegistration(firebaseUser, timestamp, registerData);
+    } else {
+      const nameParts = this.splitDisplayName(firebaseUser.displayName);
+      const randomAvatar = this.getRandomAvatar();
+      return this.createUserDataObject(firebaseUser, timestamp, nameParts, randomAvatar);
+    }
+  }
+  
+  private createUserDataFromRegistration(
+    firebaseUser: FirebaseUser,
+    timestamp: Timestamp,
+    registerData: RegisterData
+  ): Omit<User, 'id'> {
+    const displayName = `${registerData.firstName} ${registerData.lastName}`.trim();
+    const userData = {
+      email: registerData.email,
+      displayName: displayName,
+      photoURL: registerData.photoURL ?? this.getRandomAvatar(),
+      lastSeen: timestamp,
+      isActive: true,
+      createdAt: timestamp,
+      updatedAt: timestamp,
+      profile: {
+        firstName: registerData.firstName,
+        lastName: registerData.lastName
+      }
+    };    
+    return userData;
   }
 
-  private createUserDataObject(firebaseUser: FirebaseUser, timestamp: Timestamp, nameParts: {firstName: string, lastName: string}): Omit<User, 'id'> {
+  private createUserDataObject(firebaseUser: FirebaseUser, timestamp: Timestamp, nameParts: {firstName: string, lastName: string}, randomAvatar: string): Omit<User, 'id'> {
     return {
       email: firebaseUser.email || '',
       displayName: firebaseUser.displayName || '',
-      photoURL: firebaseUser.photoURL || '',
+      photoURL: randomAvatar,
       lastSeen: timestamp,
       isActive: true,
       createdAt: timestamp,
@@ -154,7 +203,6 @@ export class AuthService {
   private async addUserToAllgemeinChannel(userId: string): Promise<void> {
     try {
       const allgemeinChannel = await this.findAllgemeinChannel();
-      
       if (allgemeinChannel) {
         await this.addUserToChannelIfNotExists(allgemeinChannel, userId);
       } else {
@@ -167,7 +215,6 @@ export class AuthService {
 
   private async addUserToChannelIfNotExists(channel: Channel, userId: string): Promise<void> {
     const currentUserIDs = channel.userIDs || [];
-    
     if (!currentUserIDs.includes(userId)) {
       await this.updateChannelWithNewUser(channel, userId, currentUserIDs);
     }
@@ -179,7 +226,6 @@ export class AuthService {
       ...channel,
       userIDs: updatedUserIDs
     }).toPromise();
-    console.log(`User ${userId} added to Allgemein channel`);
   }
 
   private async findAllgemeinChannel(): Promise<Channel | null> {
@@ -223,41 +269,95 @@ export class AuthService {
     );
   }
 
-  registerWithEmail(registerData: RegisterData): Observable<AuthUser> {
+  // ========== REGISTRIERUNG ==========
+
+  registerWithEmail(registerData: Omit<RegisterData, 'photoURL'>): Observable<AuthUser> {
     this.setLoading(true);
-    return this.performEmailRegistration(registerData).pipe(
-      switchMap(() => this.waitForCurrentUser()),
-      catchError(error => this.handleRegistrationError(error))
-    );
-  }
-
-  private performEmailRegistration(registerData: RegisterData): Observable<AuthUser> {
-    return from(
-      this.firebaseService.createUserWithEmail(registerData.email, registerData.password)
-    ).pipe(
-      switchMap(firebaseUser => this.updateUserProfileAfterRegistration(firebaseUser, registerData)),
-      map(firebaseUser => this.mapFirebaseUserToAuthUser(firebaseUser))
-    );
-  }
-
-  private updateUserProfileAfterRegistration(firebaseUser: FirebaseUser | null, registerData: RegisterData): Observable<FirebaseUser> {
-    if (!firebaseUser) {
-      throw new Error('Registration failed');
+    const completeData: RegisterData = {
+      ...registerData,
+      photoURL: this.getRandomAvatar() 
+    };
+    const wasListening = !!this.authStateSubscription;
+    if (wasListening) {
+      this.authStateSubscription?.();
+      this.authStateSubscription = null;
     }
-    
-    const displayName = this.buildDisplayName(registerData);
-    return this.updateProfileAndReturnUser(firebaseUser, displayName, registerData.photoURL);
-  }
-
-  private buildDisplayName(registerData: RegisterData): string {
-    return `${registerData.firstName} ${registerData.lastName}`;
-  }
-
-  private updateProfileAndReturnUser(firebaseUser: FirebaseUser, displayName: string, photoURL?: string): Observable<FirebaseUser> {
     return from(
-      this.firebaseService.updateUserProfile(displayName, photoURL)
+      this.firebaseService.createUserWithEmail(completeData.email, completeData.password)
     ).pipe(
-      map(() => firebaseUser)
+      switchMap(firebaseUser => {
+        if (!firebaseUser) {
+          throw new Error('Registration failed');
+        }
+        const displayName = `${completeData.firstName} ${completeData.lastName}`.trim();
+        return from(
+          this.firebaseService.updateUserProfile(displayName, completeData.photoURL)
+        ).pipe(
+          switchMap(() => {
+            const updatedFirebaseUser = this.firebaseService.currentUser;
+            if (!updatedFirebaseUser) {
+              throw new Error('Failed to get updated user');
+            }
+            return from(this.syncUserToFirestore(updatedFirebaseUser, completeData));
+          }),
+          switchMap(() => {
+            return from(this.addUserToAllgemeinChannel(firebaseUser.uid)).pipe(
+              map(() => {
+                if (wasListening) {
+                  this.initializeAuthStateListener();
+                }
+                const authUser = this.mapFirebaseUserToAuthUser(this.firebaseService.currentUser!);
+                this.currentUserSubject.next(authUser);
+                return authUser;
+              })
+            );
+          })
+        );
+      }),
+      map(authUser => {
+        this.setLoading(false);
+        return authUser;
+      }),
+      catchError(error => {
+        if (wasListening) {
+          this.initializeAuthStateListener();
+        }
+        return this.handleRegistrationError(error);
+      })
+    );
+  }
+
+  // ========== AVATAR UPDATE ==========
+
+  updateUserAvatar(avatarPath: string): Observable<void> {
+    const currentUser = this.currentUserSubject.value;
+    if (!currentUser) {
+      throw new Error('No user logged in');
+    }
+    this.setLoading(true);
+    return from(
+      this.firebaseService.updateUserProfile(currentUser.displayName, avatarPath)
+    ).pipe(
+      switchMap(() => {
+        return from(this.firebaseService.updateDocument(
+          APP_CONSTANTS.COLLECTIONS.USERS,
+          currentUser.uid,
+          {
+            photoURL: avatarPath,
+            updatedAt: Timestamp.now()
+          }
+        ));
+      }),
+      map(() => {
+        const updatedUser = { ...currentUser, photoURL: avatarPath };
+        this.currentUserSubject.next(updatedUser);
+        this.setLoading(false);
+      }),
+      catchError(error => {
+        console.error('Error updating avatar:', error);
+        this.setLoading(false);
+        throw error;
+      })
     );
   }
 
@@ -316,6 +416,10 @@ export class AuthService {
       map(() => this.setLoading(false)),
       catchError(error => this.handlePasswordResetError(error))
     );
+  }
+  
+  resetPasswordSecure(email: string): Observable<void> {
+    return this.resetPasswordWithValidation(email);
   }
 
   private sendPasswordResetEmail(email: string): Observable<void> {
@@ -390,6 +494,9 @@ export class AuthService {
   private handlePasswordResetError(error: any, logMessage: string = 'Password reset error:'): Observable<never> {
     console.error(logMessage, error);
     this.setLoading(false);
+    if (error.message.includes('email-not-found')) {
+      throw new Error('email-not-found');
+    }
     throw this.handleAuthError(error);
   }
 
@@ -417,7 +524,8 @@ export class AuthService {
       'auth/invalid-email': 'Ungültige E-Mail-Adresse',
       'auth/too-many-requests': 'Zu viele Anfragen. Bitte versuchen Sie es später erneut',
       'auth/network-request-failed': 'Netzwerkfehler. Prüfen Sie Ihre Internetverbindung',
-      'auth/popup-closed-by-user': 'Anmeldung wurde abgebrochen'
+      'auth/popup-closed-by-user': 'Anmeldung wurde abgebrochen',
+      'email-not-found': 'Diese E-Mail-Adresse ist nicht registriert'
     };
   }
 
@@ -447,5 +555,29 @@ export class AuthService {
     if (this.authStateSubscription) {
       this.authStateSubscription();
     }
+  }
+
+  checkEmailExists(email: string): Observable<boolean> {
+    return this.userService.getUserByEmail(email).pipe(
+      map(user => user !== null),
+      catchError(error => {
+        console.error('Error checking email existence:', error);
+        return of(false);
+      })
+    );
+  }
+  
+  resetPasswordWithValidation(email: string): Observable<void> {
+    this.setLoading(true);
+    return this.checkEmailExists(email).pipe(
+      switchMap(exists => {
+        if (!exists) {
+          throw new Error('email-not-found');
+        }
+        return this.sendPasswordResetEmail(email);
+      }),
+      map(() => this.setLoading(false)),
+      catchError(error => this.handlePasswordResetError(error))
+    );
   }
 }

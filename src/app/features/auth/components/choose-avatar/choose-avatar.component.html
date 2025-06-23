@@ -1,1 +1,65 @@
-<p>choose-avatar works!</p>
+<div class="auth__container">
+  <div class="auth__form__container">
+    <div class="auth__form__header">
+        <div class="back__arrow" (click)="goBack()"></div>
+        <h1>Wähle deinen Avatar</h1>
+    </div>
+
+    <div class="avatar__selection__section">
+      <div class="current__avatar__preview">
+        <div class="avatar__circle" [class.selected]="selectedAvatarId">
+            <div *ngIf="selectedAvatarId"  class="placeholder__avatar">
+                <img 
+                    *ngIf="selectedAvatarId" 
+                    [src]="selectedAvatarPath" 
+                    [alt]="selectedAvatarAlt"
+                    class="avatar__image"
+                />
+            </div>
+          <div *ngIf="!selectedAvatarId" class="placeholder__avatar">
+            <img class="avatar__image" src="/icons/big_avatar_placeholder.png" draggable="false"/>
+          </div>
+        </div>
+        <div class="texts">
+            <p class="user__name" *ngIf="userName; else fallbackName">{{ userName }}</p>
+            <ng-template #fallbackName>
+                <p class="user__name">Benutzer</p>
+            </ng-template>
+            <p class="choose__text">Aus der Liste wählen</p>
+        </div>       
+      </div>
+
+      <div class="avatar__grid">
+        <button
+          *ngFor="let avatar of avatars"
+          type="button"
+          class="avatar__option"
+          [class.selected]="isAvatarSelected(avatar.id)"
+          (click)="selectAvatar(avatar.id)"
+          [disabled]="loading"
+        >
+          <img [src]="avatar.path" [alt]="avatar.alt" class="avatar__image__option" />
+        </button>
+      </div>
+
+      <div class="error" *ngIf="errorMessage">
+        <small>{{ errorMessage }}</small>
+      </div>
+    </div>
+
+    <div class="form__bottom">
+      <button 
+        type="button"
+        class="btn btn__primary"
+        [disabled]="!canContinue"
+        (click)="onContinue()"
+      >
+        <span *ngIf="!loading">Weiter</span>
+        <span *ngIf="loading">
+          Wird verarbeitet...
+          <div class="loading__spinner"></div>
+        </span>
+      </button>
+    </div>
+  </div>
+</div>

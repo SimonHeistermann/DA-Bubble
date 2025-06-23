@@ -3,7 +3,6 @@ import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angula
 import { Router } from '@angular/router';
 import { Subject, takeUntil } from 'rxjs';
 import { CommonModule } from '@angular/common';
-
 import { AuthService } from '../../../../core/services/auth-service/auth.service';
 import { AuthValidators } from '../../../../core/validators/auth.validators';
 import { RegisterData } from '../../../../core/models/auth.interface';
@@ -20,7 +19,6 @@ export class RegisterComponent implements OnInit, OnDestroy {
   loading = false;
   errorMessage = '';
   private destroy$ = new Subject<void>();
-  private registrationData: RegisterData | null = null;
 
   constructor(
     private fb: FormBuilder,
@@ -70,8 +68,7 @@ export class RegisterComponent implements OnInit, OnDestroy {
 
   onSubmit(): void {
     if (this.registerForm.valid && !this.loading) {
-      this.prepareRegistrationData();
-      this.navigateToChooseAvatar();
+      this.performRegistration();
     } else {
       this.handleInvalidForm();
     }
@@ -82,23 +79,27 @@ export class RegisterComponent implements OnInit, OnDestroy {
     this.errorMessage = 'Bitte füllen Sie alle Felder korrekt aus.';
   }
 
-  private prepareRegistrationData(): void {
+  private performRegistration(): void {
+    this.errorMessage = '';
     const formValues = this.registerForm.value;
-    this.registrationData = {
+    const registrationData: Omit<RegisterData, 'photoURL'> = {
       firstName: formValues.firstName.trim(),
       lastName: formValues.lastName.trim(),
       email: formValues.email.trim().toLowerCase(),
       password: formValues.password
     };
-    sessionStorage.setItem('pendingRegistration', JSON.stringify(this.registrationData));
-  }
-
-  goToChooseAvatar(): void {
-    if (this.registerForm.valid) this.onSubmit();
-  }
-
-  private navigateToChooseAvatar(): void {
-    this.router.navigate(['/auth/choose-avatar']);
+    this.authService.registerWithEmail(registrationData)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: (user) => {
+          console.log('Registration successful:', user);
+          this.router.navigate(['/auth/choose-avatar']);
+        },
+        error: (error) => {
+          console.error('Registration error:', error);
+          this.errorMessage = error.message || 'Ein Fehler ist aufgetreten. Bitte versuchen Sie es erneut.';
+        }
+      });
   }
 
   goBack(): void {
@@ -114,7 +115,6 @@ export class RegisterComponent implements OnInit, OnDestroy {
   private touchAndAnimateInvalidField(key: string): void {
     const control = this.registerForm.get(key);
     control?.markAsTouched();
-
     if (control?.invalid) {
       const element = document.getElementById(`${key}-group`);
       if (element) {
@@ -170,10 +170,6 @@ export class RegisterComponent implements OnInit, OnDestroy {
   hasFieldContent(fieldName: string): boolean {
     const field = this.registerForm.get(fieldName);
     return !!(field?.value && field.value.toString().length > 0);
-  }
-
-  get currentRegistrationData(): RegisterData | null {
-    return this.registrationData;
   }
 
   get canProceed(): boolean {

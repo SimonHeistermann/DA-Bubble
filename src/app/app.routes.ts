@@ -8,6 +8,7 @@ import { AuthGuard } from './core/guards/auth-guard/auth.guard';
 import { NoAuthGuard } from './core/guards/no-auth-guard/no-auth.guard';
 import { AuthLayoutComponent } from './layout/auth-layout/auth-layout.component';
 import { MainLayoutComponent } from './layout/main-layout/main-layout.component';
+import { ChooseAvatarComponent } from './features/auth/components/choose-avatar/choose-avatar.component';
 
 export const routes: Routes = [
   { 
@@ -24,6 +25,11 @@ export const routes: Routes = [
         path: 'register',
         component: RegisterComponent,
         title: 'Registrieren'
+      },
+      {
+        path: 'choose-avatar',
+        component: ChooseAvatarComponent,
+        title: 'Avatar auswählen',
       },
       {
         path: 'forgot-password',

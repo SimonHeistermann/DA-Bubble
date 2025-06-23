@@ -2,7 +2,6 @@ import { Injectable } from '@angular/core';
 import { Observable, BehaviorSubject, from, of } from 'rxjs';
 import { map, catchError } from 'rxjs/operators';
 import { Unsubscribe, Timestamp } from 'firebase/firestore';
-
 import { FirebaseService } from './../firebase-service/firebase.service';
 import { User, UserProfile } from '../../models/user.interface';
 import { APP_CONSTANTS } from '../../constants/app.constants';
@@ -73,20 +72,19 @@ export class UserService {
   }
 
   /**
-   * Benutzer nach E-Mail suchen
-   */
+   * Optimierte getUserByEmail-Methode für bessere Performance
+   * Ersetzt die bestehende Methode in deinem UserService
+  */
   getUserByEmail(email: string): Observable<User | null> {
-    return new Observable<User | null>(observer => {
-      const unsubscribe = this.firebaseService.subscribeToCollection(
-        APP_CONSTANTS.COLLECTIONS.USERS,
-        (users: User[]) => {
-          const user = users.find(u => u.email === email);
-          observer.next(user || null);
-        },
-      );
-      return () => unsubscribe();
-    }).pipe(
-      map(users => Array.isArray(users) ? users.find(u => u.email === email) || null : users),
+    if (!email || !email.trim()) {
+      return of(null);
+    }
+    const normalizedEmail = email.toLowerCase().trim();
+    return this.allUsers$.pipe(
+      map(users => {
+        const user = users.find(u => u.email.toLowerCase() === normalizedEmail);
+        return user || null;
+      }),
       catchError(error => {
         console.error('Error loading user by email:', error);
         return of(null);
@@ -322,4 +320,34 @@ export class UserService {
       this.allUsersSubscription();
     }
   }
+
+  /**
+  * Schnelle synchrone E-Mail-Existenz-Prüfung
+  * Nutzt bereits geladene Benutzer aus dem allUsers$ Stream
+  */
+  checkEmailExistsSync(email: string): boolean {
+    if (!email || !email.trim()) {
+      return false;
+    }
+    const normalizedEmail = email.toLowerCase().trim();
+    const users = this.allUsersSubject.value;
+    return users.some(user => user.email.toLowerCase() === normalizedEmail);
+  }
+
+  /**
+  * Asynchrone E-Mail-Existenz-Prüfung mit Observable
+  */
+  checkEmailExists(email: string): Observable<boolean> {
+    if (!email || !email.trim()) {
+      return of(false);
+    }
+    const normalizedEmail = email.toLowerCase().trim();
+    return this.allUsers$.pipe(
+      map(users => users.some(user => user.email.toLowerCase() === normalizedEmail)),
+      catchError(error => {
+        console.error('Error checking email existence:', error);
+        return of(false);
+      })
+    );
+  } 
 }
