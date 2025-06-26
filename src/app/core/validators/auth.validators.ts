@@ -1,18 +1,44 @@
-import { AbstractControl, ValidationErrors, ValidatorFn } from '@angular/forms';
+import { AbstractControl, ValidationErrors, ValidatorFn, FormGroup } from '@angular/forms';
 
 export class AuthValidators {
   
+  /** Custom required validator */
+  static required(control: AbstractControl): ValidationErrors | null {
+    return control.value && control.value.toString().trim().length > 0 ? null : { required: true };
+  }
+
+  /** Validates that the input doesn't contain only whitespace */
+  static noWhitespaceOnly(control: AbstractControl): ValidationErrors | null {
+    if (!control.value) {
+      return null;
+    }
+
+    const isWhitespace = control.value.toString().trim().length === 0;
+    return isWhitespace ? { whitespace: true } : null;
+  }
+
+  /** Email validator */
   static email(control: AbstractControl): ValidationErrors | null {
     if (!control.value) {
       return null;
     }
-    
+
     const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/;
-    const valid = emailRegex.test(control.value);
-    
-    return valid ? null : { email: { value: control.value } };
+    const isValid = emailRegex.test(control.value);
+
+    return isValid ? null : { email: true };
   }
 
+  /** Simple password validator (for login) */
+  static simplePassword(control: AbstractControl): ValidationErrors | null {
+    if (!control.value) {
+      return null;
+    }
+
+    return control.value.length >= 6 ? null : { simplePassword: true };
+  }
+
+  /** Strong password validator (for registration) */
   static password(control: AbstractControl): ValidationErrors | null {
     if (!control.value) {
       return null;
@@ -37,38 +63,95 @@ export class AuthValidators {
     return Object.keys(errors).length > 0 ? { password: errors } : null;
   }
 
-  static simplePassword(control: AbstractControl): ValidationErrors | null {
-    if (!control.value) {
-      return null;
-    }
-    return control.value.length >= 6 ? null : { simplePassword: true };
-  }
-
+  /** Validator to ensure passwords match */
   static passwordMatch(passwordField: string, confirmPasswordField: string): ValidatorFn {
-    return (control: AbstractControl): ValidationErrors | null => {
-      const password = control.get(passwordField);
-      const confirmPassword = control.get(confirmPasswordField);
+    return (form: AbstractControl): ValidationErrors | null => {
+      if (!(form instanceof FormGroup)) {
+        return null;
+      }
+      const password = form.get(passwordField);
+      const confirmPassword = form.get(confirmPasswordField);
       if (!password || !confirmPassword) {
         return null;
       }
-      return password.value === confirmPassword.value ? null : { passwordMatch: true };
+      if (password.value !== confirmPassword.value) {
+        confirmPassword.setErrors({ passwordMismatch: true });
+        return { passwordMismatch: true };
+      } else {
+        if (confirmPassword.errors) {
+          delete confirmPassword.errors['passwordMismatch'];
+          if (Object.keys(confirmPassword.errors).length === 0) {
+            confirmPassword.setErrors(null);
+          }
+        }
+      }
+      return null;
     };
   }
 
-  static name(control: AbstractControl): ValidationErrors | null {
+  /** Prevents special characters in names */
+  static noSpecialCharacters(control: AbstractControl): ValidationErrors | null {
     if (!control.value) {
       return null;
     }
-    const nameRegex = /^[a-zA-ZäöüÄÖÜß\s]+$/;
-    const valid = nameRegex.test(control.value);
-    return valid ? null : { name: { value: control.value } };
+    const nameRegex = /^[a-zA-ZäöüÄÖÜß\s\-']+$/;
+    return nameRegex.test(control.value) ? null : { noSpecialCharacters: true };
   }
 
-  static noWhitespace(control: AbstractControl): ValidationErrors | null {
+  /** Combined name validator: required, no whitespace, no special chars */
+  static name(control: AbstractControl): ValidationErrors | null {
+    const requiredError = this.required(control);
+    if (requiredError) return requiredError;
+    const whitespaceError = this.noWhitespaceOnly(control);
+    if (whitespaceError) return whitespaceError;
+    const specialCharsError = this.noSpecialCharacters(control);
+    if (specialCharsError) return specialCharsError;
+    return null;
+  }
+
+  /** German phone number validator */
+  static phoneNumber(control: AbstractControl): ValidationErrors | null {
     if (!control.value) {
       return null;
     }
-    const isWhitespace = (control.value || '').trim().length === 0;
-    return isWhitespace ? { whitespace: true } : null;
+    const phoneRegex = /^(\+49|0)[1-9]\d{1,14}$/;
+    return phoneRegex.test(control.value.replace(/\s/g, '')) ? null : { phoneNumber: true };
+  }
+
+  /** Validates that a checkbox is checked */
+  static requiredTrue(control: AbstractControl): ValidationErrors | null {
+    return control.value === true ? null : { required: true };
+  }
+
+  /** Minimum age validator */
+  static minimumAge(minAge: number): ValidatorFn {
+    return (control: AbstractControl): ValidationErrors | null => {
+      if (!control.value) {
+        return null;
+      }
+      const birthDate = new Date(control.value);
+      const today = new Date();
+      let age = today.getFullYear() - birthDate.getFullYear();
+      const monthDiff = today.getMonth() - birthDate.getMonth();
+      if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+        age--;
+      }
+      return age >= minAge
+        ? null
+        : { minimumAge: { requiredAge: minAge, actualAge: age } };
+    };
+  }
+
+  /** Validates proper URL format */
+  static url(control: AbstractControl): ValidationErrors | null {
+    if (!control.value) {
+      return null;
+    }
+    try {
+      new URL(control.value);
+      return null;
+    } catch {
+      return { url: true };
+    }
   }
 }

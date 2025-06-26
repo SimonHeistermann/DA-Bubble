@@ -1,7 +1,7 @@
 @use './../../../styles.scss' as *;
 
 .auth-layout {
-    height: 100vh;
+    min-height: 100vh;
     @include displayFlex($g: 8px);
     flex-direction: column;
 }
@@ -19,7 +19,7 @@ main {
 }
   
 .auth-container {
-    max-width: 606px;
+    max-width: 700px;
     background: white;
     border-radius: 30px;
     box-shadow: 0 2px 10px 0px #00000014;

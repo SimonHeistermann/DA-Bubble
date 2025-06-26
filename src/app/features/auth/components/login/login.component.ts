@@ -2,52 +2,70 @@ import { Component, OnInit, OnDestroy } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
 import { Router } from '@angular/router';
 import { Subject, takeUntil } from 'rxjs';
-
 import { AuthService } from '../../../../core/services/auth-service/auth.service';
 import { AuthValidators } from '../../../../core/validators/auth.validators';
 import { LoginCredentials } from '../../../../core/models/auth.interface';
 import { CommonModule } from '@angular/common';
+import { OverlayComponent } from '../notifications/overlay/overlay.component';
+import { ErrorNotificationComponent } from '../notifications/error-notification/error-notification.component';
+import { SuccessNotificationComponent } from '../notifications/success-notification/success-notification.component';
+import { NotificationService } from '../../../../core/services/notification-service/notification.service';
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [
+    CommonModule, ReactiveFormsModule, OverlayComponent, 
+    ErrorNotificationComponent, SuccessNotificationComponent
+  ],
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.scss']
 })
 export class LoginComponent implements OnInit, OnDestroy {
   loginForm!: FormGroup;
   loading = false;
-  errorMessage = '';
   showPassword = false;
   private destroy$ = new Subject<void>();
+  private redirectTimeoutId?: number;
 
   constructor(
     private fb: FormBuilder,
     private authService: AuthService,
-    private router: Router
+    private router: Router,
+    public notificationService: NotificationService
   ) {
     this.createForm();
-  }
+  }  
 
   ngOnInit(): void {
-    this.authService.isAuthenticated$.pipe(
-      takeUntil(this.destroy$)
-    ).subscribe(isAuth => {
-      if (isAuth) {
-        this.router.navigate(['/dashboard']);
-      }
-    });
-    this.authService.loading$.pipe(
-      takeUntil(this.destroy$)
-    ).subscribe(loading => {
-      this.loading = loading;
-    });
+    this.subscribeToAuthenticationState();
+    this.subscribeToLoadingState();
   }
 
   ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();
+    if (this.redirectTimeoutId) {
+      clearTimeout(this.redirectTimeoutId);
+    }
+  }  
+
+  private subscribeToAuthenticationState(): void {
+    // this.authService.isAuthenticated$.pipe(
+    //   takeUntil(this.destroy$)
+    // ).subscribe(isAuth => {
+    //   if (isAuth) {
+    //     this.router.navigate(['/dashboard']);
+    //   }
+    // });
+  }
+
+  private subscribeToLoadingState(): void {
+    this.authService.loading$.pipe(
+      takeUntil(this.destroy$)
+    ).subscribe(loading => {
+      this.loading = loading;
+    });
   }
 
   private createForm(): void {
@@ -59,52 +77,79 @@ export class LoginComponent implements OnInit, OnDestroy {
       password: ['', [
         Validators.required,
         AuthValidators.simplePassword
-      ]]
+      ]],
+      honeypot: ['']
     });
   }
 
   onSubmit(): void {
+    if (this.loginForm.get('honeypot')?.value) {
+      console.warn('Honeypot field filled. Possible bot.');
+      return;
+    }
     if (this.loginForm.valid && !this.loading) {
-      this.errorMessage = '';
-      const credentials: LoginCredentials = {
-        email: this.loginForm.get('email')?.value.trim(),
-        password: this.loginForm.get('password')?.value
-      };
-
-      this.authService.signInWithEmail(credentials).pipe(
-        takeUntil(this.destroy$)
-      ).subscribe({
-        next: (user) => {
-          console.log('Login successful:', user);
-          this.router.navigate(['/dashboard']);
-        },
-        error: (error) => {
-          console.error('Login error:', error);
-          this.errorMessage = error.message || 'Falsches Passwort oder Email. Bitte versuchen Sie es erneut.';
-        }
-      });
+      this.performEmailLogin();
     } else {
       this.markFormGroupTouched();
     }
   }
 
-  onGoogleSignIn(): void {
-    if (!this.loading) {
-      this.errorMessage = '';
-      this.authService.signInWithGoogle().pipe(
-        takeUntil(this.destroy$)
-      ).subscribe({
-        next: (user) => {
-          console.log('Google login successful:', user);
-          this.router.navigate(['/dashboard']);
-        },
-        error: (error) => {
-          console.error('Google login error:', error);
-          this.errorMessage = error.message || 'Google-Anmeldung fehlgeschlagen. Bitte versuchen Sie es erneut.';
-        }
-      });
-    }
+  private performEmailLogin(): void {
+    this.notificationService.clearAll();
+    const credentials = this.extractLoginCredentials();
+    this.authService.signInWithEmail(credentials).pipe(
+      takeUntil(this.destroy$)
+    ).subscribe({
+      next: () => this.handleEmailLoginSuccess(),
+      error: (error) => this.handleEmailLoginError(error)
+    });
+  }  
+
+  private extractLoginCredentials(): LoginCredentials {
+    return {
+      email: this.loginForm.get('email')?.value.trim(),
+      password: this.loginForm.get('password')?.value
+    };
   }
+
+  private handleEmailLoginSuccess(): void {
+    this.notificationService.showSuccess('Angemeldet!');
+    this.redirectTimeoutId = window.setTimeout(() => {
+      this.router.navigate(['/dashboard']);
+    }, 2000);
+  }
+  
+  private handleEmailLoginError(error: any): void {
+    console.error('Login error:', error);
+    this.notificationService.showError('Fehler beim Anmelden.');
+  }
+
+  onGoogleSignIn(): void {
+    if (this.loading) return;
+    this.notificationService.clearAll();
+    this.authService.signInWithGoogle().pipe(
+      takeUntil(this.destroy$)
+    ).subscribe({
+      next: () => this.handleGoogleLoginSuccess(),
+      error: (error) => this.handleGoogleLoginError(error)
+    });
+  }
+
+  private handleGoogleLoginSuccess(): void {
+    this.notificationService.showSuccess('Angemeldet!');
+    this.redirectTimeoutId = window.setTimeout(() => {
+      this.router.navigate(['/dashboard']);
+    }, 2000);
+  }  
+
+  private handleGoogleLoginError(error: any): void {
+    console.error('Google login error:', error);
+    this.notificationService.showError('Fehler bei der Google-Anmeldung.');
+  }  
+
+  hideAllNotifications(): void {
+    this.notificationService.clearAll();
+  }  
 
   togglePasswordVisibility(): void {
     this.showPassword = !this.showPassword;
@@ -120,26 +165,43 @@ export class LoginComponent implements OnInit, OnDestroy {
 
   private markFormGroupTouched(): void {
     Object.keys(this.loginForm.controls).forEach(key => {
-      const control = this.loginForm.get(key);
-      control?.markAsTouched();
+      this.touchAndAnimateInvalidField(key);
     });
+  }
+
+  private touchAndAnimateInvalidField(key: string): void {
+    const control = this.loginForm.get(key);
+    control?.markAsTouched();
+    if (control?.invalid) {
+      const element = document.getElementById(`${key}-group`);
+      if (element) {
+        element.classList.add('error__state');
+        setTimeout(() => element.classList.remove('error__state'), 300);
+      }
+    }
   }
 
   getFieldError(fieldName: string): string | null {
     const field = this.loginForm.get(fieldName);
-    if (field?.touched && field?.invalid) {
-      const errors = field.errors;
-      if (errors?.['required']) {
-        return fieldName === 'email' ? '*Email ist erforderlich.' : '*Passwort ist erforderlich.';
-      }
-      if (errors?.['email']) {
-        return '*Diese Email ist leider ungültig.';
-      }
-      if (errors?.['simplePassword']) {
-        return '*Passwort muss mindestens 6 Zeichen lang sein';
-      }
+    if (field?.touched && field.invalid) {
+      return this.getControlErrorMessage(fieldName, field.errors);
     }
     return null;
+  }
+
+  private getControlErrorMessage(fieldName: string, errors: any): string | null {
+    if (errors?.['required']) return this.getRequiredErrorMessage(fieldName);
+    if (errors?.['email']) return '*Diese E-Mail-Adresse ist leider ungültig.';
+    if (errors?.['simplePassword']) return '*Passwort muss mindestens 6 Zeichen haben.';
+    return null;
+  }
+
+  private getRequiredErrorMessage(fieldName: string): string {
+    const errorMessages: { [key: string]: string } = {
+      email: '*E-Mail-Adresse ist erforderlich.',
+      password: '*Passwort ist erforderlich.'
+    };
+    return errorMessages[fieldName] || '*Dieses Feld ist erforderlich.';
   }
 
   isFieldInvalid(fieldName: string): boolean {
@@ -154,6 +216,10 @@ export class LoginComponent implements OnInit, OnDestroy {
 
   hasFieldContent(fieldName: string): boolean {
     const field = this.loginForm.get(fieldName);
-    return !!(field?.value && field.value.length > 0);
+    return !!(field?.value && field.value.toString().length > 0);
+  }
+
+  get canSubmit(): boolean {
+    return this.loginForm.valid && !this.loading;
   }
 }

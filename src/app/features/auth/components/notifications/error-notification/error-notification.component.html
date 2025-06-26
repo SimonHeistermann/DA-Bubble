@@ -1,0 +1,16 @@
+<div class="error__notification" [ngClass]="{ show: show }">
+    <button class="close__button" (click)="onClose()" aria-label="Schließen">✕</button>
+    <div class="error__content">
+        <div class="error__icon">
+            <svg viewBox="0 0 24 24" fill="none">
+                <circle cx="12" cy="12" r="10" stroke="white" stroke-width="2" />
+                <path d="M12 8v4" stroke="white" stroke-width="2" stroke-linecap="round" />
+                <path d="M12 16h.01" stroke="white" stroke-width="2" stroke-linecap="round" />
+            </svg>
+        </div>
+        <div class="error__text">
+            <h3>{{ message }}</h3>
+        </div>
+    </div>
+</div>
+  
