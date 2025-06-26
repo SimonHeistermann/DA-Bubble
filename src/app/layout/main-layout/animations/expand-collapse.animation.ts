@@ -33,6 +33,24 @@ export const toggleMarginRight20Animation = trigger('toggleMarginRight20', [
   ]),
 ]);
 
+export const toggleMarginLeft20Animation = trigger('toggleMarginLeft20', [
+  state('closed', style({
+    width: '0',
+    opacity: 0,
+    marginLeft: '0',
+  })),
+  state('open', style({
+    width: '*',
+    opacity: 1,
+
+    marginLeft: '20px',
+  })),
+
+  transition('closed <=> open', [
+    animate('200ms ease-in-out')
+  ]),
+]);
+
 export const toggleMarginTop25Animation = trigger('toggleMarginTop25', [
   state('closed', style({
     height: '0',

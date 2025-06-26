@@ -1,0 +1,26 @@
+<main class="main-container" [@toggleMarginLeft20]="showSelf ? 'open' : 'closed'">
+
+    <section>
+        <div class="thread-header">
+            <div class="title">
+                <span>Thread</span>
+                <img src="/icons/tag_click.png">
+                <p>Allgemein</p>
+            </div>
+
+            <img (click)="hideThreadContainer()" src="">
+        </div>
+
+        <div class="container-body-input scrollbar__none">
+        <div class="container-body scrollbar__none" #containerBody>
+            <app-message-box (readMessageEmitter)="readMessage()"></app-message-box>
+            <!-- <app-message-box (readMessageEmitter)="onReadMessage()" [channel]="channel" [currentUser]="currentUser" [allUsers]="allUsers"></app-message-box> -->
+        </div>
+        <div class="container-input">
+            <app-input (sendMessageEmitter)="sendMessage($event)"></app-input>
+            <!-- <app-input (sendMessageEmitter)="onSendMessage($event)" [allChannelUser]="allUsersWithOutCurrentUser" [placeHolder]="this.channel?.name || ''"></app-input> -->
+        </div>
+    </div>
+    </section>
+
+</main>

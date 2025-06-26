@@ -1,4 +1,4 @@
-import { Component, ElementRef, EventEmitter, inject, Input, OnDestroy, Output, ViewChild } from '@angular/core';
+import { Component, ElementRef, EventEmitter, inject, Input, OnChanges, OnDestroy, Output, SimpleChanges, ViewChild } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { ChannelService } from '../../../../core/services/channel.service';
@@ -10,17 +10,18 @@ import { Subscription } from 'rxjs';
 import { AuthService } from '../../../../core/services/auth-service/auth.service';
 import { UserService } from '../../../../core/services/user-service/user.service';
 import { Channel, ChannelData } from '../../../../core/models/channel.interface';
+import { AutoResizeDirective } from '../../../../core/directives/auto-resize.directive';
 
 
 @Component({
   selector: 'app-add-channel',
   standalone: true,
-  imports: [CommonModule, FormsModule, RichtextEditorComponent, UserListComponent],
+  imports: [CommonModule, FormsModule, RichtextEditorComponent, UserListComponent, AutoResizeDirective],
   templateUrl: './add-channel.component.html',
   styleUrl: './add-channel.component.scss',
   animations: [verticalExpandCollapseAnimation]
 })
-export class AddChannelComponent implements OnDestroy {
+export class AddChannelComponent implements OnDestroy, OnChanges {
   filteredUsers: User[] = [];
   allUsers: User[] = [];
 
@@ -31,28 +32,30 @@ export class AddChannelComponent implements OnDestroy {
   channelService = inject(ChannelService);
   tagIDs: string[] = [];
 
-  @Input() showOverlay = false;
+  
   @Output() closeOverlayEmitter = new EventEmitter<void>();
   editorEl!: HTMLDivElement;
   @ViewChild("richtextEditor") richtextEditorRef!: RichtextEditorComponent;
+
+  @Input() showOverlay = false;
 
   showChannelNameError = false;
   showAddUserContent = false;
   firstCbActivated = true;
   showActiveButtonInAddUser = false;
-
   showChooseNameInput = false;
   editorOverflowStyle = 'hidden';
-
   showUserList = false;
   errMsg = '';
   
   channel:Partial<ChannelData> = {
-    name: 'New Channel',
+    name: '',
     description: '',
     createdBy: '',
     userIDs: []
   };
+
+
 
   ngOnInit() {
     
@@ -77,7 +80,6 @@ export class AddChannelComponent implements OnDestroy {
     this.subscriptions.add(
       this.userService.allUsers$.subscribe(users => {
         this.allUsers = users;
-        console.log('alluser: ', this.allUsers);
       }));
   }
   
@@ -96,6 +98,7 @@ export class AddChannelComponent implements OnDestroy {
   }
 
   addOneChannelToDB() {
+    this.channel.createdBy = this.currentUser?.id;
     this.subscriptions.add(
       this.channelService.addOneChannel(this.channel).subscribe({
         next: (id: string) => {
@@ -106,7 +109,7 @@ export class AddChannelComponent implements OnDestroy {
         },
         complete: () => {
           console.log('Add channel operation completed.');
-          this.closeOverlayEmitter.emit();
+          this.closeOverlay()
         }
       })
     )
@@ -203,11 +206,32 @@ export class AddChannelComponent implements OnDestroy {
     this.richtextEditorRef.insertTag(u);
   }
 
+  ngOnChanges(changes: SimpleChanges): void {
+    // if (changes['showOverlay'])
+  }
+
   closeOverlay() {
-    this.showOverlay = false;
+    this.clearData();
     this.closeOverlayEmitter.emit();
   }
 
+  clearData() {
+    this.showOverlay = false;
+    this.showAddUserContent = false;
+    this.firstCbActivated = true;
+
+    this.channel = {
+      name: '',
+      description: '',
+      createdBy: '',
+      userIDs: []
+    };
+    this.filteredUsers = [];
+    this.tagIDs = [];
+    this.showUserList = false;
+    this.showChannelNameError = false;
+    this.showChooseNameInput = false;
+  }
 
   ngOnDestroy(): void {
     this.subscriptions.unsubscribe();

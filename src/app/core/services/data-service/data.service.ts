@@ -48,6 +48,17 @@ export class DataService {
         return this.firebaseCore.updateDocument(collectionName, docId, updateData);
     }
 
+    /**
+     * Dokument aktualisieren mit automatischem Timestamp und gibt eine ID zurück
+     */
+    async updateDocumentWithReturnedID(collectionName: string, docId: string, data: any): Promise<string> {
+        const updateData = {
+            ...data,
+            updatedAt: this.firebaseCore.createTimestamp()
+        };
+        return this.firebaseCore.updateDocumentWithReturnedID(collectionName, docId, updateData);
+    }
+
     // ==================== DELEGATED METHODS ====================
 
     /**
@@ -69,6 +80,13 @@ export class DataService {
      */
     subscribeToCollection(collectionName: string, callback: (data: any[]) => void, ...queryConstraints: any[]) {
         return this.firebaseCore.subscribeToCollection(collectionName, callback, ...queryConstraints);
+    }
+
+    /**
+     * Collection mit einmaligem Querz
+     */
+    subscribeToCollectionOnce(collectionName: string, callback: (data: any[]) => void, ...queryConstraints: any[]) {
+        return this.firebaseCore.getCollectionOnce(collectionName, callback, ...queryConstraints);
     }
 
     /**
