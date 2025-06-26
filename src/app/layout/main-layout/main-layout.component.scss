@@ -1,6 +1,8 @@
 @use './../../../styles.scss' as *;
 @use './../../../styles/overlay.scss' as *;
 
+
+
 .main-layout {
     display: flex;
     flex-direction: column;
@@ -28,6 +30,7 @@ app-main-header {
 
 .overlay-bar {
     position: absolute;
+    z-index: 2;
     background: #FFFFFF;
     width: 56px;
     height: 310px;
@@ -46,6 +49,7 @@ app-main-header {
 
 
 .hide-menu {
+
 
     >img {
         content: url('/icons/show-navigation.png');

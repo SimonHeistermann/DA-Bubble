@@ -1,0 +1,7 @@
+
+<div class="overlay-content">
+ <span (click)="showProfile()">Profil</span>
+ <span (click)="logOut()">Log out</span>
+</div>
+<app-actual-profile class="test" [showOverlay]="showProfileOverlay" (closeOverlayEmitter)="showProfileOverlay = false; 
+currentUserIndex = -1" [currentUser]="currentUser"></app-actual-profile>

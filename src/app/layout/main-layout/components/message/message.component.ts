@@ -1,71 +1,107 @@
-import { AfterViewInit, Component, EventEmitter, inject, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
+import { AfterViewChecked, AfterViewInit, ChangeDetectionStrategy, Component, EventEmitter, Inject, inject, InjectionToken, Input, OnChanges, OnInit, Output, SimpleChanges } from '@angular/core';
 import { InputComponent } from '../shared/input/input.component';
 import { CommonModule } from '@angular/common';
-import { Channel } from '../../../../core/models/channel.interface';
-import { Subscription } from 'rxjs';
+import { Channel, CHANNEL_TOKEN } from '../../../../core/models/channel.interface';
+import { filter, Subscription } from 'rxjs';
 import { UserService } from '../../../../core/services/user-service/user.service';
-import { forkJoin, of } from 'rxjs';
-import { filter, map } from 'rxjs/operators';
+import { forkJoin} from 'rxjs';
 import { User } from '../../../../core/models/user.interface';
-import { AddChannelUserComponent } from './add-channel-user/add-channel-user.component';
 import {
   ElementRef,
   ViewChild,
-  ViewContainerRef,
-  TemplateRef,
 } from '@angular/core';
-import {
-  OverlayRef,
-} from '@angular/cdk/overlay';
-import { OverlayService } from '../../../../core/services/overlay.service';
+
 import { AuthService } from '../../../../core/services/auth-service/auth.service';
-import { ChannelUserListComponent } from './channel-user-list/channel-user-list.component';
-import { EditChannelComponent } from './edit-channel/edit-channel.component';
+import { MessageBoxComponent } from './message-box/message-box.component';
+import { MessageService } from '../../../../core/services/message.service';
+import { ChannelMessageHeaderComponent } from './channel-message-header/channel-message-header.component';
+import { MessageData } from '../../../../core/models/message.interface';
+import { UserChannelActivityService } from '../../../../core/services/userReadActivity.service';
+import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
+import { ChannelService } from '../../../../core/services/channel.service';
+import { user } from '@angular/fire/auth';
+
 
 
 @Component({
   selector: 'app-message',
-  imports: [InputComponent, CommonModule, AddChannelUserComponent, ChannelUserListComponent, EditChannelComponent],
+  imports: [InputComponent, CommonModule, MessageBoxComponent, ChannelMessageHeaderComponent],
   standalone: true,
   templateUrl: './message.component.html',
   styleUrl: './message.component.scss',
-  animations: []
+  animations: [],
 })
-export class MessageComponent implements OnInit, OnChanges, AfterViewInit{
+export class MessageComponent implements OnInit{
 
-  @ViewChild('addChannelUserTemplate') addChannelUserTemplate!: TemplateRef<any>;
-  @ViewChild('addMember') addMemberRef!: ElementRef;
-  @ViewChild('channelUserListTemplate') channelUserListTemplate!: TemplateRef<any>;
-  @ViewChild('userList') userListRef!: ElementRef;
-  @ViewChild('editChannelTemplate') editChannelTemplate!: TemplateRef<any>;
-  @ViewChild('editChannel') editChannelRef!: ElementRef;
-
-  overlayRef!: OverlayRef;
-  overlayService = inject(OverlayService);
-  viewContainerRef = inject(ViewContainerRef);
-
-  @Input() channel: Channel | null = null;
-
-  @Output() leaveChannelEmitter = new EventEmitter<void>();
-
-  private subscriptions = new Subscription();
-  showHeader: 'direct' | 'channel' | 'new' = 'channel';
-  activeChannelUserButton = false;
-  activeOpenUserButton = false;
-  activeEditChannelButton = false;
+  @ViewChild('containerBody') private containerBody!: ElementRef;
  
   
+  private subscriptions = new Subscription();
+  showHeader: 'direct' | 'channel' | 'new' = 'channel';
+  
   userService = inject(UserService);
+  channelService = inject(ChannelService);
   allUsers: User[] = [];
+  allUsersWithOutCurrentUser: User[] = [];
   authService = inject(AuthService);
   currentUser: User | null = null;
+  channel: Channel | null = null;
+  messageUser: User | null = null;
+  messageService = inject(MessageService);
+  userChannelActivityService = inject(UserChannelActivityService);
 
-  ngOnInit(): void {
-    this.subCurrentUser();
+  showAddChannelUserOverlay = false;
+  showUserListOverlay = false;
+
+  route = inject(ActivatedRoute);
+
+  constructor() {
+   
   }
 
-  ngAfterViewInit(): void {
-    this.openUserListOverlay();
+  ngOnInit(): void {
+    
+    this.subscriptions.add(
+      this.route.paramMap.subscribe(params => {
+        const channelId = params.get('channelId');
+        const userId = params.get('userId');
+        if (channelId) {
+          this.loadChannel(channelId);
+          this.messageUser = null;
+        } else if (userId) {
+          this.loadUser(userId);
+          this.channel = null;
+        }
+      })
+    );
+  }
+
+  loadUser(userId:string) {
+    this.showHeader = 'direct';
+    this.subscriptions.add(
+      this.userService.getUserById(userId).subscribe({
+        next: (data) => {
+          if(data) {
+             this.messageUser = {...data};
+             this.subCurrentUser();
+          }
+        }
+      })
+    );
+  }
+
+  loadChannel(channelId: string) {
+    this.showHeader = 'channel';
+    this.subscriptions.add(
+      this.channelService.getChannelById(channelId).subscribe({
+        next: (data) => {
+          if(data) {
+             this.channel = {...data};
+             this.subCurrentUser();
+          }
+        }
+      })
+    );
   }
 
   subCurrentUser(){
@@ -76,21 +112,13 @@ export class MessageComponent implements OnInit, OnChanges, AfterViewInit{
     this.subscriptions.add(
       this.userService.currentUser$.subscribe(user => {
         this.currentUser = user;
-        if (this.allUsers.length) {
-          this.filterOutCurrentUser();
-        }
+        this.subChannelUsers();
       })
     );
   }
 
-  ngOnChanges(changes: SimpleChanges): void {
-    if (changes['channel'] && changes['channel'].currentValue) {
-      this.onChannelChanged(changes['channel'].currentValue);
-    }
-  }
-
-  onChannelChanged(channel: Channel) {
-    this.channel = channel;
+  subChannelUsers() {
+    if(!this.channel) return;
     const userIDs = this.channel.userIDs ?? [];
     if(this.channel.userIDs?.length === 0) return;
 
@@ -99,81 +127,63 @@ export class MessageComponent implements OnInit, OnChanges, AfterViewInit{
       .subscribe( users => {
         this.allUsers = [];
         this.allUsers = users.filter((u): u is User => u !== null);
-        if (this.currentUser) {
-          this.filterOutCurrentUser();
-        }
+        this.allUsersWithOutCurrentUser = this.allUsers.filter(u => u.id !== this.currentUser?.id);
      })
     )
   }
-
-  filterOutCurrentUser() {
-    this.allUsers = this.allUsers.filter(u => u.id !== this.currentUser?.id);
-  }
- 
 
   ngOnDestroy(): void {
     this.subscriptions.unsubscribe();
   }
 
-  openUserListOverlay() {
-    this.activeOpenUserButton = true; 
-    let positions = this.overlayService.defaultPositions;
-    positions[0] = { originX: 'end', originY: 'bottom', overlayX: 'end', overlayY: 'top' };
-
-
-    this.overlayRef = this.overlayService.openTemplateOverlay(
-      this.userListRef, 
-      this.channelUserListTemplate, 
-      this.viewContainerRef, 
-    );
-
-    this.overlayRef.backdropClick().subscribe(() => this.closeOverlay());
+  buildChannelMessageData(msg: string): MessageData {
+    return {
+      authorID: this.currentUser?.id || '',
+      authorName: this.currentUser?.displayName || '',
+      content: msg,
+      isEdited: false,
+      threadCount: 0,
+      type: 'channel' as 'channel',
+      channelID: this.channel?.id
+    };
   }
 
-  openAddMemberOverlay() {
-    this.activeChannelUserButton = true;
-    let positions = this.overlayService.defaultPositions;
-    positions[0] = { originX: 'end', originY: 'bottom', overlayX: 'end', overlayY: 'top' };
-
-    this.overlayRef = this.overlayService.openTemplateOverlay(
-      this.addMemberRef, 
-      this.addChannelUserTemplate, 
-      this.viewContainerRef, 
-    );
-
-    this.overlayRef.backdropClick().subscribe(() => this.closeOverlay());
-  }
-
-  openEditChannelOverlay(){
-    this.activeEditChannelButton = true;
-    let positions = this.overlayService.defaultPositions;
-    positions[0] = { originX: 'start', originY: 'bottom', overlayX: 'start', overlayY: 'top' };
-
-    this.overlayRef = this.overlayService.openTemplateOverlay(
-      this.editChannelRef, 
-      this.editChannelTemplate, 
-      this.viewContainerRef, 
-    );
-
-    this.overlayRef.backdropClick().subscribe(() => this.closeOverlay());
-  }
-
-  onAddMemberFromChannelUserList() {
-    this.overlayRef?.detach();
-    this.openAddMemberOverlay();
-  }
-
-  closeOverlay() {
-    this.activeChannelUserButton = false;
-    this.activeOpenUserButton = false;
-    this.overlayRef?.detach();
-  }
-
-  closeEditChannelOverlay(isLeaving: boolean) {
-    this.activeEditChannelButton = false;
-    if(isLeaving) this.leaveChannelEmitter.emit();
-    this.overlayRef?.detach();
+  buildPrivateMessageData(msg: string): MessageData {
+   
+    return {
+      authorID: this.currentUser?.id || '',
+      authorName: this.currentUser?.displayName || '',
+      content: msg,
+      isEdited: false,
+      threadCount: 0,
+      type: 'private' as 'private',
+      recipientID: this.messageUser?.id,
+      conversationID: this.messageService.buildConversationID(this.currentUser!.id, this.messageUser!.id)
+    };
   }
 
 
+  onSendMessage(msg: string) {
+    if ((this.currentUser && this.channel) || (this.currentUser && this.messageUser))  {
+      let messsageData ;
+      if(this.messageUser) {
+        messsageData = this.buildPrivateMessageData(msg);
+      } else {
+        messsageData = this.buildChannelMessageData(msg);
+      }
+      
+      this.subscriptions.add( this.messageService.addOneMessage(messsageData).subscribe(
+        {
+          next: (id: string) => {
+            if (this.currentUser && this.channel)
+              this.userChannelActivityService.markMessageAsReadByCurrentUser(this.currentUser.id, this.channel.id);
+            if (this.currentUser && this.messageUser)
+              this.userChannelActivityService.markMessageAsReadByCurrentUser(this.currentUser.id, this.messageUser.id);
+          }
+        }
+      ));
+    }
+
+
+  }
 }

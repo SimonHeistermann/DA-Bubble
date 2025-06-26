@@ -26,6 +26,11 @@ import { User } from '../../../../../core/models/user.interface';
 
     }
 
+    clearContent(): void {
+      const editor = this.editorRef.nativeElement;
+      editor.innerHTML = '';
+    }
+
     checkIfHasTag() {
       const editor = this.editorRef.nativeElement;
       this.hasTag.emit(editor.querySelectorAll('.tag').length > 0);
