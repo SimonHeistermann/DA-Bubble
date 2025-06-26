@@ -5,34 +5,36 @@ import { Subject, takeUntil, switchMap } from 'rxjs';
 import { AuthService } from '../../../../core/services/auth-service/auth.service';
 import { AuthValidators } from '../../../../core/validators/auth.validators';
 import { CommonModule, Location } from '@angular/common';
+import { ErrorNotificationComponent } from '../notifications/error-notification/error-notification.component';
+import { OverlayComponent } from '../notifications/overlay/overlay.component';
+import { SuccessNotificationComponent } from '../notifications/success-notification/success-notification.component';
+import { NotificationService } from '../../../../core/services/notification-service/notification.service';
 
 @Component({
   selector: 'app-forgot-password',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [
+    CommonModule, ReactiveFormsModule, ErrorNotificationComponent,
+    OverlayComponent, SuccessNotificationComponent
+  ],
   templateUrl: './forgot-password.component.html',
   styleUrls: ['./forgot-password.component.scss']
 })
 export class ForgotPasswordComponent implements OnInit, OnDestroy {
   forgotPasswordForm!: FormGroup;
   loading = false;
-  errorMessage = '';
-  successMessage = '';
-  showSuccessOverlay = false;
-  showErrorOverlay = false;
   private destroy$ = new Subject<void>();
   private submissionAttempts = 0;
   private readonly MAX_ATTEMPTS = 3;
-  private readonly RETRY_DELAY = 60000; 
+  private readonly RETRY_DELAY = 60000; // 1 Minute
   private lastSubmissionTime = 0;
-  private successTimeoutId?: number;
-  private errorTimeoutId?: number;
 
   constructor(
     private fb: FormBuilder,
     private authService: AuthService,
     private router: Router,
-    private location: Location
+    private location: Location,
+    public notificationService: NotificationService
   ) {
     this.createForm();
   }
@@ -44,12 +46,6 @@ export class ForgotPasswordComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();
-    if (this.successTimeoutId) {
-      clearTimeout(this.successTimeoutId);
-    }
-    if (this.errorTimeoutId) {
-      clearTimeout(this.errorTimeoutId);
-    }
   }
 
   private subscribeToLoadingState(): void {
@@ -77,8 +73,10 @@ export class ForgotPasswordComponent implements OnInit, OnDestroy {
       return;
     }
     if (!this.canSubmit()) {
-      this.errorMessage = `Zu viele Versuche. Bitte warten Sie ${Math.ceil((this.RETRY_DELAY - (Date.now() - this.lastSubmissionTime)) / 1000)} Sekunden.`;
-      this.showErrorNotification();
+      const secondsRemaining = this.remainingTime;
+      this.notificationService.showError(
+        `Zu viele Versuche. Bitte warten Sie ${secondsRemaining} Sekunden.`
+      );
       return;
     }
     if (this.forgotPasswordForm.valid && !this.loading) {
@@ -97,35 +95,25 @@ export class ForgotPasswordComponent implements OnInit, OnDestroy {
     this.loading = true;
     setTimeout(() => {
       this.loading = false;
-      this.successMessage = 'Eine E-Mail zum Zurücksetzen des Passworts wurde an Ihre E-Mail-Adresse gesendet.';
-      this.showSuccessNotification();
+      this.notificationService.showSuccess('E-Mail gesendet!');
     }, 2000);
   }
 
   private canSubmit(): boolean {
     const now = Date.now();
-    if (this.submissionAttempts === 0 || (now - this.lastSubmissionTime) > this.RETRY_DELAY) {
+    if ((now - this.lastSubmissionTime) > this.RETRY_DELAY) {
+      this.submissionAttempts = 0;
       return true;
     }
-    if (this.submissionAttempts >= this.MAX_ATTEMPTS) {
-      return false;
-    }
-    return true;
+
+    return this.submissionAttempts < this.MAX_ATTEMPTS;
   }
 
   private performPasswordReset(): void {
-    this.errorMessage = '';
-    this.successMessage = '';
     const email = this.forgotPasswordForm.get('email')?.value.trim();
     this.submissionAttempts++;
     this.lastSubmissionTime = Date.now();
-    this.authService.checkEmailExists(email).pipe(
-      switchMap(exists => {
-        if (!exists) {
-          throw new Error('email-not-found');
-        }
-        return this.authService.resetPassword(email);
-      }),
+    this.authService.resetPasswordSecure(email).pipe(
       takeUntil(this.destroy$)
     ).subscribe({
       next: () => this.handlePasswordResetSuccess(),
@@ -134,64 +122,27 @@ export class ForgotPasswordComponent implements OnInit, OnDestroy {
   }
 
   private handlePasswordResetSuccess(): void {
-    this.successMessage = 'Eine E-Mail zum Zurücksetzen des Passworts wurde an Ihre E-Mail-Adresse gesendet. Bitte überprüfen Sie auch Ihren Spam-Ordner.';
-    this.showSuccessNotification();
+    this.notificationService.showSuccess('E-Mail gesendet!');
     this.forgotPasswordForm.get('email')?.setValue('');
   }
 
   private handlePasswordResetError(error: any): void {
-    console.error('Password reset error:', error);
-    if (error.message.includes('email-not-found')) {
-      this.errorMessage = 'Diese E-Mail-Adresse ist nicht registriert. Bitte überprüfen Sie Ihre Eingabe oder registrieren Sie sich.';
-      this.submissionAttempts--;
-    } else if (error.message.includes('too-many-requests')) {
-      this.errorMessage = 'Zu viele Anfragen. Bitte versuchen Sie es später erneut.';
+    if (error.message?.includes('too-many-requests')) {
       this.submissionAttempts = this.MAX_ATTEMPTS;
+      this.lastSubmissionTime = Date.now();
+      this.notificationService.showError(
+        `Zu viele Anfragen. Bitte versuchen Sie es in ${this.remainingTime} Sekunden erneut.`
+      );
+    } else if (error.message?.includes('email-not-found')) {
+      this.submissionAttempts = Math.max(0, this.submissionAttempts - 1);
+      this.notificationService.showError('E-Mail-Adresse wurde nicht gefunden.');
     } else {
-      this.errorMessage = 'Ein Fehler beim Zurücksetzen des Passworts ist aufgetreten. Bitte versuchen Sie es erneut.';
-    }
-    this.showErrorNotification();
-  }
-
-  private showSuccessNotification(): void {
-    this.hideErrorNotification(); // Error ausblenden falls aktiv
-    this.showSuccessOverlay = true;
-    
-    // Automatisch nach 4 Sekunden ausblenden
-    this.successTimeoutId = window.setTimeout(() => {
-      this.hideSuccessNotification();
-    }, 4000);
-  }
-
-  private showErrorNotification(): void {
-    this.hideSuccessNotification(); // Success ausblenden falls aktiv
-    this.showErrorOverlay = true;
-    
-    // Automatisch nach 5 Sekunden ausblenden (etwas länger als Success)
-    this.errorTimeoutId = window.setTimeout(() => {
-      this.hideErrorNotification();
-    }, 5000);
-  }
-
-  hideSuccessNotification(): void {
-    this.showSuccessOverlay = false;
-    if (this.successTimeoutId) {
-      clearTimeout(this.successTimeoutId);
-      this.successTimeoutId = undefined;
-    }
-  }
-
-  hideErrorNotification(): void {
-    this.showErrorOverlay = false;
-    if (this.errorTimeoutId) {
-      clearTimeout(this.errorTimeoutId);
-      this.errorTimeoutId = undefined;
+      this.notificationService.showError('Fehler beim Zurücksetzen des Passworts.');
     }
   }
 
   hideAllNotifications(): void {
-    this.hideSuccessNotification();
-    this.hideErrorNotification();
+    this.notificationService.clearAll();
   }
 
   goBack(): void {

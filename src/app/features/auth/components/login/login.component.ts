@@ -6,28 +6,36 @@ import { AuthService } from '../../../../core/services/auth-service/auth.service
 import { AuthValidators } from '../../../../core/validators/auth.validators';
 import { LoginCredentials } from '../../../../core/models/auth.interface';
 import { CommonModule } from '@angular/common';
+import { OverlayComponent } from '../notifications/overlay/overlay.component';
+import { ErrorNotificationComponent } from '../notifications/error-notification/error-notification.component';
+import { SuccessNotificationComponent } from '../notifications/success-notification/success-notification.component';
+import { NotificationService } from '../../../../core/services/notification-service/notification.service';
 
 @Component({
   selector: 'app-login',
   standalone: true,
-  imports: [CommonModule, ReactiveFormsModule],
+  imports: [
+    CommonModule, ReactiveFormsModule, OverlayComponent, 
+    ErrorNotificationComponent, SuccessNotificationComponent
+  ],
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.scss']
 })
 export class LoginComponent implements OnInit, OnDestroy {
   loginForm!: FormGroup;
   loading = false;
-  errorMessage = '';
   showPassword = false;
   private destroy$ = new Subject<void>();
+  private redirectTimeoutId?: number;
 
   constructor(
     private fb: FormBuilder,
     private authService: AuthService,
-    private router: Router
+    private router: Router,
+    public notificationService: NotificationService
   ) {
     this.createForm();
-  }
+  }  
 
   ngOnInit(): void {
     this.subscribeToAuthenticationState();
@@ -37,7 +45,10 @@ export class LoginComponent implements OnInit, OnDestroy {
   ngOnDestroy(): void {
     this.destroy$.next();
     this.destroy$.complete();
-  }
+    if (this.redirectTimeoutId) {
+      clearTimeout(this.redirectTimeoutId);
+    }
+  }  
 
   private subscribeToAuthenticationState(): void {
     // this.authService.isAuthenticated$.pipe(
@@ -82,19 +93,17 @@ export class LoginComponent implements OnInit, OnDestroy {
       this.markFormGroupTouched();
     }
   }
-  
 
   private performEmailLogin(): void {
-    this.errorMessage = '';
+    this.notificationService.clearAll();
     const credentials = this.extractLoginCredentials();
-    
     this.authService.signInWithEmail(credentials).pipe(
       takeUntil(this.destroy$)
     ).subscribe({
-      next: (user) => this.handleEmailLoginSuccess(user),
+      next: () => this.handleEmailLoginSuccess(),
       error: (error) => this.handleEmailLoginError(error)
     });
-  }
+  }  
 
   private extractLoginCredentials(): LoginCredentials {
     return {
@@ -103,35 +112,44 @@ export class LoginComponent implements OnInit, OnDestroy {
     };
   }
 
-  private handleEmailLoginSuccess(user: any): void {
-    console.log('Email login successful:', user);
-    this.router.navigate(['/dashboard']);
+  private handleEmailLoginSuccess(): void {
+    this.notificationService.showSuccess('Angemeldet!');
+    this.redirectTimeoutId = window.setTimeout(() => {
+      this.router.navigate(['/dashboard']);
+    }, 2000);
   }
-
+  
   private handleEmailLoginError(error: any): void {
-    console.error('Email login error:', error);
-    this.errorMessage = error.message || 'Ein Fehler bei der Anmeldung ist aufgetreten.';
+    console.error('Login error:', error);
+    this.notificationService.showError('Fehler beim Anmelden.');
   }
 
   onGoogleSignIn(): void {
     if (this.loading) return;
-    this.errorMessage = '';
+    this.notificationService.clearAll();
     this.authService.signInWithGoogle().pipe(
       takeUntil(this.destroy$)
     ).subscribe({
-      next: (result) => this.handleGoogleLoginSuccess(result),
+      next: () => this.handleGoogleLoginSuccess(),
       error: (error) => this.handleGoogleLoginError(error)
     });
   }
 
-  private handleGoogleLoginSuccess(result: any): void {
-    console.log('Google login successful:', result);
-  }
+  private handleGoogleLoginSuccess(): void {
+    this.notificationService.showSuccess('Angemeldet!');
+    this.redirectTimeoutId = window.setTimeout(() => {
+      this.router.navigate(['/dashboard']);
+    }, 2000);
+  }  
 
   private handleGoogleLoginError(error: any): void {
     console.error('Google login error:', error);
-    this.errorMessage = error.message || 'Ein Fehler bei der Google-Anmeldung ist aufgetreten.';
-  }
+    this.notificationService.showError('Fehler bei der Google-Anmeldung.');
+  }  
+
+  hideAllNotifications(): void {
+    this.notificationService.clearAll();
+  }  
 
   togglePasswordVisibility(): void {
     this.showPassword = !this.showPassword;
@@ -154,7 +172,6 @@ export class LoginComponent implements OnInit, OnDestroy {
   private touchAndAnimateInvalidField(key: string): void {
     const control = this.loginForm.get(key);
     control?.markAsTouched();
-
     if (control?.invalid) {
       const element = document.getElementById(`${key}-group`);
       if (element) {

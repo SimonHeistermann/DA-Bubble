@@ -42,9 +42,9 @@
         </button>
       </div>
 
-      <div class="error" *ngIf="errorMessage">
+      <div class="error" *ngIf="notificationService.errorMessage$ | async as errorMessage">
         <small>{{ errorMessage }}</small>
-      </div>
+      </div>      
     </div>
 
     <div class="form__bottom">
@@ -63,3 +63,19 @@
     </div>
   </div>
 </div>
+<app-overlay 
+  [show]="(notificationService.showSuccess$ | async) || (notificationService.showError$ | async)"
+  (clicked)="hideAllNotifications()">
+</app-overlay>
+
+<app-success-notification 
+  [show]="notificationService.showSuccess$ | async"
+  [message]="notificationService.successMessage$ | async"
+  (close)="notificationService.clearSuccess()">
+</app-success-notification>
+
+<app-error-notification 
+  [show]="notificationService.showError$ | async"
+  [message]="notificationService.errorMessage$ | async"
+  (close)="notificationService.clearError()">
+</app-error-notification>

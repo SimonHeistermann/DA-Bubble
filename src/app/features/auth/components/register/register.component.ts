@@ -25,11 +25,11 @@ export class RegisterComponent implements OnInit, OnDestroy {
     private authService: AuthService,
     private router: Router
   ) {
-    this.createForm();
+    this.initForm();
   }
 
   ngOnInit(): void {
-    this.trackLoadingState();
+    this.subscribeToLoadingState();
   }
 
   ngOnDestroy(): void {
@@ -37,26 +37,22 @@ export class RegisterComponent implements OnInit, OnDestroy {
     this.destroy$.complete();
   }
 
-  private trackLoadingState(): void {
-    this.authService.loading$
-      .pipe(takeUntil(this.destroy$))
-      .subscribe(loading => this.loading = loading);
+  onSubmit(): void {
+    if (this.formIsValidAndReady()) {
+      this.registerUser();
+    } else {
+      this.showValidationErrors();
+    }
   }
 
-  private createForm(): void {
+  goBack(): void {
+    this.router.navigate(['/auth/login']);
+  }
+
+  private initForm(): void {
     this.registerForm = this.fb.group({
-      firstName: ['', [
-        Validators.required,
-        Validators.minLength(2),
-        Validators.maxLength(50),
-        AuthValidators.noSpecialCharacters
-      ]],
-      lastName: ['', [
-        Validators.required,
-        Validators.minLength(2),
-        Validators.maxLength(50),
-        AuthValidators.noSpecialCharacters
-      ]],
+      firstName: ['', this.getNameValidators()],
+      lastName: ['', this.getNameValidators()],
       email: ['', [Validators.required, AuthValidators.email]],
       password: ['', [Validators.required, AuthValidators.password]],
       confirmPassword: ['', [Validators.required]],
@@ -66,75 +62,76 @@ export class RegisterComponent implements OnInit, OnDestroy {
     });
   }
 
-  onSubmit(): void {
-    if (this.registerForm.valid && !this.loading) {
-      this.performRegistration();
-    } else {
-      this.handleInvalidForm();
-    }
+  private getNameValidators() {
+    return [
+      Validators.required,
+      Validators.minLength(2),
+      Validators.maxLength(50),
+      AuthValidators.noSpecialCharacters
+    ];
   }
 
-  private handleInvalidForm(): void {
-    this.markFormGroupTouched();
-    this.errorMessage = 'Bitte füllen Sie alle Felder korrekt aus.';
+  private subscribeToLoadingState(): void {
+    this.authService.loading$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(loading => this.loading = loading);
   }
 
-  private performRegistration(): void {
+  private formIsValidAndReady(): boolean {
+    return this.registerForm.valid && !this.loading;
+  }
+
+  private registerUser(): void {
     this.errorMessage = '';
+    const registrationData = this.mapFormToRegisterData();
+
+    this.authService.registerWithEmail(registrationData)
+      .pipe(takeUntil(this.destroy$))
+      .subscribe({
+        next: () => this.router.navigate(['/auth/choose-avatar']),
+        error: (error) => this.handleRegistrationError(error)
+      });
+  }
+
+  private mapFormToRegisterData(): Omit<RegisterData, 'photoURL'> {
     const formValues = this.registerForm.value;
-    const registrationData: Omit<RegisterData, 'photoURL'> = {
+    return {
       firstName: formValues.firstName.trim(),
       lastName: formValues.lastName.trim(),
       email: formValues.email.trim().toLowerCase(),
       password: formValues.password
     };
-    this.authService.registerWithEmail(registrationData)
-      .pipe(takeUntil(this.destroy$))
-      .subscribe({
-        next: (user) => {
-          console.log('Registration successful:', user);
-          this.router.navigate(['/auth/choose-avatar']);
-        },
-        error: (error) => {
-          console.error('Registration error:', error);
-          this.errorMessage = error.message || 'Ein Fehler ist aufgetreten. Bitte versuchen Sie es erneut.';
-        }
-      });
   }
 
-  goBack(): void {
-    this.router.navigate(['/auth/login']);
+  private handleRegistrationError(error: any): void {
+    console.error('Registration error:', error);
+    this.errorMessage = error.message || 'Ein Fehler ist aufgetreten. Bitte versuchen Sie es erneut.';
+  }
+
+  private showValidationErrors(): void {
+    this.markFormGroupTouched();
+    this.errorMessage = 'Bitte füllen Sie alle Felder korrekt aus.';
   }
 
   private markFormGroupTouched(): void {
-    Object.keys(this.registerForm.controls).forEach(key => {
-      this.touchAndAnimateInvalidField(key);
-    });
+    Object.keys(this.registerForm.controls).forEach(this.touchAndAnimateIfInvalid.bind(this));
   }
 
-  private touchAndAnimateInvalidField(key: string): void {
+  private touchAndAnimateIfInvalid(key: string): void {
     const control = this.registerForm.get(key);
     control?.markAsTouched();
-    if (control?.invalid) {
-      const element = document.getElementById(`${key}-group`);
-      if (element) {
-        element.classList.add('error__state');
-        setTimeout(() => element.classList.remove('error__state'), 300);
-      }
-    }
+    if (control?.invalid) this.triggerErrorAnimation(key);
   }
 
-  getFieldError(fieldName: string): string | null {
-    const field = this.registerForm.get(fieldName);
-    if (field?.touched && field.invalid) return this.getControlErrorMessage(fieldName, field.errors);
-    if (fieldName === 'confirmPassword' && this.registerForm.errors?.['passwordMismatch']) {
-      return '*Passwörter stimmen nicht überein.';
-    }
-    return null;
+  private triggerErrorAnimation(key: string): void {
+    const element = document.getElementById(`${key}-group`);
+    if (!element) return;
+    element.classList.add('error__state');
+    setTimeout(() => element.classList.remove('error__state'), 300);
   }
 
   private getControlErrorMessage(fieldName: string, errors: any): string | null {
-    if (errors?.['required']) return this.getRequiredErrorMessage(fieldName);
+    if (errors?.['required']) return this.getRequiredMessage(fieldName);
     if (errors?.['email']) return '*Diese E-Mail-Adresse ist leider ungültig.';
     if (errors?.['password']) return '*Passwort muss mindestens 6 Zeichen, einen Großbuchstaben und eine Zahl enthalten.';
     if (errors?.['minlength']) return `*Mindestens ${errors['minlength'].requiredLength} Zeichen erforderlich.`;
@@ -144,8 +141,8 @@ export class RegisterComponent implements OnInit, OnDestroy {
     return null;
   }
 
-  private getRequiredErrorMessage(fieldName: string): string {
-    const errorMessages: { [key: string]: string } = {
+  private getRequiredMessage(fieldName: string): string {
+    const messages: Record<string, string> = {
       firstName: '*Vorname ist erforderlich.',
       lastName: '*Nachname ist erforderlich.',
       email: '*E-Mail-Adresse ist erforderlich.',
@@ -153,18 +150,28 @@ export class RegisterComponent implements OnInit, OnDestroy {
       confirmPassword: '*Passwort bestätigen ist erforderlich.',
       privacyPolicy: '*Sie müssen der Datenschutzerklärung zustimmen.'
     };
-    return errorMessages[fieldName] || '*Dieses Feld ist erforderlich.';
+    return messages[fieldName] || '*Dieses Feld ist erforderlich.';
+  }
+
+  getFieldError(fieldName: string): string | null {
+    const field = this.registerForm.get(fieldName);
+    if (field?.touched && field.invalid)
+      return this.getControlErrorMessage(fieldName, field.errors);
+    if (fieldName === 'confirmPassword' && this.registerForm.errors?.['passwordMismatch']) {
+      return '*Passwörter stimmen nicht überein.';
+    }
+    return null;
   }
 
   isFieldInvalid(fieldName: string): boolean {
     const field = this.registerForm.get(fieldName);
-    return !!(field?.touched && field?.invalid) ||
+    return !!(field?.touched && field.invalid) ||
            (fieldName === 'confirmPassword' && this.registerForm.errors?.['passwordMismatch']);
   }
 
   isFieldValid(fieldName: string): boolean {
     const field = this.registerForm.get(fieldName);
-    return !!(field?.valid && field?.dirty);
+    return !!(field?.valid && field.dirty);
   }
 
   hasFieldContent(fieldName: string): boolean {

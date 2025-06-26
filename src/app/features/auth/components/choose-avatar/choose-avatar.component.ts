@@ -5,18 +5,25 @@ import { Subject, takeUntil } from 'rxjs';
 import { AuthService } from '../../../../core/services/auth-service/auth.service';
 import { AuthUser } from '../../../../core/models/auth.interface';
 import { Avatar } from '../../../../core/models/avatar.interface';
+import { OverlayComponent } from '../notifications/overlay/overlay.component';
+import { ReactiveFormsModule } from '@angular/forms';
+import { SuccessNotificationComponent } from '../notifications/success-notification/success-notification.component';
+import { ErrorNotificationComponent } from '../notifications/error-notification/error-notification.component';
+import { NotificationService } from '../../../../core/services/notification-service/notification.service';
 
 @Component({
   selector: 'app-choose-avatar',
   standalone: true,
-  imports: [CommonModule],
+  imports: [
+    CommonModule, OverlayComponent, ReactiveFormsModule, 
+    SuccessNotificationComponent, ErrorNotificationComponent
+  ],
   templateUrl: './choose-avatar.component.html',
   styleUrls: ['./choose-avatar.component.scss']
 })
 export class ChooseAvatarComponent implements OnInit, OnDestroy {
   selectedAvatarId: string | null = null;
   loading = false;
-  errorMessage = '';
   currentUser: AuthUser | null = null;
   userName = '';
   
@@ -33,8 +40,9 @@ export class ChooseAvatarComponent implements OnInit, OnDestroy {
 
   constructor(
     private router: Router,
-    private authService: AuthService
-  ) {}
+    private authService: AuthService,
+    public notificationService: NotificationService
+  ) {}  
 
   ngOnInit(): void {
     this.loadCurrentUser();
@@ -53,16 +61,16 @@ export class ChooseAvatarComponent implements OnInit, OnDestroy {
   }
 
   private loadCurrentUser(): void {
-    // this.authService.currentUser$
-    //   .pipe(takeUntil(this.destroy$))
-    //   .subscribe(user => {
-    //     if (user) {
-    //       this.currentUser = user;
-    //       this.userName = user.displayName || user.email || 'Benutzer';
-    //     } else {
-    //       this.router.navigate(['/auth/login']);
-    //     }
-    //   });
+    this.authService.currentUser$
+      .pipe(takeUntil(this.destroy$))
+      .subscribe(user => {
+        if (user) {
+          this.currentUser = user;
+          this.userName = user.displayName || user.email || 'Benutzer';
+        } else {
+          this.router.navigate(['/auth/login']);
+        }
+      });
   }
 
   selectAvatar(avatarId: string): void {
@@ -89,11 +97,8 @@ export class ChooseAvatarComponent implements OnInit, OnDestroy {
     if (!this.selectedAvatarId || this.loading || !this.currentUser) {
       return;
     }
-
-    this.errorMessage = '';
     const selectedAvatar = this.avatars.find(avatar => avatar.id === this.selectedAvatarId);
     const photoURL = selectedAvatar?.path || '';
-
     this.updateUserAvatar(photoURL);
   }
 
@@ -102,15 +107,20 @@ export class ChooseAvatarComponent implements OnInit, OnDestroy {
       .pipe(takeUntil(this.destroy$))
       .subscribe({
         next: () => {
-          console.log('Avatar updated successfully');
-          this.router.navigate(['/dashboard']);
+          this.notificationService.showSuccess('Konto erfolgreich erstellt!');
+          setTimeout(() => this.router.navigate(['/dashboard']), 1000);
         },
         error: (error) => {
           console.error('Error updating avatar:', error);
-          this.errorMessage = error.message || 'Fehler beim Aktualisieren des Avatars. Bitte versuchen Sie es erneut.';
+          const message = error.message || 'Fehler beim Aktualisieren des Avatars. Bitte versuchen Sie es erneut.';
+          this.notificationService.showError('Error!');
         }
       });
-  }
+  } 
+  
+  hideAllNotifications(): void {
+    this.notificationService.clearAll();
+  }  
 
   skipAvatarSelection(): void {
     this.router.navigate(['/dashboard']);
