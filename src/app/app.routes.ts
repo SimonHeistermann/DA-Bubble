@@ -51,7 +51,7 @@ export const routes: Routes = [
         matcher: caseInsensitiveMatch('reset-password'),
         component: ResetPasswordComponent,
         title: 'Passwort zurücksetzen',
-        data: { requiresResetToken: true }
+        // data: { requiresResetToken: true }
       },
       {
         path: '',
