@@ -338,3 +338,72 @@ form.submitting {
 .name__fields .form__field {
     flex: 1;
 }
+
+@media screen and (max-width: 430px) {
+    .auth__container {
+        @include displayFlex();
+        background-color: white;
+        padding: 36px 16px;
+        border-radius: 30px;
+    }
+
+    .auth__form__header {
+        gap: 15px !important;
+    }
+
+    .back__arrow {
+        top: 36px;
+        left: 20px;
+    }
+
+    .auth__form__container {
+        gap: 16px !important;
+    }
+
+    h1 {
+        @include fontNunito($fs: 32px, $fw: 700);
+        padding-inline: 32px;
+    }
+
+    p {
+        @include fontNunito($fs: 17px, $fw: 400);
+    }
+
+    .form__group {
+        height: 77px;
+
+        .input__wrapper {
+            height: 50px;
+            padding: 12px 32px;
+            @include fontNunito($fs: 18px, $fw: 500);
+        }
+    }
+
+    .form__fields {
+        max-height: 282px;
+        padding-top: 161px;
+        padding-right: 16px;
+        overflow: auto;
+    }
+
+    .name__fields {
+        width: 100%;
+        @include displayFlex($g: 7px, $fd: column);
+    }
+
+    .privacy__checkbox {
+        .privacy__text {
+            @include fontNunito($fs: 16px, $fw: 400);
+    
+            .privacy__link {
+                @include fontFigtree($fw: 400, $fs: 16px);
+            
+                &:hover {
+                    @include fontFigtree($fw: 500, $fs: 16px);
+                    height: 24px;
+                    padding: 5px 12px;
+                }
+            }
+        }
+    }
+}

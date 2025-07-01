@@ -1,3 +1,8 @@
+<app-intro-animation 
+  *ngIf="showIntro"
+  (animationComplete)="onIntroComplete()">
+</app-intro-animation>
+
 <div class="auth__container">
   <div class="auth__form__container">
     <div class="auth__form__header">
@@ -84,7 +89,9 @@
         <div class="form__bottom">
           <a
             class="link"
-            (click)="navigateToForgotPassword()"
+            [routerLink]="['/auth/forgot-password']"
+            rel="noopener noreferrer"
+            data-label="Passwort vergessen?"
             role="button"
             tabindex="0"
           >

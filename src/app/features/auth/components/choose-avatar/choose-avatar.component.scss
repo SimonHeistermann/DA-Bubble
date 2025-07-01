@@ -213,3 +213,79 @@
         transform: rotate(360deg);
     }
 }
+
+@media screen and (max-width: 764px) {
+    .auth__container {
+        padding: 36px 36px;
+    }
+
+    .back__arrow {
+        left: 0px;
+    }
+}
+
+@media screen and (max-width: 430px) {
+    .auth__container {
+        padding: 36px 16px;
+    }
+
+    .back__arrow {
+        top: 0px;
+        left: 0px;
+    }
+
+    .auth__form__container {
+        gap: 16px !important;
+    }
+
+    .auth__form__header {
+        h1 {
+            @include fontNunito($fs: 32px, $fw: 700);
+            text-align: center;
+            padding-inline: 32px;
+        }
+    }
+
+    .form__group {
+        height: 77px;
+
+        .input__wrapper {
+            height: 50px;
+            padding: 12px 32px;
+            @include fontNunito($fs: 18px, $fw: 500);
+        }
+    }
+
+    .info__text {
+        padding: 0px;
+    }
+
+    .avatar__circle {
+        width: 130px;
+        height: 130px;
+    
+        .avatar__image {
+            width: 120px;
+            height: 120px;
+        }
+    
+        .placeholder__avatar {
+            width: 128px;
+            height: 128px;
+            border: solid 4px transparent;
+    
+            &:hover {
+                border: solid 4px #E6E6E6;
+            }
+    
+            &:active {
+                border: solid 4px #ECEEFE
+            }
+      }
+    }
+
+    .avatar__grid {
+        width: 100%;
+        gap: 4px;
+    }
+}

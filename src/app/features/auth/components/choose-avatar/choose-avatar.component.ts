@@ -1,6 +1,6 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { Router } from '@angular/router';
-import { CommonModule } from '@angular/common';
+import { CommonModule, Location } from '@angular/common';
 import { Subject, takeUntil } from 'rxjs';
 import { AuthService } from '../../../../core/services/auth-service/auth.service';
 import { AuthUser } from '../../../../core/models/auth.interface';
@@ -41,12 +41,13 @@ export class ChooseAvatarComponent implements OnInit, OnDestroy {
   constructor(
     private router: Router,
     private authService: AuthService,
-    public notificationService: NotificationService
+    public notificationService: NotificationService,
+    private location: Location,
   ) {}  
 
   ngOnInit(): void {
-    this.loadCurrentUser();
-    this.trackLoadingState();
+    // this.loadCurrentUser();
+    // this.trackLoadingState();
   }
 
   ngOnDestroy(): void {
@@ -127,7 +128,7 @@ export class ChooseAvatarComponent implements OnInit, OnDestroy {
   }
 
   goBack(): void {
-    this.router.navigate(['/dashboard']);
+    this.location.back();
   }
 
   get canContinue(): boolean {

@@ -24,8 +24,30 @@ main {
     border-radius: 30px;
     box-shadow: 0 2px 10px 0px #00000014;
     overflow: hidden;
+    margin-inline: 16px;
 }
 
 app-auth-footer {
     width: 100%;
+}
+
+@media screen and (max-width: 764px) {
+    .auth-layout {
+        gap: 32px !important;
+    }
+
+    .auth-container {
+        width: 100%;
+        margin-inline: 32px;
+    }
+}
+
+@media screen and (max-width: 430px) {
+    .auth-container {
+        margin-inline: 16px;
+    }
+
+    main {
+        flex: unset;
+    }
 }

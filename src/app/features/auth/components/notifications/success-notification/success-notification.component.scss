@@ -68,3 +68,27 @@
         font-size: 18px;
     }
 }
+
+@media screen and (max-width: 430px) {
+    .success__notification {
+    
+        .success__content {
+    
+            .success__text {
+    
+                h3 {
+                    @include fontNunito($fs: 22px, $fw: 700);
+                    color: white;
+                }
+    
+                p {
+                    @include fontNunito($fs: 14px, $fw: 400);
+                    color: var(--black);
+                    line-height: 1.4;
+                    margin: 0;
+                    text-align: left;
+                }
+            }
+        }
+    }
+}

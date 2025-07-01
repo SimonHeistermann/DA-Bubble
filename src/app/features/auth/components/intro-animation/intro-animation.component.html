@@ -1,0 +1,16 @@
+<div class="intro-overlay" 
+     [class.fade-background]="fadeBackground"
+     [class.hidden]="isHidden">
+  <div class="intro-content">
+    <div class="logo-container" 
+         [class.move-left]="logoMoveLeft"
+         [class.move-to-header]="moveToHeaderPosition">
+      <img src="/icons/logo_without_text.png" 
+           alt="DABubble Logo" 
+           class="intro-logo" 
+           draggable="false">
+      <span class="brand-text" 
+            [class.show]="showBrandText">DABubble</span>
+    </div>
+  </div>
+</div>

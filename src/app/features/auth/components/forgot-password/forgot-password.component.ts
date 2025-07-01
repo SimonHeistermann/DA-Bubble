@@ -26,7 +26,7 @@ export class ForgotPasswordComponent implements OnInit, OnDestroy {
   private destroy$ = new Subject<void>();
   private submissionAttempts = 0;
   private readonly MAX_ATTEMPTS = 3;
-  private readonly RETRY_DELAY = 60000; // 1 Minute
+  private readonly RETRY_DELAY = 60000;
   private lastSubmissionTime = 0;
 
   constructor(

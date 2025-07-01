@@ -1,6 +1,6 @@
 import { Component, OnInit, OnDestroy } from '@angular/core';
 import { FormBuilder, FormGroup, ReactiveFormsModule, Validators } from '@angular/forms';
-import { Router } from '@angular/router';
+import { Router, RouterModule } from '@angular/router';
 import { Subject, takeUntil } from 'rxjs';
 import { AuthService } from '../../../../core/services/auth-service/auth.service';
 import { AuthValidators } from '../../../../core/validators/auth.validators';
@@ -10,18 +10,21 @@ import { OverlayComponent } from '../notifications/overlay/overlay.component';
 import { ErrorNotificationComponent } from '../notifications/error-notification/error-notification.component';
 import { SuccessNotificationComponent } from '../notifications/success-notification/success-notification.component';
 import { NotificationService } from '../../../../core/services/notification-service/notification.service';
+import { IntroAnimationComponent } from '../intro-animation/intro-animation.component';
 
 @Component({
   selector: 'app-login',
   standalone: true,
   imports: [
     CommonModule, ReactiveFormsModule, OverlayComponent, 
-    ErrorNotificationComponent, SuccessNotificationComponent
+    ErrorNotificationComponent, SuccessNotificationComponent,
+    IntroAnimationComponent, RouterModule
   ],
   templateUrl: './login.component.html',
   styleUrls: ['./login.component.scss']
 })
 export class LoginComponent implements OnInit, OnDestroy {
+  showIntro = true;
   loginForm!: FormGroup;
   loading = false;
   showPassword = false;
@@ -40,6 +43,7 @@ export class LoginComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.subscribeToAuthenticationState();
     this.subscribeToLoadingState();
+    // this.getIntroSeen();
   }
 
   ngOnDestroy(): void {
@@ -48,7 +52,12 @@ export class LoginComponent implements OnInit, OnDestroy {
     if (this.redirectTimeoutId) {
       clearTimeout(this.redirectTimeoutId);
     }
-  }  
+  }
+
+  private getIntroSeen(): void {
+    const hasSeenIntro = sessionStorage.getItem('hasSeenIntro');
+    this.showIntro = !hasSeenIntro;
+  }
 
   private subscribeToAuthenticationState(): void {
     // this.authService.isAuthenticated$.pipe(
@@ -66,6 +75,11 @@ export class LoginComponent implements OnInit, OnDestroy {
     ).subscribe(loading => {
       this.loading = loading;
     });
+  }
+
+  onIntroComplete(): void {
+    this.showIntro = false;
+    sessionStorage.setItem('hasSeenIntro', 'true');
   }
 
   private createForm(): void {
@@ -153,14 +167,6 @@ export class LoginComponent implements OnInit, OnDestroy {
 
   togglePasswordVisibility(): void {
     this.showPassword = !this.showPassword;
-  }
-
-  navigateToRegister(): void {
-    this.router.navigate(['/auth/register']);
-  }
-
-  navigateToForgotPassword(): void {
-    this.router.navigate(['/auth/forgot-password']);
   }
 
   private markFormGroupTouched(): void {

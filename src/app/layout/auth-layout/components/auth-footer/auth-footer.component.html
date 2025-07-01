@@ -1,9 +1,9 @@
 <div class="container">
-    <a href="/" data-label="Impressum" >
-      Impressum
-    </a>
-  
-    <a href="/" data-label="Datenschutz" >
-      Datenschutz
-    </a>
+  <a [routerLink]="['/auth/legal-notice']" rel="noopener noreferrer" data-label="Impressum">Impressum</a>
+  <a [routerLink]="['/auth/privacy-policy']" rel="noopener noreferrer" data-label="Datenschutz">Datenschutz</a>
+</div>
+
+<div class="mobile__footer" *ngIf="isLoginPage">
+  <span>Neu bei DABubble?</span>
+  <a [routerLink]="['/auth/register']" rel="noopener noreferrer" data-label="Account erstellen">Account erstellen</a>
 </div>
