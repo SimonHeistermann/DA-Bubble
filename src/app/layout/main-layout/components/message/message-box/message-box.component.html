@@ -79,7 +79,7 @@
                                     <div class="thread-wrapper">
                                         <span class="answer pointer">
                                             {{ message.threadCount }} 
-                                            <span class="answer-action pointer" (click)="showThreadContainer()">
+                                            <span class="answer-action pointer" (click)="showThreadContainer(index)">
                                             Antwort<ng-container *ngIf="message.threadCount > 1">en</ng-container>
                                             </span>
                                         </span>
@@ -104,7 +104,7 @@
                                     <span class="emoji pointer"  (click)="showEmojiPicker($event, index, currentUser?.id === message.authorID ? 'left' : 'right')"></span>
                                 </li>
                                 <li>
-                                    <span class="answer pointer" (click)="clickThreadMessage(index)"></span>
+                                    <span class="answer pointer" (click)="showThreadContainer(index)"></span>
                                 </li>
                                 <li>
                                     <span class="option pointer" (click)="clickEditMessage(index)">

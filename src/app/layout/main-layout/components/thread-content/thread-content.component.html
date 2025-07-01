@@ -5,21 +5,77 @@
             <div class="title">
                 <span>Thread</span>
                 <img src="/icons/tag_click.png">
-                <p>Allgemein</p>
+                     <p>{{ threadService.channel?.name }}</p>
             </div>
 
-            <img (click)="hideThreadContainer()" src="">
+            <img (click)="hideThreadContainer()">
         </div>
 
         <div class="container-body-input scrollbar__none">
+
+            <div class="thread-content">
+                 <img src="{{ threadService.mainUser?.photoURL }}">
+                <div class="thread-details">
+                    <div class="thread-content-header">
+                        <span>{{ threadService.mainUser?.displayName }}</span>
+                         <p>{{ threadService.formattedTime }}</p>
+                    </div>
+                    <div class="thread-message">
+                            {{ selectedMessage?.content }}
+                    </div>
+
+                </div>
+            
+            </div>
+            
+            <div *ngIf="threadService.currentThreadMessages.length > 0" class="divider">
+                <span>{{ threadService.currentThreadMessages.length }} Antworten</span>
+                <section></section>
+            </div>
+
         <div class="container-body scrollbar__none" #containerBody>
-            <app-message-box (readMessageEmitter)="readMessage()"></app-message-box>
-            <!-- <app-message-box (readMessageEmitter)="onReadMessage()" [channel]="channel" [currentUser]="currentUser" [allUsers]="allUsers"></app-message-box> -->
-        </div>
+            <ng-container  *ngFor="let message of threadService.currentThreadMessages; let i = index">
+
+             <div *ngIf="threadService.threadUsers[i].id != threadService.currentUser?.id" class="thread-content">
+                 <img src="{{ threadService.threadUsers[i].photoURL }}">
+                <div class="thread-details">
+                   
+                    <div class="thread-content-header">
+                        <span>{{ threadService.threadUsers[i].displayName }}</span>
+                         <p>{{ this.dateService.getHoursAndMinutes(message.editedAt!) }}</p>
+                    </div>
+                   
+                    <div class="thread-message">
+                            {{ message.content }}
+                    </div>
+
+                </div>
+            
+            </div>
+
+             <div *ngIf="threadService.threadUsers[i].id == threadService.currentUser?.id" class="crnt-user-content">
+                 <img src="{{ threadService.threadUsers[i].photoURL }}">
+                <div class="thread-details">
+                    <div class="crnt-usr-thread-header">
+                        <span>{{ threadService.threadUsers[i].displayName }}</span>
+                         <p>{{ this.dateService.getHoursAndMinutes(message.editedAt!) }}</p>
+                    </div>
+                   
+                        <div class="crnt-usr-thread">
+                            {{ message.content }}
+                        </div>
+
+                </div>
+            
+            </div>
+            </ng-container>
+            <!-- <app-message-box (readMessageEmitter)="readMessage()"></app-message-box> -->
+            <!-- <app-message-box (readMessageEmitter)="readMessage()" [channel]="channel" [currentUser]="currentUser" [allUsers]="allUsers"></app-message-box> -->
+         </div>
         <div class="container-input">
-            <app-input (sendMessageEmitter)="sendMessage($event)"></app-input>
-            <!-- <app-input (sendMessageEmitter)="onSendMessage($event)" [allChannelUser]="allUsersWithOutCurrentUser" [placeHolder]="this.channel?.name || ''"></app-input> -->
-        </div>
+             <app-input (sendMessageEmitter)="sendMessage($event)"
+                [allChannelUser]="this.threadService.allUsersWithOutCurrentUser"></app-input>
+         </div>
     </div>
     </section>
 

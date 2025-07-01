@@ -25,9 +25,8 @@ export interface ThreadMessage {
     messageId: string;
     authorId: string;               
     content: string;
-    // type: 'text';
     createdAt?: Timestamp;
-    updatedAt?: Timestamp;
+    editedAt?: Timestamp;
     isEdited: boolean;
     mentions: string[];
     reactions: MessageReactions;
