@@ -36,7 +36,7 @@
         <div class="container-body scrollbar__none" #containerBody>
             <ng-container  *ngFor="let message of threadService.currentThreadMessages; let i = index">
 
-             <div *ngIf="threadService.threadUsers[i].id != threadService.currentUser?.id" class="thread-content">
+             <div *ngIf="threadService.threadUsers[i] && (threadService.threadUsers[i].id != threadService.currentUser?.id)" class="thread-content">
                  <img src="{{ threadService.threadUsers[i].photoURL }}">
                 <div class="thread-details">
                    
@@ -53,7 +53,7 @@
             
             </div>
 
-             <div *ngIf="threadService.threadUsers[i].id == threadService.currentUser?.id" class="crnt-user-content">
+             <div *ngIf="threadService.threadUsers[i] && (threadService.threadUsers[i].id == threadService.currentUser?.id)" class="crnt-user-content">
                  <img src="{{ threadService.threadUsers[i].photoURL }}">
                 <div class="thread-details">
                     <div class="crnt-usr-thread-header">

@@ -5,6 +5,7 @@ import { ThreadService } from '../../../../core/services/thread-service/thread.s
 import { InputComponent } from '../shared/input/input.component';
 import { Message, ThreadMessage } from '../../../../core/models/message.interface';
 import { User } from '../../../../core/models/user.interface';
+import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import { FirebaseService } from '../../../../core/services/firebase-service/firebase.service';
 import { ChannelData } from '../../../../core/models/channel.interface';
 import { ChannelService } from '../../../../core/services/channel.service';
@@ -14,8 +15,9 @@ import { MessageService } from '../../../../core/services/message.service';
 import { Subscription } from 'rxjs';
 import { forkJoin } from 'rxjs';
 import { ActivatedRoute } from '@angular/router';
-import { Timestamp } from 'firebase/firestore/lite';
+import { Timestamp } from 'firebase/firestore';
 import { DataService } from '../../../../core/services/data-service/data.service';
+import { Firestore } from '@angular/fire/firestore';
 
 @Component({
   selector: 'app-thread-content',
@@ -30,7 +32,7 @@ export class ThreadContentComponent {
   @Input() channel: ChannelData | null = null;
   @Input() allUsers: User[] = [];
   @Input() allUsersWithOutCurrentUser: User[] = [];
-  @Input()selectedMessage: Message | null = null;
+  @Input() selectedMessage: Message | null = null;
 
   formattedDate: string = '';
   showHeader: 'direct' | 'channel' | 'new' = 'channel';
@@ -47,6 +49,7 @@ export class ThreadContentComponent {
   userService = inject(UserService);
   messageService = inject(MessageService);
   authService = inject(FirebaseService);
+  firestore = inject(Firestore);
   route = inject(ActivatedRoute);
 
 
@@ -80,7 +83,7 @@ readMessage() {
         createdAt: this.selectedMessage?.createdAt ?? Timestamp.now(),
         editedAt: this.selectedMessage?.updatedAt ?? Timestamp.now(),
         isEdited: false,
-        mentions: [],
+        mentions: [''],
         reactions: {},
       };
     }
@@ -93,12 +96,11 @@ readMessage() {
   this.buildMessageData(msg);
   if (this.selectedMessage) {
     this.selectedMessage.threadCount++;
+    console.log(this.selectedMessage.id);
+    this.dataService.updateDocument('messages', this.selectedMessage.id, this.selectedMessage);
     this.dataService.addDocument('threadmessage', this.buildMessageData(msg));
-    console.log(this.selectedMessage);
-    
   }
-  console.log(`MessageData: ${JSON.stringify(this.buildMessageData(msg))}`);
-  
   }
+
 
 }

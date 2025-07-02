@@ -80,15 +80,14 @@ this.firebaseService.getCollectionOnce( 'threadmessage', (content) => {
     console.log(`AuthorIDs: ${timeStamp}`);
     const uniqueAuthorIDs = Array.from(new Set(authorIDs));
     this.userService.getUsersByIds(uniqueAuthorIDs).subscribe(users => {
-     this.threadUsers = uniqueAuthorIDs
-    .map(id => users.find(u => u?.id === id))
-    .filter((u): u is User => u !== null);
+     const userMap = new Map(users.map(u => [u.id, u]));
+    this.threadUsers = this.currentThreadMessages.map(m => userMap.get(m.authorId)!);
+    console.log(this.threadUsers);
     });
   },
   where('messageId', '==', this.message.value?.id),
   orderBy('editedAt', 'asc')
 );
-
 
 this.userService.getUserById(this.message.value?.authorID ?? '').subscribe({
   next: (user) => {
