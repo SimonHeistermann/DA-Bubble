@@ -1,4 +1,4 @@
-import { Inject, Injectable, Input } from '@angular/core';
+import { Inject, Injectable, Input, ViewChild, ElementRef } from '@angular/core';
 import { BehaviorSubject } from 'rxjs';
 import { Message, ThreadMessage } from '../../models/message.interface';
 import { DateService } from '../date.service';
@@ -11,6 +11,7 @@ import { Subscription } from 'rxjs';
 import { forkJoin } from 'rxjs';
 import { or, orderBy, where } from 'firebase/firestore';
 import { ChannelData } from '../../models/channel.interface';
+import { ChangeDetectorRef } from '@angular/core';
 import { ThreadContentComponent } from '../../../layout/main-layout/components/thread-content/thread-content.component';
 
 @Injectable({
@@ -44,8 +45,9 @@ export class ThreadService {
     private channelService: ChannelService,
     private userService: UserService,
     private authService: AuthService,
-    private firebaseService: FirebaseService,
-  ) {}
+    private firebaseService: FirebaseService
+  ) {
+  }
 
 
   show() {
@@ -60,8 +62,6 @@ export class ThreadService {
 
   setMessage(message: Message) {
    this.message.next(message);
-   console.log(this.message.value?.createdAt);
-
    if (this.message.value?.createdAt) {
    this.formattedTime = this.dateService.getHoursAndMinutes(this.message.value.createdAt)
    }
@@ -70,19 +70,16 @@ export class ThreadService {
      if (this.message.value?.channelID) {
           this.loadChannel(this.message.value?.channelID);
           this.messageUser = null;
-          console.log(`ChannelId gefunden: ${this.message.value?.channelID}`);
         } 
 
 this.firebaseService.getCollectionOnce( 'threadmessage', (content) => {
     this.currentThreadMessages = content;
     const authorIDs = this.currentThreadMessages.map(m => m.authorId);
     const timeStamp  = this.currentThreadMessages.map(m => m.messageId );
-    console.log(`AuthorIDs: ${timeStamp}`);
     const uniqueAuthorIDs = Array.from(new Set(authorIDs));
     this.userService.getUsersByIds(uniqueAuthorIDs).subscribe(users => {
      const userMap = new Map(users.map(u => [u.id, u]));
     this.threadUsers = this.currentThreadMessages.map(m => userMap.get(m.authorId)!);
-    console.log(this.threadUsers);
     });
   },
   where('messageId', '==', this.message.value?.id),
@@ -138,7 +135,6 @@ this.userService.getUserById(this.message.value?.authorID ?? '').subscribe({
         this.subChannelUsers();
       })
     );
-    console.log(`Current User: ${this.currentUser?.id} - ${this.currentUser?.displayName}`);
     
   }
 
@@ -153,7 +149,6 @@ this.userService.getUserById(this.message.value?.authorID ?? '').subscribe({
           this.allUsers = [];
           this.allUsers = users.filter((u): u is User => u !== null);
           this.allUsersWithOutCurrentUser = this.allUsers.filter(u => u.id !== this.currentUser?.id);
-          // console.log(this.allUsersWithOutCurrentUser);
           
        })
       )

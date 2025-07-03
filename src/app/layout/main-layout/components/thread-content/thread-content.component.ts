@@ -5,7 +5,6 @@ import { ThreadService } from '../../../../core/services/thread-service/thread.s
 import { InputComponent } from '../shared/input/input.component';
 import { Message, ThreadMessage } from '../../../../core/models/message.interface';
 import { User } from '../../../../core/models/user.interface';
-import { doc, getDoc, updateDoc } from 'firebase/firestore';
 import { FirebaseService } from '../../../../core/services/firebase-service/firebase.service';
 import { ChannelData } from '../../../../core/models/channel.interface';
 import { ChannelService } from '../../../../core/services/channel.service';
@@ -13,7 +12,6 @@ import { DateService } from '../../../../core/services/date.service';
 import { UserService } from '../../../../core/services/user-service/user.service';
 import { MessageService } from '../../../../core/services/message.service';
 import { Subscription } from 'rxjs';
-import { forkJoin } from 'rxjs';
 import { ActivatedRoute } from '@angular/router';
 import { Timestamp } from 'firebase/firestore';
 import { DataService } from '../../../../core/services/data-service/data.service';
@@ -89,17 +87,16 @@ readMessage() {
     }
 
   sendMessage(msg: string) {
-  console.log(msg);
-
-  console.log(this.containerBody);
   
   this.buildMessageData(msg);
   if (this.selectedMessage) {
     this.selectedMessage.threadCount++;
-    console.log(this.selectedMessage.id);
     this.dataService.updateDocument('messages', this.selectedMessage.id, this.selectedMessage);
-    this.dataService.addDocument('threadmessage', this.buildMessageData(msg));
+    this.dataService.addDocument('threadmessage', this.buildMessageData(msg)).then(() =>{
+    this.threadService.setMessage(this.selectedMessage!);
+    });
   }
+    // this.changeDetectorRef.detectChanges();
   }
 
 
