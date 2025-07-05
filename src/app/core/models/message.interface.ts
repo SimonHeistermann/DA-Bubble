@@ -22,6 +22,7 @@ export interface Message extends MessageData{
 }
 
 export interface ThreadMessage {
+    id?: string;
     messageId: string;
     authorId: string;               
     content: string;
@@ -29,7 +30,12 @@ export interface ThreadMessage {
     editedAt?: Timestamp;
     isEdited: boolean;
     mentions: string[];
-    reactions: MessageReactions;
+    reactions: ThreadReactions[];
+}
+
+export interface ThreadReactions {
+  emojiStr: string;
+  userId: string;
 }
 
 export interface MessageReactions {

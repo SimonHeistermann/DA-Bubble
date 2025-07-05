@@ -374,12 +374,7 @@ export class MessageBoxComponent implements OnInit, OnDestroy, AfterViewInit{
 
   showThreadContainer(index: number){
     this.threadService.show(); 
-     console.log('Go to thread message component:', this.messages[index]);
-    
     this.threadService.setMessage(this.messages[index]);
-    
-    // this.threadMessageEmitter.emit(this.messages[index]);
-    
   }
 
 }

@@ -23,6 +23,14 @@
                     <div class="thread-message">
                             {{ selectedMessage?.content }}
                     </div>
+                    <div class="nerd-reacted-bar">
+                        <div class="emoji" *ngFor="let reaction of threadService.reactionsArray">
+                        <img *ngIf="reaction.emoji == 'check-mark'" src="/icons/emojis/1.png">
+                        <img *ngIf="reaction.emoji == 'thumbs-up'" src="/icons/emojis/3.png">
+                        <span *ngIf="reaction.emoji != 'thumbs-up' && reaction.emoji != 'check-mark'">{{ reaction.emoji }}</span>
+                        <p> 1 </p>
+                        </div>
+                    </div>
 
                 </div>
             
@@ -46,14 +54,37 @@
                     </div>
                    
                     <div class="thread-message">
-                            {{ message.content }}
+                            {{ message.content }}̵
+                    </div>
+                      <div *ngIf="message.reactions.length > 0" class="nerd-reacted-bar">
+                        <div class="emoji" *ngFor="let reaction of message.reactions">
+                        <img *ngIf="reaction.emojiStr == 'check-mark'" src="/icons/emojis/1.png">
+                        <img *ngIf="reaction.emojiStr == 'thumbs-up'" src="/icons/emojis/3.png">
+                        <span *ngIf="reaction.emojiStr != 'thumbs-up' && reaction.emojiStr != 'check-mark'">{{ reaction.emojiStr }}</span>
+                        <p> 1 </p>
+                        </div>
                     </div>
 
                 </div>
             
+            <div class="reaction-bar">
+                <img 
+                (mouseenter)="hideEditBar = false" 
+                (mouseleave)="hideEditBar = true" 
+                (click)="showEmojiPicker($event, i)"
+                src="/icons/add_reaction_thread.png">
+                <img src="/icons/burger_icon.png">
+            </div>
+            <div *ngIf="hideEditBar" class="edit-bar">
+                <span>Nachricht bearbeiten</span>
+            </div>
+
             </div>
 
              <div *ngIf="threadService.threadUsers[i] && (threadService.threadUsers[i].id == threadService.currentUser?.id)" class="crnt-user-content">
+                <ng-template #emojiPickerTemplate>
+                     <app-emoji-picker (selectedEojiEmitter)="onSelectedEmoji($event)" (closeOverlayEmitter)="closeEmojiPickerOverlay()"></app-emoji-picker>
+                </ng-template>
                  <img src="{{ threadService.threadUsers[i].photoURL }}">
                 <div class="thread-details">
                     <div class="crnt-usr-thread-header">
@@ -64,9 +95,29 @@
                         <div class="crnt-usr-thread">
                             {{ message.content }}
                         </div>
-
+                     <div *ngIf="message.reactions.length > 0" class="nerd-reacted-bar">
+                        <div class="emoji" *ngFor="let reaction of message.reactions">
+                        <img *ngIf="reaction.emojiStr == 'check-mark'" src="/icons/emojis/1.png">
+                        <img *ngIf="reaction.emojiStr == 'thumbs-up'" src="/icons/emojis/3.png">
+                        <span *ngIf="reaction.emojiStr != 'thumbs-up' && reaction.emojiStr != 'check-mark'">{{ reaction.emojiStr }}</span>
+                        <p> 1 </p>
+                        </div>
+                    </div>
                 </div>
-            
+                
+             
+            <div class="reaction-bar">
+                <img 
+                (mouseenter)="hideEditBar = false" 
+                (mouseleave)="hideEditBar = true" 
+                (click)="showEmojiPicker($event, i)"
+                src="/icons/add_reaction_thread.png">
+                <img src="/icons/burger_icon.png">
+            </div>
+            <div *ngIf="hideEditBar" class="edit-bar">
+                <span>Nachricht bearbeiten</span>
+            </div>
+
             </div>
             </ng-container>
             <!-- <app-message-box (readMessageEmitter)="readMessage()"></app-message-box> -->

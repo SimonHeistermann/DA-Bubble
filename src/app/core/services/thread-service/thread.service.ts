@@ -33,6 +33,7 @@ export class ThreadService {
     threadUsers: User[] = [];
     allUsers: User[] = [];
     allUsersWithOutCurrentUser: User[] = [];
+    reactionsArray: { emoji: string; user: any }[] = [];
 
   private showThread = new BehaviorSubject<boolean>(false);
   showThread$ = this.showThread.asObservable();
@@ -65,7 +66,6 @@ export class ThreadService {
    if (this.message.value?.createdAt) {
    this.formattedTime = this.dateService.getHoursAndMinutes(this.message.value.createdAt)
    }
-   
    this.subChannelUsers();
      if (this.message.value?.channelID) {
           this.loadChannel(this.message.value?.channelID);
@@ -73,9 +73,12 @@ export class ThreadService {
         } 
 
 this.firebaseService.getCollectionOnce( 'threadmessage', (content) => {
-    this.currentThreadMessages = content;
+    this.currentThreadMessages = content.map(doc => ({
+       ...doc,
+         id: doc.id
+        }));
+        
     const authorIDs = this.currentThreadMessages.map(m => m.authorId);
-    const timeStamp  = this.currentThreadMessages.map(m => m.messageId );
     const uniqueAuthorIDs = Array.from(new Set(authorIDs));
     this.userService.getUsersByIds(uniqueAuthorIDs).subscribe(users => {
      const userMap = new Map(users.map(u => [u.id, u]));
@@ -89,8 +92,15 @@ this.firebaseService.getCollectionOnce( 'threadmessage', (content) => {
 this.userService.getUserById(this.message.value?.authorID ?? '').subscribe({
   next: (user) => {
     this.mainUser = user;
-  }
-})
+      }
+  })
+
+  this.reactionsArray = Object.entries(this.message.value?.reactions ?? {}).map( ([key, value]) => {
+    return {
+      emoji: key,
+      user: value.users[0]
+    };
+  })
 
   }
 
