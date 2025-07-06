@@ -280,4 +280,67 @@ section {
             border: 1px solid var(--purple-1);
             padding: 3px 8px;
             border-radius: 20px;
+            position: relative;
+             &:hover {
+            .reaction-hover {
+                display: flex !important;
+            }
         }
+        }
+
+        .reaction-hover {
+            position: absolute;
+            @include displayFlex($fd: column, $ai: center, $jc: center !important);
+            bottom: 30px;
+            left: 50%;
+            padding: 10px;
+            border-radius: 20px;
+            border-bottom-left-radius: 0;
+            color: var(--white);
+            background-color: var(--purple-3);
+            z-index: 999;
+            gap: 5px;
+            white-space: nowrap;
+            display: none !important;
+            }
+
+
+            .thread-editor {
+                @include displayFlex($fd: column, $ai: center, $jc: center !important);
+                position: relative;
+                >textarea {
+                    resize: none;
+                    border-radius: 12px;
+                    border: none;
+                    width: 100%;
+                    font-size: 16px;
+                    padding: 0 12px;
+                    color: #686868;
+                    line-height: 20px;
+                    min-height: 60px;
+                    overflow-y: scroll;
+                }
+                ::-webkit-scrollbar {
+                    display: none;
+                    }
+            }
+
+            .btns-container {
+                @include displayFlex($fd: row, $ai: center, $jc: space-between !important);
+                position: absolute;
+                gap: 10px;
+                bottom: 2%;
+                :nth-child(1){
+                    background-color: var(--white);
+                    color: var(--purple-3);
+                    border: 1px solid var(--purple-3);
+                    padding: 5px 10px;
+                    border-radius: 10px;
+                }
+                :nth-child(2){
+                    background-color: var(--purple-3);
+                    color: var(--white);
+                    padding: 5px 10px;
+                    border-radius: 10px;
+                }
+            }

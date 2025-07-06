@@ -34,12 +34,16 @@ export class ThreadService {
     allUsers: User[] = [];
     allUsersWithOutCurrentUser: User[] = [];
     reactionsArray: { emoji: string; user: any }[] = [];
+    mentions: string[] = [];
 
   private showThread = new BehaviorSubject<boolean>(false);
   showThread$ = this.showThread.asObservable();
 
   private message = new BehaviorSubject<Message | null>(null);
   message$ = this.message.asObservable();
+
+  private selectedUserSource = new BehaviorSubject<User | null>(null);
+  selectedUser$ = this.selectedUserSource.asObservable();
 
   constructor(
     private dateService: DateService,
@@ -163,5 +167,18 @@ this.userService.getUserById(this.message.value?.authorID ?? '').subscribe({
        })
       )
     }
+
+
+
+  setSelectedUser(user: User) {
+    this.selectedUserSource.next(user);
+    console.log(this.selectedUserSource.value?.displayName);
+    if (this.selectedUserSource.value?.displayName) {
+    this.mentions.push(this.selectedUserSource.value?.displayName);
+    }
+    
+  }
+
+
   
 }
