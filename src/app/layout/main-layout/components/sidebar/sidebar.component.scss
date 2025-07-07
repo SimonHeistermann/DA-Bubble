@@ -39,6 +39,14 @@
     justify-content: space-between;
     margin-bottom: 20px;
 
+    .devspace-icon {
+        @include imgButton($wh:40px, $url: '/icons/edit_square.png');
+
+        &:hover {
+            background-image: url('/icons/edit_square_hover.png');
+        }
+    }
+
 }
 
 .dev-logo-cont {

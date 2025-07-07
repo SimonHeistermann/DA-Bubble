@@ -111,8 +111,6 @@ export class MainLayoutContentComponent implements AfterViewInit, OnInit {
   handleUserChange(userId: string) {
     const index = this.allUsers.findIndex(u => u.id === userId);
     this.clickedUser = this.allUsers[index];
-    console.log(this.clickedUser);
-    
   }
 
   toggleMenu() {
@@ -127,13 +125,16 @@ export class MainLayoutContentComponent implements AfterViewInit, OnInit {
     this.clickedChannel = c;
   }
 
+  onClickDevspace() {
+    
+  }
+
   onLeaveChannel() {
     this.sidebarRef.clickChannelName(0, this.sidebarRef.channels[0]);
   }
 
   handleThreadMessage(message: any) {
       console.log(`HandleThreadMessage called`, message);
-  
       this.selectedMessage = message;
       console.log(this.selectedMessage);
       

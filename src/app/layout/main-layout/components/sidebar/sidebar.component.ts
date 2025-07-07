@@ -43,6 +43,7 @@ export class SidebarComponent implements OnInit, OnDestroy {
 
   @Input() showSelf: boolean = true;
   @Output() addChannel = new EventEmitter<void>();
+  @Output() clickDevspaceEmiter = new EventEmitter<void>();
   @Output() clickChannelNameEmitter = new EventEmitter<Channel>();
 
   openChannel = true;
@@ -156,7 +157,10 @@ export class SidebarComponent implements OnInit, OnDestroy {
   }
 
   
-  
+  clickDevspace() {
+    // this.clickDevspaceEmiter.emit();
+     this.router.navigate(['/dashboard', 'search']);
+  }
 
   clickChannelHead(){
     this.openChannel = !this.openChannel;
@@ -168,6 +172,8 @@ export class SidebarComponent implements OnInit, OnDestroy {
 
   clickAddChannel() {
     this.addChannel.emit();
+    this.currentUserIndex = -1;
+    this.currentChannelIndex = -1;
   }
 
   clickChannelName(index: number, channel: Channel) {

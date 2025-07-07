@@ -20,12 +20,13 @@ import { UserChannelActivityService } from '../../../../core/services/userReadAc
 import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 import { ChannelService } from '../../../../core/services/channel.service';
 import { user } from '@angular/fire/auth';
+import { SearchMessageHeaderComponent } from './search-message-header/search-message-header.component';
 
 
 
 @Component({
   selector: 'app-message',
-  imports: [InputComponent, CommonModule, MessageBoxComponent, ChannelMessageHeaderComponent],
+  imports: [InputComponent, CommonModule, MessageBoxComponent, ChannelMessageHeaderComponent, SearchMessageHeaderComponent],
   standalone: true,
   templateUrl: './message.component.html',
   styleUrl: './message.component.scss',
@@ -71,9 +72,17 @@ export class MessageComponent implements OnInit{
         } else if (userId) {
           this.loadUser(userId);
           this.channel = null;
+        } else {
+           this.handleShowSearchField();
         }
       })
     );
+  }
+
+  handleShowSearchField() {
+    this.showHeader = 'new';
+    this.messageUser = null;
+    this.messageUser = null;
   }
 
   loadUser(userId:string) {

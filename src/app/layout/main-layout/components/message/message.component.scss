@@ -25,6 +25,10 @@
         box-shadow: 0px 2px 10px 0px #00000014;
         @include displayFlex($jc: space-between, $ai:center);
 
+        .new-message-to {
+            width: 100%;
+        }
+
         .channel-message {
             width: 100%;
         }

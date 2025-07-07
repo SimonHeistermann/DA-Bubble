@@ -142,11 +142,11 @@
                         
                     </p>
                 </div>
-            } @else {
+            } @else if(channel) {
                 <div class="channel-empty-content">
                     <div class="empty-content-header">
                         <img src="/icons/tag.png" alt="">
-                        <h3 class="empty-content-title">{{channel?.name}}</h3>
+                        <h3 class="empty-content-title">{{channel.name}}</h3>
                     </div>
                     <p> 
                         @if (channel && channel.createdBy) {
@@ -173,10 +173,10 @@
                         }
                     
                         erstellt. Das ist der Anfang des Channels 
-                        <span class="empty-content-name"># {{channel?.name}}</span>
+                        <span class="empty-content-name"># {{channel.name}}</span>
                     </p>
                 </div>
-            }
+            } 
             
         }
         
