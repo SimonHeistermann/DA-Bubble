@@ -1,5 +1,5 @@
-import { AfterViewInit, Component, ElementRef, EventEmitter, inject, Input, OnDestroy, OnInit, Output, ViewChild } from '@angular/core';
-import { Subscription } from 'rxjs';
+import { AfterViewInit, ChangeDetectorRef, Component, ElementRef, EventEmitter, inject, Input, OnDestroy, OnInit, Output, QueryList, ViewChild, ViewChildren } from '@angular/core';
+import { Subscription, take } from 'rxjs';
 import { ChannelService } from '../../../../core/services/channel.service';
 import { Channel } from '../../../../core/models/channel.interface';
 import { toggleMarginRight20Animation, toggleMarginTop25Animation } from '../../animations/expand-collapse.animation';
@@ -14,6 +14,7 @@ import { UserChannelActivityService } from '../../../../core/services/userReadAc
 import { UserReadActivity, UserReadActivityData } from '../../../../core/models/userReadActivity.interface';
 import { user } from '@angular/fire/auth';
 import { Message } from '../../../../core/models/message.interface';
+import { CommunicatorService } from '../message/search-message-header/search-message-header.component';
 
 @Component({
   selector: 'app-sidebar',
@@ -25,6 +26,9 @@ import { Message } from '../../../../core/models/message.interface';
 
 })
 export class SidebarComponent implements OnInit, OnDestroy {
+  @ViewChildren('channelItem') channelItems!: QueryList<ElementRef>;
+  @ViewChildren('userItem') userItems!: QueryList<ElementRef>;
+
   route = inject(ActivatedRoute);
 
   private subscriptions = new Subscription();
@@ -33,6 +37,8 @@ export class SidebarComponent implements OnInit, OnDestroy {
   userService = inject(UserService);
   messageService = inject(MessageService)
   userChannelActivityService = inject(UserChannelActivityService);
+  communicator = inject(CommunicatorService);
+  cdRef = inject(ChangeDetectorRef);
   
   channels: Channel[] = [];
   allUsers: User[] = [];
@@ -57,6 +63,41 @@ export class SidebarComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.subCurrentUser();
+
+    this.subChannelMessage();
+    this.subUserMessage();
+  }
+
+  subChannelMessage() {
+    this.communicator.channelMessage$.subscribe(channel => {
+      
+      const index = this.channels.findIndex(c => c.id == channel.id);
+      this.currentChannelIndex = index;
+      this.currentUserIndex = -1;
+      this.cdRef.detectChanges();
+
+      setTimeout(() => {
+        const el = this.channelItems.get(index)?.nativeElement;
+        console.log(el);
+        
+        el?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      });
+    })
+  }
+
+  subUserMessage() {
+    this.communicator.userMessage$.subscribe(user => {
+      const index = this.allUsers.findIndex(u => u.id == user.id);
+      this.currentChannelIndex = -1;
+      this.currentUserIndex = index;
+      this.cdRef.detectChanges();
+
+      setTimeout(() => {  
+        const el = this.userItems.get(index)?.nativeElement;
+        console.log(el);
+        el?.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        });
+    })
   }
 
   subUserChannelActivites() {
@@ -149,6 +190,7 @@ export class SidebarComponent implements OnInit, OnDestroy {
     this.subscriptions.add(
       this.channelService.getChannelsOrderByCreatedAt(this.currentUser.id, (data) => {
         this.channels = [...data];
+        
         if (this.channels.length > 0) {
           this.clickChannelNameEmitter.emit(this.channels[this.currentChannelIndex]);
         }
@@ -158,7 +200,6 @@ export class SidebarComponent implements OnInit, OnDestroy {
 
   
   clickDevspace() {
-    // this.clickDevspaceEmiter.emit();
      this.router.navigate(['/dashboard', 'search']);
   }
 

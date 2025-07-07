@@ -55,6 +55,7 @@ export class MessageComponent implements OnInit{
   showUserListOverlay = false;
 
   route = inject(ActivatedRoute);
+  router = inject(Router);
 
   constructor() {
    
@@ -66,6 +67,7 @@ export class MessageComponent implements OnInit{
       this.route.paramMap.subscribe(params => {
         const channelId = params.get('channelId');
         const userId = params.get('userId');
+        
         if (channelId) {
           this.loadChannel(channelId);
           this.messageUser = null;
@@ -80,12 +82,14 @@ export class MessageComponent implements OnInit{
   }
 
   handleShowSearchField() {
+    
     this.showHeader = 'new';
     this.messageUser = null;
     this.messageUser = null;
   }
 
   loadUser(userId:string) {
+    console.log('loadUser');
     this.showHeader = 'direct';
     this.subscriptions.add(
       this.userService.getUserById(userId).subscribe({
@@ -100,6 +104,7 @@ export class MessageComponent implements OnInit{
   }
 
   loadChannel(channelId: string) {
+    console.log('loadChannel');
     this.showHeader = 'channel';
     this.subscriptions.add(
       this.channelService.getChannelById(channelId).subscribe({

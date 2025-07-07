@@ -1,16 +1,17 @@
 <section class="devspace" [@toggleMarginRight20]="showSelf ? 'open' : 'closed'">
 
     <section class="devspace-wrapper">
-        <ngx-simplebar class="devspace-content">
-            <div class="devspace-head">
-                <div class="dev-logo-cont">
-                    <img src="/icons/devspaceIcon.png">
-                    <span>Devspace</span>
-                </div>
-                <div class="pointer devspace-icon" (click)="clickDevspace()">
-
-                </div>
+        <div class="devspace-head">
+            <div class="dev-logo-cont">
+                <img src="/icons/devspaceIcon.png">
+                <span>Devspace</span>
             </div>
+            <div class="pointer devspace-icon" (click)="clickDevspace()">
+
+            </div>
+        </div>
+        <ngx-simplebar class="devspace-content">
+            
         
             <div class="devlist-container">
                 <section>
@@ -30,7 +31,7 @@
                     <div class="channel-names" [@toggleMarginTop25]="openChannel ? 'open' : 'closed'">
                         <ul>
                             @for(channel of channels; let index = $index; track channel.id) {
-                                <li class="channel-li pointer" [class.selected]="index === currentChannelIndex"  (click)="clickChannelName(index, channel)">
+                                <li class="channel-li pointer" [class.selected]="index === currentChannelIndex"  (click)="clickChannelName(index, channel)" #channelItem>
                                     <div class="channel-li-content">
                                         <div class="tag-channel-name">
                                             <div class="tag"></div>
@@ -93,7 +94,7 @@
                             </li>
                             
                             @for (user of allUsers; let index = $index; track $index) {
-                                <li [class.selected]="index === currentUserIndex" >
+                                <li [class.selected]="index === currentUserIndex" #userItem>
 
                                     <div class="li-content pointer"  (click)="clickUserName(index, user)">
                                         

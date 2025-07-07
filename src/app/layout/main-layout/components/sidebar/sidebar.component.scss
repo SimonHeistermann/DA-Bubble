@@ -18,7 +18,7 @@
         left: 0;
 
         width: 100%;
-        height: 100%;
+        height: calc(100% - 80px);
         padding: 30px 0;
 
         .devspace-content {
@@ -32,6 +32,7 @@
 
 
 .devspace-head {
+    padding: 0 30px;
     width: 100%;
     display: flex;
     flex-direction: row;
