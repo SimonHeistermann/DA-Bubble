@@ -11,7 +11,7 @@
             <img (click)="hideThreadContainer()">
         </div>
 
-        <div class="container-body-input scrollbar__none">
+        <div class="container-body-input container-body scrollbar__none">
 
             <div class="thread-content">
                 <img src="{{ threadService.mainUser?.photoURL }}">
@@ -42,14 +42,13 @@
                 <section></section>
             </div>
 
-            <div class="container-body scrollbar__none" #containerBody>
+            <div class="scrollbar__none" #containerBody>
                 <ng-container *ngFor="let message of threadService.currentThreadMessages; let i = index">
 
                     <div *ngIf="threadService.threadUsers[i] && (threadService.threadUsers[i].id != threadService.currentUser?.id)"
                         class="thread-content">
                         <img src="{{ threadService.threadUsers[i].photoURL }}">
                         <div class="thread-details">
-
                             <div class="thread-content-header">
                                 <span>{{ threadService.threadUsers[i].displayName }}</span>
                                 <p>{{ this.dateService.getHoursAndMinutes(message.editedAt!) }}</p>
@@ -80,15 +79,9 @@
 
                         </div>
 
-                        <div class="reaction-bar">
-                            <img (mouseenter)="hideEditBar = false" (mouseleave)="hideEditBar = true"
-                                (click)="showEmojiPicker($event, i)" src="/icons/add_reaction_thread.png">
-                            <img src="/icons/burger_icon.png">
+                        <div class="reaction-bar alter" style="right: 13px;">
+                            <img (click)="showEmojiPicker($event, i)" src="/icons/add_reaction_thread.png">
                         </div>
-                        <div *ngIf="hideEditBar" class="edit-bar">
-                            <span>Nachricht bearbeiten</span>
-                        </div>
-
                     </div>
 
                     <div *ngIf="threadService.threadUsers[i] && (threadService.threadUsers[i].id == threadService.currentUser?.id)"
@@ -98,7 +91,7 @@
                                 (closeOverlayEmitter)="closeEmojiPickerOverlay()"></app-emoji-picker>
                         </ng-template>
                         <img src="{{ threadService.threadUsers[i].photoURL }}">
-                        <div class="thread-details">
+                        <div (mouseenter)="hideEditBar = false" class="thread-details">
                             <div class="crnt-usr-thread-header">
                                 <span>{{ threadService.threadUsers[i].displayName }}</span>
                                 <p>{{ this.dateService.getHoursAndMinutes(message.editedAt!) }}</p>
@@ -108,17 +101,12 @@
                                 <div class="thread-editor" *ngIf="editingIndex === i && editingMode">
                                 <textarea #textarea
                                 [(ngModel)]="message.content"
-                               
                                 placeholder="{{ message.content }}"></textarea>
                                 <div class="btns-container">
                                     <button (click)="breakEditing(i)">Abbrechen</button>
                                     <button (click)="saveEditing(i, message.content)">Speichern</button>
                                 </div>
                                 </div>
-                                <!-- <app-message-content *ngIf="editingIndex === i && editingMode" 
-                                (sendMessageEmitter)="edittedMessage( message.content)"></app-message-content> -->
-                                <!-- <app-input *ngIf="editingIndex === i && editingMode" 
-                                (sendMessageEmitter)="edittedMessage( $event, message.content )"></app-input> -->
                                 <span *ngIf="editingIndex !== i || !editingMode">{{ message.content }}</span>
                             </div>
                             <div *ngIf="message.reactions.length > 0" class="nerd-reacted-bar">
@@ -146,7 +134,7 @@
                         <div class="reaction-bar">
                             <img (mouseenter)="hideEditBar = false" (mouseleave)="hideEditBar = true"
                                 (click)="showEmojiPicker($event, i)" src="/icons/add_reaction_thread.png">
-                            <img src="/icons/burger_icon.png">
+                            <img (mouseenter)="hideEditBar = true" src="/icons/burger_icon.png">
                         </div>
                         <div *ngIf="hideEditBar && !editingMode" class="edit-bar">
                             <span (click)="editMessage(i)">Nachricht bearbeiten</span>
