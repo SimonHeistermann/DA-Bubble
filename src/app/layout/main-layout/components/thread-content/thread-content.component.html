@@ -17,7 +17,7 @@
                 <img src="{{ threadService.mainUser?.photoURL }}">
                 <div class="thread-details">
                     <div class="thread-content-header">
-                        <span>{{ threadService.mainUser?.displayName }}</span>
+                        <span (click)="showProfile(threadService.mainUser!)">{{ threadService.mainUser?.displayName }}</span>
                         <p>{{ threadService.formattedTime }}</p>
                     </div>
                     <div class="thread-message">
@@ -50,7 +50,7 @@
                         <img src="{{ threadService.threadUsers[i].photoURL }}">
                         <div class="thread-details">
                             <div class="thread-content-header">
-                                <span>{{ threadService.threadUsers[i].displayName }}</span>
+                                <span (click)="showProfile(threadService.threadUsers[i])">{{ threadService.threadUsers[i].displayName }}</span>
                                 <p>{{ this.dateService.getHoursAndMinutes(message.editedAt!) }}</p>
                             </div>
 
@@ -93,7 +93,7 @@
                         <img src="{{ threadService.threadUsers[i].photoURL }}">
                         <div (mouseenter)="hideEditBar = false" class="thread-details">
                             <div class="crnt-usr-thread-header">
-                                <span>{{ threadService.threadUsers[i].displayName }}</span>
+                                <span (click)="showProfile(threadService.threadUsers[i])">{{ threadService.threadUsers[i].displayName }}</span>
                                 <p>{{ this.dateService.getHoursAndMinutes(message.editedAt!) }}</p>
                             </div>
 
@@ -151,3 +151,6 @@
     </section>
 
 </main>
+
+            <app-profile-ref [showOverlay]="canShowProfile" (closeOverlayEmitter)="canShowProfile = false; 
+            currentUserIndex = -1" [currentUser]="profileRefUser"></app-profile-ref>

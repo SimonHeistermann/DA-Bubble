@@ -21,10 +21,10 @@ import { EmojiPickerComponent } from '../shared/emoji-picker/emoji-picker.compon
 import { OverlayRef } from '@angular/cdk/overlay';
 import { OverlayService } from '../../../../core/services/overlay.service';
 import { ViewContainerRef } from '@angular/core';
-
+import { ProfileRefComponent } from "./profile-ref/profile-ref.component";
 @Component({
   selector: 'app-thread-content',
-  imports: [InputComponent, CommonModule, FormsModule, EmojiPickerComponent],
+  imports: [InputComponent, CommonModule, FormsModule, EmojiPickerComponent, ProfileRefComponent],
   templateUrl: './thread-content.component.html',
   styleUrl: './thread-content.component.scss',
   animations: [toggleMarginLeft20Animation]
@@ -41,11 +41,14 @@ export class ThreadContentComponent {
   hideEditBar: boolean = true;
   showEmoji: boolean = false;
   editingMode: boolean = false;
+  currentUserIndex = -1;
+  profileRefUser: User | null = null;
 
   emojiPickerOverlayRef!: OverlayRef;
   overlayService = inject(OverlayService);
   viewContainerRef = inject(ViewContainerRef);
   showProfileOverlay = false;
+  canShowProfile = false;
 
   formattedDate: string = '';
   showHeader: 'direct' | 'channel' | 'new' = 'channel';
@@ -194,5 +197,10 @@ export class ThreadContentComponent {
       console.error('Message ID is undefined, cannot update document.');
     }
   }
+
+showProfile(user: User) {
+   this.canShowProfile = true;
+   this.profileRefUser = user;
+}
 
 }
