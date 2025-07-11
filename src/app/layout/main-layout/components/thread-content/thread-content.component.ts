@@ -37,30 +37,23 @@ export class ThreadContentComponent {
   @Input() allUsersWithOutCurrentUser: User[] = [];
   @Input() selectedMessage: Message | null = null;
 
-
+  showProfileOverlay = false;
+  canShowProfile = false;
   hideEditBar: boolean = true;
   showEmoji: boolean = false;
   editingMode: boolean = false;
-  currentUserIndex = -1;
   profileRefUser: User | null = null;
-
-  emojiPickerOverlayRef!: OverlayRef;
-  overlayService = inject(OverlayService);
-  viewContainerRef = inject(ViewContainerRef);
-  showProfileOverlay = false;
-  canShowProfile = false;
-
-  formattedDate: string = '';
-  showHeader: 'direct' | 'channel' | 'new' = 'channel';
   messageUser: User | null = null;
   currentUser: User | null = null;
   emojiPickerIndex: number | null = null;
   editingIndex: number | null = null;
+  formattedDate: string = '';
+  showHeader: 'direct' | 'channel' | 'new' = 'channel';
 
-  @ViewChild('containerBody') containerBody!: ElementRef;
-  @ViewChild('emojiPickerTemplate') emojiPickerTemplate !: TemplateRef<any>;
+  currentUserIndex = -1;
+  emojis: {}[] = [];
 
-  private subscriptions = new Subscription();
+  emojiPickerOverlayRef!: OverlayRef;
   threadService = inject(ThreadService);
   channelService = inject(ChannelService);
   dataService = inject(DataService);
@@ -70,6 +63,10 @@ export class ThreadContentComponent {
   authService = inject(FirebaseService);
   firestore = inject(Firestore);
   route = inject(ActivatedRoute);
+  overlayService = inject(OverlayService);
+  viewContainerRef = inject(ViewContainerRef);
+  @ViewChild('containerBody') containerBody!: ElementRef;
+  @ViewChild('emojiPickerTemplate') emojiPickerTemplate !: TemplateRef<any>;
 
 
   ngOnInit() {
@@ -78,11 +75,23 @@ export class ThreadContentComponent {
     });
   } 
 
-
   formatDate(rawDate: Timestamp | Timestamp) {
     if (rawDate) {
       this.formattedDate = this.dateService.getHoursAndMinutes(rawDate);
     }
+  }
+
+  getRows(text: string): number {
+  return Math.max(Math.ceil(text.length / 35));
+  }
+
+  getCols(text: string): number {
+  return Math.max(Math.ceil(text.length / 20));
+  }
+
+  showProfile(user: User) {
+   this.canShowProfile = true;
+   this.profileRefUser = user;
   }
 
   hideThreadContainer() {
@@ -116,8 +125,6 @@ export class ThreadContentComponent {
   showEmojiPicker(event: MouseEvent, index: number) {
     console.log(`showEmojiPicker called`, event.currentTarget as HTMLElement);
     this.emojiPickerIndex = index;
-    console.log(this.emojiPickerIndex);
-
 
     this.emojiPickerOverlayRef = this.overlayService.openTemplateOverlay(
       this.containerBody,
@@ -128,8 +135,6 @@ export class ThreadContentComponent {
     this.emojiPickerOverlayRef.backdropClick().subscribe(() => this.emojiPickerOverlayRef.dispose());
   }
 
-  emojis: {}[] = [];
-
   onSelectedEmoji(emojiStr: string) {
     if (this.emojiPickerIndex == null) return;
     const index = this.emojiPickerIndex;
@@ -139,11 +144,6 @@ export class ThreadContentComponent {
       currentMessage.reactions = [];
     }
     currentMessage.reactions.push({ emojiStr, user });
-    console.log(`currentMessage called`, currentMessage.id);
-    console.log(`onSelectedEmoji called`, emojiStr, user);
-    // currentMessage.reactions = this.emojis;
-    console.log(`onSelectedEmoji called`, currentMessage.reactions);
-    console.log(`onSelectedEmoji called`, currentMessage.id);
     if (currentMessage.id) {
       this.dataService.updateDocument('threadmessage', currentMessage.id,
         { reactions: currentMessage.reactions }).then(() => {
@@ -170,7 +170,7 @@ export class ThreadContentComponent {
     
   }
 
-  breakEditing(index: number) {
+  breakEditing() {
     this.editingIndex = null;
     this.editingMode = false;
   }
@@ -182,11 +182,8 @@ export class ThreadContentComponent {
     
   }
   edittedMessage(content: string, index: number) {
-    // debugger;
-    console.log(index, `ReadMessage called`, content);
     this.threadService.currentThreadMessages[index].content = content;
     this.threadService.currentThreadMessages[index].editedAt = Timestamp.now();
-    console.log(this.threadService.currentThreadMessages[index]);
     const messageId = this.threadService.currentThreadMessages[index].id;
     if (typeof messageId === 'string') {
       this.dataService.updateDocument('threadmessage', messageId,
@@ -197,10 +194,5 @@ export class ThreadContentComponent {
       console.error('Message ID is undefined, cannot update document.');
     }
   }
-
-showProfile(user: User) {
-   this.canShowProfile = true;
-   this.profileRefUser = user;
-}
 
 }

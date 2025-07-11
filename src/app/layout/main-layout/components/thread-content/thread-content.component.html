@@ -99,11 +99,11 @@
 
                             <div class="crnt-usr-thread">
                                 <div class="thread-editor" *ngIf="editingIndex === i && editingMode">
-                                <textarea #textarea
+                                <textarea [cols]="getCols(message.content)" [rows]="getRows(message.content)" #textarea
                                 [(ngModel)]="message.content"
                                 placeholder="{{ message.content }}"></textarea>
                                 <div class="btns-container">
-                                    <button (click)="breakEditing(i)">Abbrechen</button>
+                                    <button (click)="breakEditing()">Abbrechen</button>
                                     <button (click)="saveEditing(i, message.content)">Speichern</button>
                                 </div>
                                 </div>
