@@ -314,6 +314,12 @@ section {
             gap: 5px;
             white-space: nowrap;
             display: none !important;
+            >div {
+                
+                >p {
+                    @include displayFlex($fd: column, $ai: center !important);
+                }
+            }
             }
 
 

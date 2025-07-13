@@ -12,7 +12,6 @@ import { ChannelService } from '../../../../core/services/channel.service';
 import { DateService } from '../../../../core/services/date.service';
 import { UserService } from '../../../../core/services/user-service/user.service';
 import { MessageService } from '../../../../core/services/message.service';
-import { Subscription } from 'rxjs';
 import { ActivatedRoute } from '@angular/router';
 import { Timestamp } from 'firebase/firestore';
 import { DataService } from '../../../../core/services/data-service/data.service';
@@ -22,6 +21,8 @@ import { OverlayRef } from '@angular/cdk/overlay';
 import { OverlayService } from '../../../../core/services/overlay.service';
 import { ViewContainerRef } from '@angular/core';
 import { ProfileRefComponent } from "./profile-ref/profile-ref.component";
+import { object } from '@angular/fire/database';
+
 @Component({
   selector: 'app-thread-content',
   imports: [InputComponent, CommonModule, FormsModule, EmojiPickerComponent, ProfileRefComponent],
@@ -75,6 +76,14 @@ export class ThreadContentComponent {
     });
   } 
 
+  getReactionsArray(){
+    const reaction = this.selectedMessage?.reactions ?? {};
+    return Object.entries(reaction).map(([emoji, data]) => ({
+    emoji,
+    users: data.users
+  }));
+  }
+
   formatDate(rawDate: Timestamp | Timestamp) {
     if (rawDate) {
       this.formattedDate = this.dateService.getHoursAndMinutes(rawDate);
@@ -122,8 +131,8 @@ export class ThreadContentComponent {
     }
   }
 
-  showEmojiPicker(event: MouseEvent, index: number) {
-    console.log(`showEmojiPicker called`, event.currentTarget as HTMLElement);
+  showEmojiPicker(index: number) {
+  
     this.emojiPickerIndex = index;
 
     this.emojiPickerOverlayRef = this.overlayService.openTemplateOverlay(
@@ -136,14 +145,32 @@ export class ThreadContentComponent {
   }
 
   onSelectedEmoji(emojiStr: string) {
+    // debugger;
     if (this.emojiPickerIndex == null) return;
+
     const index = this.emojiPickerIndex;
     const currentMessage = this.threadService.currentThreadMessages[index];
-    const user = this.threadService.currentUser?.displayName ?? '';
+    const currentUser = this.threadService.currentUser?.displayName ?? '';
+
     if (!Array.isArray(currentMessage.reactions)) {
       currentMessage.reactions = [];
     }
-    currentMessage.reactions.push({ emojiStr, user });
+
+    const existingReaction = currentMessage.reactions.find(reaction => reaction.emojiStr === emojiStr);
+    if (existingReaction){
+      if (!existingReaction.user.includes(currentUser)) {
+        existingReaction.user.push(currentUser);
+      } else {
+        existingReaction.user.splice(existingReaction.user.indexOf(currentUser), 1);
+        if(existingReaction.user.length == 0) {
+          currentMessage.reactions.splice(currentMessage.reactions.indexOf(existingReaction), 1);
+        }
+      }
+    } else {
+      currentMessage.reactions.push({ emojiStr, user: [currentUser] });
+      
+    }
+    
     if (currentMessage.id) {
       this.dataService.updateDocument('threadmessage', currentMessage.id,
         { reactions: currentMessage.reactions }).then(() => {
