@@ -22,15 +22,20 @@ export interface Message extends MessageData{
 }
 
 export interface ThreadMessage {
+    id?: string;
     messageId: string;
     authorId: string;               
     content: string;
-    // type: 'text';
     createdAt?: Timestamp;
-    updatedAt?: Timestamp;
+    editedAt?: Timestamp;
     isEdited: boolean;
     mentions: string[];
-    reactions: MessageReactions;
+    reactions: ThreadReactions[];
+}
+
+export interface ThreadReactions {
+  emojiStr: string;
+  user: string;
 }
 
 export interface MessageReactions {

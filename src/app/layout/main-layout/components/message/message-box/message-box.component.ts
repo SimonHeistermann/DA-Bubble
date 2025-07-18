@@ -311,13 +311,6 @@ export class MessageBoxComponent implements OnInit, OnDestroy, AfterViewInit{
     this.subUpdateMessage(id, messageData);
   }
 
-  clickThreadMessage(index: number) {
-    console.log('Go to thread message component:', this.messages[index]);
-    
-    this.threadMessageEmitter.emit(this.messages[index]);
-    this.threadService.show();
-  }
-
   clickEditMessage(index: number){
     this.clickedMessageIndex = index;
     this.editingIndex = index;
@@ -379,8 +372,9 @@ export class MessageBoxComponent implements OnInit, OnDestroy, AfterViewInit{
     this.subscriptions.unsubscribe();
   }
 
-  showThreadContainer(){
+  showThreadContainer(index: number){
     this.threadService.show(); 
+    this.threadService.setMessage(this.messages[index]);
   }
 
 }
