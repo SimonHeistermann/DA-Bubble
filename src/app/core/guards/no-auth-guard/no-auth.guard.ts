@@ -10,19 +10,13 @@ export class NoAuthGuard implements CanActivate {
   private authService = inject(AuthService);
   private router = inject(Router);
 
-  /**
-   * Verhindert Zugriff auf Auth-Seiten wenn bereits angemeldet
-   * Leitet zum Dashboard weiter, wenn angemeldet
-   */
   canActivate(): Observable<boolean | UrlTree> {
-    return this.authService.isAuthenticated$.pipe(
+    return this.authService.isAuthenticatedExtended$.pipe(
       take(1),
       map(isAuthenticated => {
-        if (!isAuthenticated) {
-          return true;
-        } else {
-          return this.router.createUrlTree(['/dashboard']);
-        }
+        return !isAuthenticated
+          ? true
+          : this.router.createUrlTree(['/dashboard']);
       })
     );
   }

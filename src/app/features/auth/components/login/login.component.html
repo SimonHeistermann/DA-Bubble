@@ -125,8 +125,21 @@
                       <div class="loading__spinner"></div>
                   </span>
               </button>
-              <button class="btn btn__secondary">
+              <button
+                type="button"
+                class="btn btn__secondary"
+                (click)="onGuestLogin()"
+                [disabled]="guestLoading"
+                [attr.aria-busy]="guestLoading"
+                aria-label="Als Gast anmelden"
+              >
+                <span *ngIf="!guestLoading">
                   Gäste-Login
+                </span>
+                <span *ngIf="guestLoading">
+                  Wird geladen...
+                  <div class="loading__spinner"></div>
+                </span>
               </button>
           </div>
         </div>

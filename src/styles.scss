@@ -143,7 +143,7 @@ input:focus, textarea:focus {
 .cdk-overlay-pane {
   font-family: inherit;
   backface-visibility: hidden;
-  transform: translateZ(0); // promote pane itself
+  transform: translateZ(0);
 }
 
 .mat-tooltip.custom__tooltip {

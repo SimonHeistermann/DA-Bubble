@@ -46,8 +46,8 @@ export class ChooseAvatarComponent implements OnInit, OnDestroy {
   ) {}  
 
   ngOnInit(): void {
-    // this.loadCurrentUser();
-    // this.trackLoadingState();
+    this.loadCurrentUser();
+    this.trackLoadingState();
   }
 
   ngOnDestroy(): void {

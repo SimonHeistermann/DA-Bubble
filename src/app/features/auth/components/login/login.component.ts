@@ -28,6 +28,8 @@ export class LoginComponent implements OnInit, OnDestroy {
   loginForm!: FormGroup;
   loading = false;
   showPassword = false;
+  guestLoading = false;
+  showGuestInfo = false;
   private destroy$ = new Subject<void>();
   private redirectTimeoutId?: number;
 
@@ -43,7 +45,7 @@ export class LoginComponent implements OnInit, OnDestroy {
   ngOnInit(): void {
     this.subscribeToAuthenticationState();
     this.subscribeToLoadingState();
-    // this.getIntroSeen();
+    this.getIntroSeen();
   }
 
   ngOnDestroy(): void {
@@ -54,33 +56,21 @@ export class LoginComponent implements OnInit, OnDestroy {
     }
   }
 
-  private getIntroSeen(): void {
-    const hasSeenIntro = sessionStorage.getItem('hasSeenIntro');
-    this.showIntro = !hasSeenIntro;
+  // ========== GETTER ==========
+
+  get isAnyLoginInProgress(): boolean {
+    return this.loading || this.guestLoading;
   }
 
-  private subscribeToAuthenticationState(): void {
-    // this.authService.isAuthenticated$.pipe(
-    //   takeUntil(this.destroy$)
-    // ).subscribe(isAuth => {
-    //   if (isAuth) {
-    //     this.router.navigate(['/dashboard']);
-    //   }
-    // });
+  get canSubmit(): boolean {
+    return this.loginForm.valid && !this.isAnyLoginInProgress;
   }
 
-  private subscribeToLoadingState(): void {
-    this.authService.loading$.pipe(
-      takeUntil(this.destroy$)
-    ).subscribe(loading => {
-      this.loading = loading;
-    });
+  get canGuestLogin(): boolean {
+    return !this.isAnyLoginInProgress;
   }
 
-  onIntroComplete(): void {
-    this.showIntro = false;
-    sessionStorage.setItem('hasSeenIntro', 'true');
-  }
+  // ========== FORM SETUP ==========
 
   private createForm(): void {
     this.loginForm = this.fb.group({
@@ -95,6 +85,8 @@ export class LoginComponent implements OnInit, OnDestroy {
       honeypot: ['']
     });
   }
+
+  // ========== AUTHENTICATION METHODS ==========
 
   onSubmit(): void {
     if (this.loginForm.get('honeypot')?.value) {
@@ -117,25 +109,6 @@ export class LoginComponent implements OnInit, OnDestroy {
       next: () => this.handleEmailLoginSuccess(),
       error: (error) => this.handleEmailLoginError(error)
     });
-  }  
-
-  private extractLoginCredentials(): LoginCredentials {
-    return {
-      email: this.loginForm.get('email')?.value.trim(),
-      password: this.loginForm.get('password')?.value
-    };
-  }
-
-  private handleEmailLoginSuccess(): void {
-    this.notificationService.showSuccess('Angemeldet!');
-    this.redirectTimeoutId = window.setTimeout(() => {
-      this.router.navigate(['/dashboard']);
-    }, 2000);
-  }
-  
-  private handleEmailLoginError(error: any): void {
-    console.error('Login error:', error);
-    this.notificationService.showError('Fehler beim Anmelden.');
   }
 
   onGoogleSignIn(): void {
@@ -149,6 +122,35 @@ export class LoginComponent implements OnInit, OnDestroy {
     });
   }
 
+  onGuestLogin(): void {
+    if (this.guestLoading || this.loading) return;
+    this.guestLoading = true;
+    this.notificationService.clearAll();
+    this.authService.signInAsGuest().pipe(
+      takeUntil(this.destroy$)
+    ).subscribe({
+      next: (guestUser) => {
+        console.log('Guest user logged in:', guestUser);
+        this.handleGuestLoginSuccess();
+      },
+      error: (error) => this.handleGuestLoginError(error)
+    });
+  }
+
+  // ========== LOGIN SUCCESS/ERROR HANDLERS ==========
+
+  private handleEmailLoginSuccess(): void {
+    this.notificationService.showSuccess('Angemeldet!');
+    this.redirectTimeoutId = window.setTimeout(() => {
+      this.router.navigate(['/dashboard']);
+    }, 2000);
+  }
+  
+  private handleEmailLoginError(error: any): void {
+    console.error('Login error:', error);
+    this.notificationService.showError('Fehler beim Anmelden.');
+  }
+
   private handleGoogleLoginSuccess(): void {
     this.notificationService.showSuccess('Angemeldet!');
     this.redirectTimeoutId = window.setTimeout(() => {
@@ -159,14 +161,34 @@ export class LoginComponent implements OnInit, OnDestroy {
   private handleGoogleLoginError(error: any): void {
     console.error('Google login error:', error);
     this.notificationService.showError('Fehler bei der Google-Anmeldung.');
-  }  
+  }
 
-  hideAllNotifications(): void {
-    this.notificationService.clearAll();
-  }  
+  private handleGuestLoginSuccess(): void {
+    this.guestLoading = false;
+    this.notificationService.showSuccess('Als Gast angemeldet!');
+    this.router.navigate(['/dashboard']).then(success => {
+      if (!success) {
+        console.error('Navigation to dashboard failed');
+        setTimeout(() => {
+          this.router.navigate(['/dashboard']);
+        }, 100);
+      }
+    });
+  }
 
-  togglePasswordVisibility(): void {
-    this.showPassword = !this.showPassword;
+  private handleGuestLoginError(error: any): void {
+    this.guestLoading = false;
+    console.error('Guest login error:', error);
+    this.notificationService.showError('Fehler beim Gast-Login!');
+  }
+
+  // ========== FORM VALIDATION & FIELD HELPERS ==========
+
+  private extractLoginCredentials(): LoginCredentials {
+    return {
+      email: this.loginForm.get('email')?.value.trim(),
+      password: this.loginForm.get('password')?.value
+    };
   }
 
   private markFormGroupTouched(): void {
@@ -225,7 +247,56 @@ export class LoginComponent implements OnInit, OnDestroy {
     return !!(field?.value && field.value.toString().length > 0);
   }
 
-  get canSubmit(): boolean {
-    return this.loginForm.valid && !this.loading;
+  // ========== UI INTERACTION METHODS ==========
+
+  togglePasswordVisibility(): void {
+    this.showPassword = !this.showPassword;
+  }
+
+  toggleGuestInfo(): void {
+    this.showGuestInfo = !this.showGuestInfo;
+  }
+
+  hideAllNotifications(): void {
+    this.notificationService.clearAll();
+  }
+
+  onEscapeKey(): void {
+    if (this.showGuestInfo) {
+      this.showGuestInfo = false;
+    }
+  }
+
+  // ========== INTRO ANIMATION ==========
+
+  onIntroComplete(): void {
+    this.showIntro = false;
+    sessionStorage.setItem('hasSeenIntro', 'true');
+  }
+
+  private getIntroSeen(): void {
+    const hasSeenIntro = sessionStorage.getItem('hasSeenIntro');
+    this.showIntro = !hasSeenIntro;
+  }
+
+  // ========== SUBSCRIPTIONS ==========
+
+  private subscribeToAuthenticationState(): void {
+    this.authService.currentUser$.pipe(
+      takeUntil(this.destroy$)
+    ).subscribe(user => {
+      if (user) {
+        console.log('User authenticated, redirecting to dashboard');
+        this.router.navigate(['/dashboard']);
+      }
+    });
+  }
+
+  private subscribeToLoadingState(): void {
+    this.authService.loading$.pipe(
+      takeUntil(this.destroy$)
+    ).subscribe(loading => {
+      this.loading = loading;
+    });
   }
 }

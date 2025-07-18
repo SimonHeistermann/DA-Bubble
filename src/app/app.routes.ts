@@ -27,7 +27,7 @@ export const routes: Routes = [
   {
     path: 'auth',
     component: AuthLayoutComponent,
-    // canActivate: [NoAuthGuard],
+    canActivate: [NoAuthGuard],
     children: [
       {
         matcher: caseInsensitiveMatch('login'),
@@ -53,7 +53,7 @@ export const routes: Routes = [
         matcher: caseInsensitiveMatch('reset-password'),
         component: ResetPasswordComponent,
         title: 'Passwort zurücksetzen',
-        // data: { requiresResetToken: true }
+        data: { requiresResetToken: true }
       },
       {
         matcher: caseInsensitiveMatch('legal-notice'),

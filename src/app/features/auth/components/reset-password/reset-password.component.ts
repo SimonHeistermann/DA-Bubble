@@ -38,8 +38,8 @@ export class ResetPasswordComponent implements OnInit, OnDestroy {
   }
 
   ngOnInit(): void {
-    // this.extractResetCode();
-    // this.verifyResetCode();
+    this.extractResetCode();
+    this.verifyResetCode();
   }
 
   ngOnDestroy(): void {

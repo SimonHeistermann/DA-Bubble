@@ -109,6 +109,20 @@ export class UserService {
   }
 
   /**
+  * Alle Benutzer aus Firestore abrufen (einmaliger Abruf)
+  */
+  getAllUsers(): Observable<User[]> {
+    return from(
+      this.firebaseService.getCollectionOncePromise(APP_CONSTANTS.COLLECTIONS.USERS)
+    ).pipe(
+      catchError(error => {
+        console.error('Error getting all users:', error);
+        return of([]);
+      })
+    );
+  }
+
+  /**
    * Benutzer nach Namen suchen
    */
   searchUsersByName(searchTerm: string): Observable<User[]> {
@@ -126,6 +140,34 @@ export class UserService {
       catchError(error => {
         console.error('Error searching users:', error);
         return of([]);
+      })
+    );
+  }
+
+  /**
+  * Neuen Benutzer in Firestore anlegen
+  */
+  createUser(user: User): Promise<void> {
+    return this.firebaseService.setDocument(
+      APP_CONSTANTS.COLLECTIONS.USERS,
+      user.id,
+      user
+    );
+  }
+
+  /**
+  * Benutzer aus der Datenbank löschen
+  */
+  deleteUser(uid: string): Observable<void> {
+    return from(
+      this.firebaseService.deleteDocument(
+        APP_CONSTANTS.COLLECTIONS.USERS,
+        uid
+      )
+    ).pipe(
+      catchError(error => {
+        console.error('Error deleting user:', error);
+        throw error;
       })
     );
   }
