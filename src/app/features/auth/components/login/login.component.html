@@ -3,7 +3,7 @@
   (animationComplete)="onIntroComplete()">
 </app-intro-animation>
 
-<div class="auth__container">
+<div class="auth__container"  *ngIf="!showIntro">
   <div class="auth__form__container">
     <div class="auth__form__header">
       <h1>Anmeldung</h1>

@@ -24,7 +24,7 @@ import { IntroAnimationComponent } from '../intro-animation/intro-animation.comp
   styleUrls: ['./login.component.scss']
 })
 export class LoginComponent implements OnInit, OnDestroy {
-  showIntro = true;
+  showIntro = false;
   loginForm!: FormGroup;
   loading = false;
   showPassword = false;
@@ -272,11 +272,15 @@ export class LoginComponent implements OnInit, OnDestroy {
   onIntroComplete(): void {
     this.showIntro = false;
     sessionStorage.setItem('hasSeenIntro', 'true');
+    this.createForm();
   }
 
   private getIntroSeen(): void {
     const hasSeenIntro = sessionStorage.getItem('hasSeenIntro');
     this.showIntro = !hasSeenIntro;
+    if (!this.showIntro) {
+      this.createForm();
+    }
   }
 
   // ========== SUBSCRIPTIONS ==========
