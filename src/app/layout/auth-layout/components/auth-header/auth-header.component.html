@@ -1,7 +1,8 @@
 <div class="container">
     <a 
         class="logo" 
-        href="/" 
+        [routerLink]="['/auth/login']" 
+        rel="noopener noreferrer"
     >
       <img src="/icons/logo.png" draggable="false">
     </a>
@@ -9,7 +10,8 @@
     <div class="header__right" *ngIf="isLoginPage">
       <span>Neu bei DABubble?</span>
       <a 
-        href="/auth/register"
+        [routerLink]="['/auth/register']" 
+        rel="noopener noreferrer"
         data-label="Account erstellen"
       >
         Account erstellen

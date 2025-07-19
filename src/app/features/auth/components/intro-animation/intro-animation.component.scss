@@ -1,0 +1,119 @@
+@use './../../../../../styles.scss' as *;
+
+.intro-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100vw;
+    height: 100vh;
+    background: linear-gradient(135deg, #7c3aed 0%, #6366f1 100%);
+    z-index: 9999;
+    @include displayFlex($ai: center, $jc: center);
+    transition: opacity 1.2s ease-out;
+
+    &.fade-background {
+        opacity: 0;
+    }
+
+    &.hidden {
+        display: none;
+    }
+}
+
+.intro-content {
+    position: relative;
+    @include displayFlex($ai: center, $jc: center);
+    width: min(100%, 696px);
+    height: 184px;
+}
+
+.logo-container {
+    @include displayFlex($ai: center, $jc: center, $g: 20px);
+    position: absolute;
+    transition: all 0.8s cubic-bezier(0.4, 0, 0.2, 1);
+    left: 50%;
+    transform: translateX(-50%);
+  
+    &.move-left {
+        transform: translateX(-50%) translateX(-140px);
+    }
+  
+    &.move-to-header {
+        transform: translateX(calc(-50vw + #{$standardInlinePadding})) translateY(calc(-50vh + 60px)) scale(0.35);
+        transition: all 0.9s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    }
+}
+
+.intro-logo {
+    width: 187px;
+    height: 184px;
+    transition: all 0.8s ease;
+    position: relative;
+    z-index: 2;
+  
+    .logo-container.move-to-header & {
+        transition: all 0.9s cubic-bezier(0.25, 0.46, 0.45, 0.94), opacity 0.8s ease-out;
+        opacity: 0;
+  }
+}
+
+.brand-text {
+    @include fontNunito($fw: 700, $fs: 4.5rem, $lh: 120%);
+    color: var(--white);
+    opacity: 0;
+    transform: translateX(-100px);
+    transition: all 0.6s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+    white-space: nowrap;
+    position: absolute;
+    left: 0;
+    z-index: 1;
+  
+    &.show {
+        opacity: 1;
+        transform: translateX(207px);
+    }
+  
+    .logo-container.move-to-header & {
+        transition: all 0.9s cubic-bezier(0.25, 0.46, 0.45, 0.94), opacity 0.8s ease-out;
+        opacity: 0;
+    }
+}
+
+@media screen and (max-width: 764px) {
+    .intro-content {
+        width: 90vw;
+        max-width: 500px;
+        padding: 0 1rem;
+        box-sizing: border-box;
+    }
+
+    .logo-container {
+        &.move-left {
+            transform: translateX(-50%) translateX(-60px);
+        }
+
+        &.move-to-header {
+            transform: translateX(-50%) translateY(calc(-50vh + 60px)) scale(0.4);
+            transition: all 0.9s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+        }
+    }
+
+    .intro-logo {
+        width: min(90vw, 120px);
+        height: auto;
+        max-width: 100%;
+    }
+
+    .brand-text {
+        @include fontNunito($fw: 700, $fs: clamp(2rem, 7vw, 3rem), $lh: 120%);
+        transform: translateX(-160px);
+        white-space: normal; 
+        text-align: left;
+        max-width: 70vw;
+        margin-left: 16px;
+
+        &.show {
+        transform: translateX(120px);
+        }
+    }
+}

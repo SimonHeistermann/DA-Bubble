@@ -10,6 +10,8 @@ import { MainLayoutComponent } from './layout/main-layout/main-layout.component'
 import { MessageComponent } from './layout/main-layout/components/message/message.component';
 import { MainLayoutContentComponent } from './layout/main-layout/main-layout-content/main-layout-content.component';
 import { ChooseAvatarComponent } from './features/auth/components/choose-avatar/choose-avatar.component';
+import { LegalNoticeComponent } from './features/auth/components/legal-notice/legal-notice.component';
+import { PrivacyPolicyComponent } from './features/auth/components/privacy-policy/privacy-policy.component';
 
 function caseInsensitiveMatch(path: string) {
   return (segments: UrlSegment[]): UrlMatchResult | null => {
@@ -25,7 +27,7 @@ export const routes: Routes = [
   {
     path: 'auth',
     component: AuthLayoutComponent,
-    // canActivate: [NoAuthGuard],
+    canActivate: [NoAuthGuard],
     children: [
       {
         matcher: caseInsensitiveMatch('login'),
@@ -52,6 +54,16 @@ export const routes: Routes = [
         component: ResetPasswordComponent,
         title: 'Passwort zurücksetzen',
         data: { requiresResetToken: true }
+      },
+      {
+        matcher: caseInsensitiveMatch('legal-notice'),
+        component: LegalNoticeComponent,
+        title: 'Impressum'
+      },
+      {
+        matcher: caseInsensitiveMatch('privacy-policy'),
+        component: PrivacyPolicyComponent,
+        title: 'Datenschutzerklärung'
       },
       {
         path: '',

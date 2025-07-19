@@ -90,6 +90,18 @@ export class DataService {
     }
 
     /**
+    * Collection einmalig mit Query laden und Promise zurückgeben
+    */
+    async getCollectionOncePromise(collectionName: string, ...queryConstraints: any[]): Promise<any[]> {
+        try {
+        return this.firebaseCore.getCollectionOncePromise(collectionName, ...queryConstraints);
+        } catch (error) {
+        console.error(`Error in DataService.getCollectionOncePromise:`, error);
+        throw error;
+        }
+    }
+
+    /**
      * Einzelnes Dokument überwachen
      */
     subscribeToDocument(collectionName: string, docId: string, callback: (data: any | null) => void) {

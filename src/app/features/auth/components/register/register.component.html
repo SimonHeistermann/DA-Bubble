@@ -183,7 +183,7 @@
                                 <div class="checkbox__icon"></div>
                             </div>
                             <label for="privacyPolicy" class="privacy__text">
-                                Ich stimme der <a href="#" class="privacy__link">Datenschutzerklärung</a> zu.
+                                Ich stimme der <a [routerLink]="['/auth/privacy-policy']" rel="noopener noreferrer" data-label="Datenschutzerklärung" class="privacy__link">Datenschutzerklärung</a> zu.
                             </label>
                         </div>
                         <div class="error privacy__error" *ngIf="getFieldError('privacyPolicy')" id="privacy-error">

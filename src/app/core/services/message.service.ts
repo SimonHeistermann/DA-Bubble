@@ -3,7 +3,7 @@ import { collection, CollectionReference, doc, DocumentReference, onSnapshot, or
 import { Firestore } from "@angular/fire/firestore";
 import { Channel, ChannelData } from "../models/channel.interface";
 import { DataService } from "./data-service/data.service";
-import { catchError, from, Observable } from "rxjs";
+import { catchError, from, Observable, switchMap, map, of } from "rxjs";
 import { Message, MessageData } from "../models/message.interface";
 
 @Injectable({
@@ -62,6 +62,20 @@ export class MessageService{
         return [userID1, userID2].sort().join('_');
     }
 
-   
+    deleteMessagesByUser(userId: string): Observable<void> {
+        return from(this.dataService.getCollectionOncePromise(this.COL_NAME)).pipe(
+          switchMap((messages: Message[]) => {
+            const toDelete = messages.filter(m =>
+              m.authorID === userId || m.recipientID === userId
+            );
+            const deletes = toDelete.map(msg => this.dataService.deleteDocument(this.COL_NAME, msg.id));
+            return from(Promise.all(deletes)).pipe(map(() => void 0));
+          }),
+          catchError(error => {
+            console.error('Error deleting messages by user:', error);
+            return of(void 0);
+          })
+        );
+      }      
 
 }

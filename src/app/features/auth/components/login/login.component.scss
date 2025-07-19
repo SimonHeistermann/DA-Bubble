@@ -389,3 +389,60 @@ form.submitting {
     80% { transform: translateX(5px); }
     100% { transform: translateX(0); }
 }
+
+@media screen and (max-width: 430px) {
+    .auth__container {
+        @include displayFlex();
+        background-color: white;
+        padding: 36px 16px;
+        border-radius: 30px;
+    }
+
+    .auth__form__header {
+        gap: 15px !important;
+    }
+
+    .auth__form__container {
+        gap: 16px !important;
+    }
+
+    h1 {
+        @include fontNunito($fs: 32px, $fw: 700);
+    }
+
+    p {
+        @include fontNunito($fs: 17px, $fw: 400);
+    }
+
+    .form__group {
+        height: 77px;
+
+        .input__wrapper {
+            height: 50px;
+            padding: 12px 32px;
+            @include fontNunito($fs: 18px, $fw: 500);
+        }
+    }
+
+    .link {
+        @include fontFigtree($fw: 400, $fs: 17px);
+    }
+
+    .divider {
+        span {
+            @include fontNunito($fs: 17px, $fw: 400);
+        }
+    }
+
+    .btn__google {
+        height: 50px;
+
+        &:not(:disabled):hover {
+            height: 50px;
+        }
+    
+        &:not(:disabled):active {
+            height: 50px;
+        }
+    }
+}

@@ -1,4 +1,9 @@
-<div class="auth__container">
+<app-intro-animation 
+  *ngIf="showIntro"
+  (animationComplete)="onIntroComplete()">
+</app-intro-animation>
+
+<div class="auth__container"  *ngIf="!showIntro">
   <div class="auth__form__container">
     <div class="auth__form__header">
       <h1>Anmeldung</h1>
@@ -84,7 +89,9 @@
         <div class="form__bottom">
           <a
             class="link"
-            (click)="navigateToForgotPassword()"
+            [routerLink]="['/auth/forgot-password']"
+            rel="noopener noreferrer"
+            data-label="Passwort vergessen?"
             role="button"
             tabindex="0"
           >
@@ -118,8 +125,21 @@
                       <div class="loading__spinner"></div>
                   </span>
               </button>
-              <button class="btn btn__secondary">
+              <button
+                type="button"
+                class="btn btn__secondary"
+                (click)="onGuestLogin()"
+                [disabled]="guestLoading"
+                [attr.aria-busy]="guestLoading"
+                aria-label="Als Gast anmelden"
+              >
+                <span *ngIf="!guestLoading">
                   Gäste-Login
+                </span>
+                <span *ngIf="guestLoading">
+                  Wird geladen...
+                  <div class="loading__spinner"></div>
+                </span>
               </button>
           </div>
         </div>

@@ -33,3 +33,54 @@ a {
         border: 1px solid var(--light-purple);
     }
 }
+
+.mobile__footer {
+    width: 100%;
+    padding-inline: $standardInlinePadding;
+    display: none;
+    margin-bottom: 50px;
+
+    > span {
+        @include fontNunito($lh: 100%, $fs: 18px);
+        color: var(--black);
+        margin-right: 16px;
+    }
+
+    > a {
+        @include fontFigtree();
+        display: inline-block;
+        color: var(--purple-2);
+        text-decoration: none;
+        transition: border-color 125ms ease-in, color 125ms ease-in, font-weight 125ms ease-in;
+        padding: 10px 15px;
+        border-radius: 30px;
+        border: 1px solid transparent;
+        position: relative;
+
+        &::after {
+            content: attr(data-label);
+            font-weight: 500;
+            visibility: hidden;
+            height: 0;
+            overflow: hidden;
+            display: block;
+        }
+
+        &:hover {
+            @include fontFigtree($fw: 500);
+            color: var(--purple-1);
+            border: 1px solid var(--light-purple);
+        }
+    }
+}
+
+@media screen and (max-width: 764px) {
+    .container {
+        display: none !important;
+    }
+
+    .mobile__footer {
+        @include displayFlex($ai: center, $jc: flex-end, $g: 16px);
+        flex-direction: column;
+    }
+}
