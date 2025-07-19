@@ -15,6 +15,7 @@ import { AuthService } from '../../../core/services/auth-service/auth.service';
 import { UserService } from '../../../core/services/user-service/user.service';
 import { filter, Subscription } from 'rxjs';
 import { ChannelService } from '../../../core/services/channel.service';
+import { Message } from '../../../core/models/message.interface';
 
 @Component({
   selector: 'app-main-layout-content',
@@ -38,6 +39,8 @@ export class MainLayoutContentComponent implements AfterViewInit, OnInit {
   clickedChannel: Channel | null = null;
   clickedUser: User | null = null;
   firstUnreadMessageId: string = '';
+
+  selectedMessage: Message | null = null;
 
   currentUser: User | null = null;
   allChannels: Channel[] = [];
@@ -108,8 +111,6 @@ export class MainLayoutContentComponent implements AfterViewInit, OnInit {
   handleUserChange(userId: string) {
     const index = this.allUsers.findIndex(u => u.id === userId);
     this.clickedUser = this.allUsers[index];
-    console.log(this.clickedUser);
-    
   }
 
   toggleMenu() {
@@ -124,8 +125,19 @@ export class MainLayoutContentComponent implements AfterViewInit, OnInit {
     this.clickedChannel = c;
   }
 
+  onClickDevspace() {
+    
+  }
+
   onLeaveChannel() {
     this.sidebarRef.clickChannelName(0, this.sidebarRef.channels[0]);
   }
+
+  handleThreadMessage(message: any) {
+      console.log(`HandleThreadMessage called`, message);
+      this.selectedMessage = message;
+      console.log(this.selectedMessage);
+      
+    }
 }
 

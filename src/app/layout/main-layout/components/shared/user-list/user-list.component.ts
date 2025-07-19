@@ -1,7 +1,8 @@
-import { AfterViewInit, Component, ElementRef, EventEmitter, Input, Output, ViewChild } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, EventEmitter, Inject, Input, Output, ViewChild } from '@angular/core';
 import { User } from '../../../../../core/models/user.interface';
 import { CommonModule } from '@angular/common';
 import { SimplebarAngularModule } from 'simplebar-angular'; 
+import { ThreadService } from '../../../../../core/services/thread-service/thread.service';
 
 @Component({
   selector: 'app-user-list',
@@ -18,11 +19,16 @@ export class UserListComponent implements AfterViewInit{
   @Input() maxHeight = '30vh';
   @Input() editingMode = false;
 
+  constructor(private threadService: ThreadService) {}
+
   isOverflowing = false;
   
 
   clickLi(u: User) {
     this.clickedUser.emit(u);
+    if (this.threadService.threadOpen) {
+    this.threadService.setSelectedUser(u);
+    }
   }
 
   @Input()

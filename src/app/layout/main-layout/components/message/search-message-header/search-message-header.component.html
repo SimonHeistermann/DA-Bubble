@@ -1,0 +1,46 @@
+<div class="search-message-header-container" #wrapper>
+    <h2>Neue Nachricht</h2>
+    <input type="text" placeholder="An: #chnanel, order @jemand oder E-Mail Addresse" (input)="inputText()" [(ngModel)]="inputContent">
+
+    <div class="search-result scrollbar__none" *ngIf="showList">
+        <div class="search-result-user" *ngIf="showUserList">
+            <h3>User</h3>
+            <ul>
+                @for (user of filteredUsers; track user.id) {
+                    <li (click)="clickUser(user)">
+                        <img [src]="user?.photoURL?.startsWith('http') ? '/icons/avatars/avatar_1.png' : user?.photoURL" alt="">
+                        <h4>{{ user.displayName }}</h4>
+                        <span>{{ user.email }}</span>
+                    </li>
+                } @empty {
+                   Kein Nuzter gefunden.
+                }
+               
+            </ul>
+        </div>
+        <div class="divider" *ngIf="filteredChannels.length > 0 && filteredUsers.length > 0">
+
+        </div>
+        <div class="search-result-channel " *ngIf="showChannelList">
+            <h3>Channel</h3>
+            <ul> 
+                @for (channel of filteredChannels; track channel.id) {
+                    <li (click)="clickChannel(channel)">
+                        <img src="/icons/tag.png" alt="">
+                        <h4>{{ channel.name }}</h4>
+                        <span>
+                            @if(channel.name == 'Allgemein'){
+                                System Admin
+                            } @else () {
+                                {{ findUserNameByID(channel.createdBy) }}
+                            }
+                        </span>
+                    </li>
+                } @empty {
+                   Kein Channel gefunden.
+                }
+               
+            </ul>
+        </div>
+    </div>
+</div>

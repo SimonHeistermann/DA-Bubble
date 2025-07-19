@@ -5,22 +5,156 @@
             <div class="title">
                 <span>Thread</span>
                 <img src="/icons/tag_click.png">
-                <p>Allgemein</p>
+                <p>{{ threadService.channel?.name }}</p>
             </div>
 
-            <img (click)="hideThreadContainer()" src="">
+            <img (click)="hideThreadContainer()">
         </div>
 
-        <div class="container-body-input scrollbar__none">
-        <div class="container-body scrollbar__none" #containerBody>
-            <app-message-box (readMessageEmitter)="readMessage()"></app-message-box>
-            <!-- <app-message-box (readMessageEmitter)="onReadMessage()" [channel]="channel" [currentUser]="currentUser" [allUsers]="allUsers"></app-message-box> -->
+        <div class="container-body-input container-body scrollbar__none">
+
+            <div class="thread-content">
+                <img src="{{ threadService.mainUser?.photoURL }}">
+                <div class="thread-details">
+                    <div class="thread-content-header">
+                        <span (click)="showProfile(threadService.mainUser!)">{{ threadService.mainUser?.displayName }}</span>
+                        <p>{{ threadService.formattedTime }}</p>
+                    </div>
+                    <div class="thread-message">
+                        {{ selectedMessage?.content }}
+                    </div>
+                    <div class="nerd-reacted-bar">
+                        <div class="emoji" *ngFor="let reaction of getReactionsArray()">
+                            <img *ngIf="reaction.emoji === 'check-mark'" src="/icons/emojis/1.png">
+                            <img *ngIf="reaction.emoji === 'thumbs-up'" src="/icons/emojis/3.png">
+                            <span *ngIf="reaction.emoji !== 'thumbs-up' && reaction.emoji !=='check-mark'">{{
+                                reaction.emoji }}</span>
+                            <p> {{ reaction.users.length }} </p>
+                        </div>
+                    </div>
+
+                </div>
+
+            </div>
+
+            <div *ngIf="threadService.currentThreadMessages.length > 0" class="divider">
+                <span>{{ threadService.currentThreadMessages.length }} Antworten</span>
+                <section></section>
+            </div>
+
+            <div class="scrollbar__none" #containerBody>
+                <ng-container *ngFor="let message of threadService.currentThreadMessages; let i = index">
+
+                    <div *ngIf="threadService.threadUsers[i] && (threadService.threadUsers[i].id != threadService.currentUser?.id)"
+                        class="thread-content">
+                        <img src="{{ threadService.threadUsers[i].photoURL }}">
+                        <div class="thread-details">
+                            <div class="thread-content-header">
+                                <span (click)="showProfile(threadService.threadUsers[i])">{{ threadService.threadUsers[i].displayName }}</span>
+                                <p>{{ this.dateService.getHoursAndMinutes(message.editedAt!) }}</p>
+                            </div>
+
+                            <div class="thread-message">
+                                {{ message.content }}̵
+                            </div>
+                            <div *ngIf="message.reactions.length > 0" class="nerd-reacted-bar">
+                                <div class="emoji" *ngFor="let reaction of message.reactions">
+                                    <img *ngIf="reaction.emojiStr == 'check-mark'" src="/icons/emojis/1.png">
+                                    <img *ngIf="reaction.emojiStr == 'thumbs-up'" src="/icons/emojis/3.png">
+                                    <span
+                                        *ngIf="reaction.emojiStr != 'thumbs-up' && reaction.emojiStr != 'check-mark'">{{
+                                        reaction.emojiStr }}</span>
+                                        <p> {{ reaction.user.length}} </p>
+                                    <div class="reaction-hover">
+                                        <img *ngIf="reaction.emojiStr == 'check-mark'" src="/icons/emojis/1.png">
+                                        <img *ngIf="reaction.emojiStr == 'thumbs-up'" src="/icons/emojis/3.png">
+                                        <span
+                                            *ngIf="reaction.emojiStr != 'thumbs-up' && reaction.emojiStr != 'check-mark'">
+                                            {{ reaction.emojiStr }}</span>
+                                         <div *ngIf="reaction.user.length > 1; else singleUser"><p *ngFor="let eachUser of reaction.user"> {{ eachUser }} </p>  
+                                           </div>
+                                             <ng-template #singleUser>{{ reaction.user }}</ng-template>
+                                             
+                                        <p>hat reagiert</p>
+                                    </div>
+                                </div>
+                            </div>
+
+                        </div>
+
+                        <div class="reaction-bar alter" style="right: 13px;">
+                            <img (click)="showEmojiPicker(i)" src="/icons/add_reaction_thread.png">
+                        </div>
+                    </div>
+
+                    <div *ngIf="threadService.threadUsers[i] && (threadService.threadUsers[i].id == threadService.currentUser?.id)"
+                        class="crnt-user-content">
+                        <ng-template #emojiPickerTemplate>
+                            <app-emoji-picker (selectedEojiEmitter)="onSelectedEmoji($event)"
+                                (closeOverlayEmitter)="closeEmojiPickerOverlay()"></app-emoji-picker>
+                        </ng-template>
+                        <img src="{{ threadService.threadUsers[i].photoURL }}">
+                        <div (mouseenter)="hideEditBar = false" class="thread-details">
+                            <div class="crnt-usr-thread-header">
+                                <span (click)="showProfile(threadService.threadUsers[i])">{{ threadService.threadUsers[i].displayName }}</span>
+                                <p>{{ this.dateService.getHoursAndMinutes(message.editedAt!) }}</p>
+                            </div>
+
+                            <div class="crnt-usr-thread">
+                                <div class="thread-editor" *ngIf="editingIndex === i && editingMode">
+                                <textarea [cols]="getCols(message.content)" [rows]="getRows(message.content)" #textarea
+                                [(ngModel)]="message.content"
+                                placeholder="{{ message.content }}"></textarea>
+                                <div class="btns-container">
+                                    <button (click)="breakEditing()">Abbrechen</button>
+                                    <button (click)="saveEditing(i, message.content)">Speichern</button>
+                                </div>
+                                </div>
+                                <span *ngIf="editingIndex !== i || !editingMode">{{ message.content }}</span>
+                            </div>
+                            <div *ngIf="message.reactions.length > 0" class="nerd-reacted-bar">
+                                <div class="emoji" *ngFor="let reaction of message.reactions">
+                                    <img *ngIf="reaction.emojiStr == 'check-mark'" src="/icons/emojis/1.png">
+                                    <img *ngIf="reaction.emojiStr == 'thumbs-up'" src="/icons/emojis/3.png">
+                                    <span *ngIf="reaction.emojiStr != 'thumbs-up' && reaction.emojiStr != 'check-mark'">
+                                        {{ reaction.emojiStr }}</span>
+                                    <p> {{ reaction.user.length }} </p>
+                                    <div class="reaction-hover">
+                                        <img *ngIf="reaction.emojiStr == 'check-mark'" src="/icons/emojis/1.png">
+                                        <img *ngIf="reaction.emojiStr == 'thumbs-up'" src="/icons/emojis/3.png">
+                                        <span *ngIf="reaction.emojiStr != 'thumbs-up' && reaction.emojiStr != 'check-mark'">
+                                            {{ reaction.emojiStr }}</span>
+                                           <div *ngIf="reaction.user.length > 1; else singleUser">
+                                            <p *ngFor="let eachUser of reaction.user"> {{ eachUser }} </p>  
+                                           </div>
+                                           <ng-template #singleUser>{{ reaction.user }}</ng-template>
+                                        <p>hat reagiert</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+
+                        <div class="reaction-bar">
+                            <img (mouseenter)="hideEditBar = false" (mouseleave)="hideEditBar = true"
+                                (click)="showEmojiPicker(i)" src="/icons/add_reaction_thread.png">
+                            <img (mouseenter)="hideEditBar = true" src="/icons/burger_icon.png">
+                        </div>
+                        <div *ngIf="hideEditBar && !editingMode" class="edit-bar">
+                            <span (click)="editMessage(i)">Nachricht bearbeiten</span>
+                        </div>
+
+                    </div>
+                </ng-container>
+            </div>
+            <div class="container-input">
+                <app-input (sendMessageEmitter)="sendMessage($event)"
+                    [allChannelUser]="this.threadService.allUsersWithOutCurrentUser"></app-input>
+            </div>
         </div>
-        <div class="container-input">
-            <app-input (sendMessageEmitter)="sendMessage($event)"></app-input>
-            <!-- <app-input (sendMessageEmitter)="onSendMessage($event)" [allChannelUser]="allUsersWithOutCurrentUser" [placeHolder]="this.channel?.name || ''"></app-input> -->
-        </div>
-    </div>
     </section>
 
 </main>
+
+            <app-profile-ref [showOverlay]="canShowProfile" (closeOverlayEmitter)="canShowProfile = false; 
+            currentUserIndex = -1" [currentUser]="profileRefUser"></app-profile-ref>

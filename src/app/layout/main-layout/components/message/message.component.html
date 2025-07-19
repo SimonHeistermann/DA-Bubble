@@ -1,7 +1,7 @@
 <main class="main-content">
-    <div class="container-head">
+    <div class="container-head" [style.height.px]="showHeader == 'new' ? '140' : '80'">
         <div class="new-message-to" *ngIf="showHeader == 'new'">
-
+            <app-search-message-header></app-search-message-header>
         </div>
         <div class="channel-message" *ngIf="showHeader == 'channel'">
             <app-channel-message-header [channel]="channel"></app-channel-message-header>

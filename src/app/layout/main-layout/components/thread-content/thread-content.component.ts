@@ -1,12 +1,31 @@
-import { Component, Input, inject } from '@angular/core';
+import { Component, ElementRef, Input, TemplateRef, ViewChild, inject } from '@angular/core';
+import { CommonModule } from '@angular/common';
+import { FormsModule } from '@angular/forms';
 import { toggleMarginLeft20Animation } from '../../animations/expand-collapse.animation';
 import { ThreadService } from '../../../../core/services/thread-service/thread.service';
-import { MessageBoxComponent } from '../message/message-box/message-box.component';
 import { InputComponent } from '../shared/input/input.component';
+import { Message, ThreadMessage, ThreadReactions } from '../../../../core/models/message.interface';
+import { User } from '../../../../core/models/user.interface';
+import { FirebaseService } from '../../../../core/services/firebase-service/firebase.service';
+import { ChannelData } from '../../../../core/models/channel.interface';
+import { ChannelService } from '../../../../core/services/channel.service';
+import { DateService } from '../../../../core/services/date.service';
+import { UserService } from '../../../../core/services/user-service/user.service';
+import { MessageService } from '../../../../core/services/message.service';
+import { ActivatedRoute } from '@angular/router';
+import { Timestamp } from 'firebase/firestore';
+import { DataService } from '../../../../core/services/data-service/data.service';
+import { Firestore } from '@angular/fire/firestore';
+import { EmojiPickerComponent } from '../shared/emoji-picker/emoji-picker.component';
+import { OverlayRef } from '@angular/cdk/overlay';
+import { OverlayService } from '../../../../core/services/overlay.service';
+import { ViewContainerRef } from '@angular/core';
+import { ProfileRefComponent } from "./profile-ref/profile-ref.component";
+import { object } from '@angular/fire/database';
 
 @Component({
   selector: 'app-thread-content',
-  imports: [ MessageBoxComponent, InputComponent ],
+  imports: [InputComponent, CommonModule, FormsModule, EmojiPickerComponent, ProfileRefComponent],
   templateUrl: './thread-content.component.html',
   styleUrl: './thread-content.component.scss',
   animations: [toggleMarginLeft20Animation]
@@ -14,22 +33,193 @@ import { InputComponent } from '../shared/input/input.component';
 export class ThreadContentComponent {
 
   @Input() showSelf: boolean = true;
+  @Input() channel: ChannelData | null = null;
+  @Input() allUsers: User[] = [];
+  @Input() allUsersWithOutCurrentUser: User[] = [];
+  @Input() selectedMessage: Message | null = null;
 
+  showProfileOverlay = false;
+  canShowProfile = false;
+  hideEditBar: boolean = true;
+  showEmoji: boolean = false;
+  editingMode: boolean = false;
+  profileRefUser: User | null = null;
+  messageUser: User | null = null;
+  currentUser: User | null = null;
+  emojiPickerIndex: number | null = null;
+  editingIndex: number | null = null;
+  formattedDate: string = '';
+  showHeader: 'direct' | 'channel' | 'new' = 'channel';
+
+  currentUserIndex = -1;
+  emojis: {}[] = [];
+
+  emojiPickerOverlayRef!: OverlayRef;
   threadService = inject(ThreadService);
+  channelService = inject(ChannelService);
+  dataService = inject(DataService);
+  dateService = inject(DateService);
+  userService = inject(UserService);
+  messageService = inject(MessageService);
+  authService = inject(FirebaseService);
+  firestore = inject(Firestore);
+  route = inject(ActivatedRoute);
+  overlayService = inject(OverlayService);
+  viewContainerRef = inject(ViewContainerRef);
+  @ViewChild('containerBody') containerBody!: ElementRef;
+  @ViewChild('emojiPickerTemplate') emojiPickerTemplate !: TemplateRef<any>;
 
+
+  ngOnInit() {
+    this.threadService.message$.subscribe(msg => {
+      this.selectedMessage = msg;
+    });
+  } 
+
+  getReactionsArray(){
+    const reaction = this.selectedMessage?.reactions ?? {};
+    return Object.entries(reaction).map(([emoji, data]) => ({
+    emoji,
+    users: data.users
+  }));
+  }
+
+  formatDate(rawDate: Timestamp | Timestamp) {
+    if (rawDate) {
+      this.formattedDate = this.dateService.getHoursAndMinutes(rawDate);
+    }
+  }
+
+  getRows(text: string): number {
+  return Math.max(Math.ceil(text.length / 35));
+  }
+
+  getCols(text: string): number {
+  return Math.max(Math.ceil(text.length / 20));
+  }
+
+  showProfile(user: User) {
+   this.canShowProfile = true;
+   this.profileRefUser = user;
+  }
 
   hideThreadContainer() {
     this.threadService.hide();
   }
 
-readMessage() {
-  console.log(`ReadMessage called`);
-  
+  buildMessageData(msg: string): ThreadMessage {
+    return {
+      messageId: this.selectedMessage?.id ?? '',
+      authorId: this.threadService.currentUser?.id ?? '',
+      content: msg,
+      createdAt: this.selectedMessage?.createdAt ?? Timestamp.now(),
+      editedAt: this.selectedMessage?.updatedAt ?? Timestamp.now(),
+      isEdited: false,
+      mentions: this.threadService.mentions,
+      reactions: [] as ThreadReactions[],
+    };
   }
 
   sendMessage(msg: string) {
-  console.log(msg);
+    this.buildMessageData(msg);
+    if (this.selectedMessage) {
+      this.selectedMessage.threadCount++;
+      this.dataService.updateDocument('messages', this.selectedMessage.id, this.selectedMessage);
+      this.dataService.addDocument('threadmessage', this.buildMessageData(msg)).then(() => {
+        this.threadService.setMessage(this.selectedMessage!);
+      });
+    }
+  }
+
+  showEmojiPicker(index: number) {
   
+    this.emojiPickerIndex = index;
+
+    this.emojiPickerOverlayRef = this.overlayService.openTemplateOverlay(
+      this.containerBody,
+      this.emojiPickerTemplate,
+      this.viewContainerRef
+    );
+
+    this.emojiPickerOverlayRef.backdropClick().subscribe(() => this.emojiPickerOverlayRef.dispose());
+  }
+
+  onSelectedEmoji(emojiStr: string) {
+    // debugger;
+    if (this.emojiPickerIndex == null) return;
+
+    const index = this.emojiPickerIndex;
+    const currentMessage = this.threadService.currentThreadMessages[index];
+    const currentUser = this.threadService.currentUser?.displayName ?? '';
+
+    if (!Array.isArray(currentMessage.reactions)) {
+      currentMessage.reactions = [];
+    }
+
+    const existingReaction = currentMessage.reactions.find(reaction => reaction.emojiStr === emojiStr);
+    if (existingReaction){
+      if (!existingReaction.user.includes(currentUser)) {
+        existingReaction.user.push(currentUser);
+      } else {
+        existingReaction.user.splice(existingReaction.user.indexOf(currentUser), 1);
+        if(existingReaction.user.length == 0) {
+          currentMessage.reactions.splice(currentMessage.reactions.indexOf(existingReaction), 1);
+        }
+      }
+    } else {
+      currentMessage.reactions.push({ emojiStr, user: [currentUser] });
+      
+    }
+    
+    if (currentMessage.id) {
+      this.dataService.updateDocument('threadmessage', currentMessage.id,
+        { reactions: currentMessage.reactions }).then(() => {
+          console.log(`Reaction updated successfully`);
+        });
+    } else {
+      console.error('currentMessage.id is undefined, cannot update document.');
+    }
+    this.emojiPickerOverlayRef?.dispose();
+
+  }
+
+  closeEmojiPickerOverlay() {
+    this.emojiPickerOverlayRef?.dispose();
+  }
+
+  editMessage(index: number) {
+    this.editingIndex = index;
+    if (!this.editingMode) {
+      this.editingMode = true
+    } else {
+      this.editingMode = false;
+    }
+    
+  }
+
+  breakEditing() {
+    this.editingIndex = null;
+    this.editingMode = false;
+  }
+
+  saveEditing(index: number, content: string) {
+    this.edittedMessage(content, index);
+    this.editingIndex = null;
+    this.editingMode = false;
+    
+  }
+  edittedMessage(content: string, index: number) {
+    this.threadService.currentThreadMessages[index].content = content;
+    this.threadService.currentThreadMessages[index].editedAt = Timestamp.now();
+    const messageId = this.threadService.currentThreadMessages[index].id;
+    if (typeof messageId === 'string') {
+      this.dataService.updateDocument('threadmessage', messageId,
+        { content: content, editedAt: Timestamp.now() }).then(() => {
+          console.log(`Message updated successfully`);
+      });
+    } else {
+      console.error('Message ID is undefined, cannot update document.');
+    }
   }
 
 }

@@ -144,7 +144,6 @@ export class InputComponent{
     const cursorPos = textarea.selectionStart;
     const text = this.inputMessage;
     this.inputMessage = text.slice(0, cursorPos) + '@' + text.slice(cursorPos);
-
     setTimeout(() => {
       textarea.focus();
       textarea.setSelectionRange(cursorPos + 1, cursorPos + 1);
@@ -157,7 +156,6 @@ export class InputComponent{
 
   onClickUser(u: User) {
     if (this.mentionStartIndex === null) return;
-
     const textarea = this.textareaRef.nativeElement;
     const cursorPos = textarea.selectionStart;
     const beforeMention = this.inputMessage.slice(0, this.mentionStartIndex);

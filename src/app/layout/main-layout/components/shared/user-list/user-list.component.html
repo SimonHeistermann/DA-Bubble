@@ -1,5 +1,5 @@
 <ngx-simplebar class="simple-bar" [ngStyle]="{'max-height': maxHeight}">
-    <div class="ul-list-container" >
+    <div class="ul-list-container" #listContainer>
         <ul>
             @for(u of dataSource; let index = $index; track $index) {
             

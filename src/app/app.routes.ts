@@ -90,6 +90,7 @@ export const routes: Routes = [
         children:[
           { path: 'channels/:channelId', component: MessageComponent },
           { path: 'users/:userId', component: MessageComponent },
+          { path: 'search', component: MessageComponent },
         ]}
     ]
   },
