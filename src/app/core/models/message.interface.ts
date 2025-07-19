@@ -35,7 +35,7 @@ export interface ThreadMessage {
 
 export interface ThreadReactions {
   emojiStr: string;
-  user: string;
+  user: string[];
 }
 
 export interface MessageReactions {
