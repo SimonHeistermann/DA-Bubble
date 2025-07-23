@@ -6,6 +6,7 @@ import { ChannelService } from '../channel.service';
 import { UserService } from '../user-service/user.service';
 import { AuthService } from '../auth-service/auth.service';
 import { FirebaseService } from '../firebase-service/firebase.service';
+import { DashboardResponsiveService } from '../dashboard-responsive/dashboard-responsive.service';
 import { User } from '../../models/user.interface';
 import { Subscription } from 'rxjs';
 import { forkJoin } from 'rxjs';
@@ -48,7 +49,8 @@ export class ThreadService {
     private channelService: ChannelService,
     private userService: UserService,
     private authService: AuthService,
-    private firebaseService: FirebaseService
+    private firebaseService: FirebaseService,
+    private dashboardResponsive: DashboardResponsiveService,
   ) {
   }
 
@@ -57,6 +59,7 @@ export class ThreadService {
   }
 
   show() {
+    this.dashboardResponsive.setOpenThread(true); 
     this.showThread.next(true);
     this.threadOpen = true;
   }
