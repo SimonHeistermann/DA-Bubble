@@ -10,7 +10,7 @@
     border-radius: 30px;
     background-color: #FFFFFF;
     height: calc(100vh - 136px);
-    z-index: 10;
+    z-index: 1;
     position: relative;
 
 
@@ -91,4 +91,11 @@
     
 }
 
+
+@media (max-width: 575px) {
+    .main-content {
+        height: calc(100vh - 94px);
+        border-radius: 0px;
+    }
+}
 

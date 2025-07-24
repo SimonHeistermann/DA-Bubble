@@ -9,7 +9,6 @@
     position: fixed;
     top: 0px;
     left: -98px;
-    border-top-right-radius: 30px;
     border-top-right-radius: 0px !important;
 
     .img-wrapper {
@@ -98,5 +97,25 @@
                 color: var(--white);
             }
         }
+    }
+}
+
+@media (max-width: 960px) {
+    .overlay-content {
+       width: 90%;
+       max-width: 380px;
+       top: auto;
+       bottom: auto;
+       border-top-right-radius: 30px !important;
+       left: auto;
+    }
+
+    .overlay-profile {
+        position: static !important;
+    }
+
+    .profile {
+        height: fit-content !important;
+        border-radius: 30px !important;
     }
 }

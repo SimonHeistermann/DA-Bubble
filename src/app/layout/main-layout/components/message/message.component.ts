@@ -21,6 +21,8 @@ import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
 import { ChannelService } from '../../../../core/services/channel.service';
 import { user } from '@angular/fire/auth';
 import { SearchMessageHeaderComponent } from './search-message-header/search-message-header.component';
+import { DashboardResponsiveService } from '../../../../core/services/dashboard-responsive/dashboard-responsive.service';
+import { MainLayoutContentComponent } from '../../main-layout-content/main-layout-content.component';
 
 
 
@@ -42,6 +44,7 @@ export class MessageComponent implements OnInit{
   
   userService = inject(UserService);
   channelService = inject(ChannelService);
+  mainLayoutContentComponent = inject(MainLayoutContentComponent);
   allUsers: User[] = [];
   allUsersWithOutCurrentUser: User[] = [];
   authService = inject(AuthService);
@@ -53,21 +56,21 @@ export class MessageComponent implements OnInit{
 
   showAddChannelUserOverlay = false;
   showUserListOverlay = false;
+  isTablet = false;
+  isMobile = false;
 
   route = inject(ActivatedRoute);
   router = inject(Router);
 
-  constructor() {
+  constructor(public dashboardResponsive: DashboardResponsiveService) {
    
   }
 
   ngOnInit(): void {
-    
     this.subscriptions.add(
       this.route.paramMap.subscribe(params => {
         const channelId = params.get('channelId');
         const userId = params.get('userId');
-        
         if (channelId) {
           this.loadChannel(channelId);
           this.messageUser = null;
@@ -76,13 +79,12 @@ export class MessageComponent implements OnInit{
           this.channel = null;
         } else {
            this.handleShowSearchField();
-        }
-      })
-    );
-  }
+        }}));
 
-  handleShowSearchField() {
-    
+     this.dashboardResponsive.isTablet$.subscribe(isTablet => { this.isTablet = isTablet;})
+     this.dashboardResponsive.isMobile$.subscribe(isMobile => { this.isMobile = isMobile;})}
+
+  handleShowSearchField() { 
     this.showHeader = 'new';
     this.messageUser = null;
     this.messageUser = null;

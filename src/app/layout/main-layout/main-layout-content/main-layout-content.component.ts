@@ -16,6 +16,8 @@ import { UserService } from '../../../core/services/user-service/user.service';
 import { filter, Subscription } from 'rxjs';
 import { ChannelService } from '../../../core/services/channel.service';
 import { Message } from '../../../core/models/message.interface';
+import { DashboardResponsiveService } from '../../../core/services/dashboard-responsive/dashboard-responsive.service';
+
 
 @Component({
   selector: 'app-main-layout-content',
@@ -26,6 +28,9 @@ import { Message } from '../../../core/models/message.interface';
 })
 export class MainLayoutContentComponent implements AfterViewInit, OnInit {
   @ViewChild('sidebar') sidebarRef!: SidebarComponent;
+  @ViewChild('message') messageRef!: ElementRef;
+  @ViewChild('thread') threadContentRef!: ThreadContentComponent;
+
 
   private subscriptions = new Subscription();
   route = inject(ActivatedRoute);
@@ -36,6 +41,9 @@ export class MainLayoutContentComponent implements AfterViewInit, OnInit {
 
   showSidebar = true;
   showAddChannelOverlay = false;
+  smallScreen = false;
+  isTablet = false;
+  isMobile = false;
   clickedChannel: Channel | null = null;
   clickedUser: User | null = null;
   firstUnreadMessageId: string = '';
@@ -48,10 +56,19 @@ export class MainLayoutContentComponent implements AfterViewInit, OnInit {
 
   router = inject(Router);
 
+  constructor(public dashboardResponsive: DashboardResponsiveService) {}
 
   ngOnInit() {
-
     this.subCurrentUser();
+    this.dashboardResponsive.smallScreen$.subscribe(smallScreen => {
+      this.smallScreen = smallScreen;
+    })
+    this.dashboardResponsive.isTablet$.subscribe(isTablet => {
+      this.isTablet = isTablet;
+    })
+    this.dashboardResponsive.isMobile$.subscribe(isMobile => {
+      this.isMobile = isMobile;
+    })
   }
 
   ngAfterViewInit(): void {
@@ -114,6 +131,9 @@ export class MainLayoutContentComponent implements AfterViewInit, OnInit {
   }
 
   toggleMenu() {
+    if (this.smallScreen) {
+    this.threadService.hide();
+    }
     this.showSidebar = !this.showSidebar;
   }
 
@@ -126,7 +146,7 @@ export class MainLayoutContentComponent implements AfterViewInit, OnInit {
   }
 
   onClickDevspace() {
-    
+
   }
 
   onLeaveChannel() {
@@ -134,7 +154,6 @@ export class MainLayoutContentComponent implements AfterViewInit, OnInit {
   }
 
   handleThreadMessage(message: any) {
-      console.log(`HandleThreadMessage called`, message);
       this.selectedMessage = message;
       console.log(this.selectedMessage);
       

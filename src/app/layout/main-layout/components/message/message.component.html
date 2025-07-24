@@ -1,4 +1,4 @@
-<main class="main-content">
+<main class="main-content" *ngIf="!isTablet || (isTablet && dashboardResponsive.openMain$ | async)" #messageContainer>
     <div class="container-head" [style.height.px]="showHeader == 'new' ? '140' : '80'">
         <div class="new-message-to" *ngIf="showHeader == 'new'">
             <app-search-message-header></app-search-message-header>
