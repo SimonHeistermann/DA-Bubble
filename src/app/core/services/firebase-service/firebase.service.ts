@@ -235,6 +235,24 @@ export class FirebaseService {
         }
     }
 
+    async getCollectionOncePromise(
+        collectionName: string,
+        ...queryConstraints: QueryConstraint[]
+      ): Promise<any[]> {
+        try {
+          const colRef = collection(this.firestore, collectionName);
+          const q = query(colRef, ...queryConstraints);
+          const snapshot = await getDocs(q);
+          return snapshot.docs.map(doc => ({
+            id: doc.id,
+            ...doc.data()
+          }));
+        } catch (error) {
+          console.error(`Error getting documents once from ${collectionName}:`, error);
+          throw error;
+        }
+      }      
+
     subscribeToDocument(
         collectionName: string,
         docId: string,
@@ -275,4 +293,5 @@ export class FirebaseService {
         const colRef = collection(this.firestore, collectionName);
         return query(colRef, ...constraints);
     }
+    
 }

@@ -3,7 +3,7 @@ import { collection, CollectionReference, doc, DocumentReference, onSnapshot, or
 import { Firestore } from "@angular/fire/firestore";
 import { Channel, ChannelData } from "../models/channel.interface";
 import { DataService } from "./data-service/data.service";
-import { catchError, from, Observable } from "rxjs";
+import { catchError, from, Observable, of } from "rxjs";
 import { Unsubscribe } from "firebase/auth";
 
 @Injectable({
@@ -52,6 +52,20 @@ export class ChannelService{
         return this.dataService.subscribeToCollection(this.CHANNEL_COL_NAME, callback, where('name', '==',  name)); 
     }
 
+    getChannelByNameOnce(name: string): Observable<Channel[]> {
+        return from(
+          this.dataService.getCollectionOncePromise(
+            'channels',
+            where('name', '==', name)
+          )
+        ).pipe(
+          catchError(error => {
+            console.error('Error loading channel by name once:', error);
+            return of([]);
+          })
+        );
+    }      
+
     getChannelById(id: string): Observable<Channel>{
         return from(
             this.dataService.getDocument(this.CHANNEL_COL_NAME, id)
@@ -62,5 +76,14 @@ export class ChannelService{
             })
         );
     }
+
+    getAllChannelsOnce(): Observable<Channel[]> {
+        return from(this.dataService.getCollectionOncePromise(this.CHANNEL_COL_NAME)).pipe(
+          catchError(error => {
+            console.error('Error loading all channels:', error);
+            return of([]);
+          })
+        );
+      }      
 
 }

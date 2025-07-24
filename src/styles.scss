@@ -130,8 +130,8 @@ input:focus, textarea:focus {
 
 
 .scrollbar__none {
-  scrollbar-width: none;  /* Firefox */
-  -ms-overflow-style: none; /* IE 10+ */
+  scrollbar-width: none; 
+  -ms-overflow-style: none;
   &::-webkit-scrollbar {
       display: none;
   }
@@ -151,7 +151,7 @@ input:focus, textarea:focus {
 .cdk-overlay-pane {
   font-family: inherit;
   backface-visibility: hidden;
-  transform: translateZ(0); // promote pane itself
+  transform: translateZ(0);
 }
 
 .mat-tooltip.custom__tooltip {

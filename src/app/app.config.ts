@@ -30,11 +30,7 @@ export const appConfig: ApplicationConfig = {
         ErrorInterceptor
       ])
     ),
-    provideFirebaseApp(() => initializeApp(firebaseConfig)), 
-    provideAuth(() => getAuth()), 
-    provideFirestore(() => getFirestore()), 
-    provideDatabase(() => getDatabase()), 
-    provideStorage(() => getStorage()),
-    provideAnimations(),
+    provideFirebaseApp(() => initializeApp(firebaseConfig)), provideAuth(() => getAuth()), provideFirestore(() => getFirestore()), provideDatabase(() => getDatabase()), provideStorage(() => getStorage()),
+    provideAnimations()
   ]
 };

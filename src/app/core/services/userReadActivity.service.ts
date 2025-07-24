@@ -1,7 +1,7 @@
 import {inject, Injectable } from "@angular/core";
 import { where } from "firebase/firestore";
 import { DataService } from "./data-service/data.service";
-import { catchError, from, Observable } from "rxjs";
+import { catchError, from, Observable, switchMap, of, pipe, map } from "rxjs";
 import { UserReadActivity, UserReadActivityData } from "../models/userReadActivity.interface";
 
 @Injectable({
@@ -12,7 +12,7 @@ export class UserChannelActivityService{
     dataService = inject(DataService);
 
     markMessageAsReadByCurrentUser(currentUserId: string, activityID: string) {
-        this.getUserReadActivityByIDsOnce(currentUserId, activityID, (data: any) => {
+        this.getUserReadActivityByIDsOnce(currentUserId, activityID, (data: UserReadActivity[]) => {
         const activities = [...data];
         if(activities.length === 1) {
             const userChannelActivity = activities[0];
@@ -67,4 +67,18 @@ export class UserChannelActivityService{
                 where('userID', '==', userID),
         ); 
     }
+
+    deleteActivitiesByUser(userId: string): Observable<void> {
+        return from(this.dataService.getCollectionOncePromise(this.COL_NAME)).pipe(
+          switchMap((activities: UserReadActivity[]) => {
+            const toDelete = activities.filter(a => a.userID === userId);
+            const deletes = toDelete.map(act => this.dataService.deleteDocument(this.COL_NAME, act.id));
+            return from(Promise.all(deletes)).pipe(map(() => void 0));
+          }),
+          catchError(error => {
+            console.error('Error deleting read activities by user:', error);
+            return of(void 0);
+          })
+        );
+      }      
 }

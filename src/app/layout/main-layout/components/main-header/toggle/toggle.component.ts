@@ -47,8 +47,8 @@ export class ToggleComponent {
   }
 
   logOut() {
-    this.authService.signOut();
-  }
+    this.authService.signOut().subscribe();
+  }  
 
 
 }
