@@ -1,7 +1,8 @@
 
 <div class="overlay-content">
- <span (click)="showProfile()">Profil</span>
- <span (click)="logOut()">Log out</span>
+ <img *ngIf="isMobile" src="/icons/rect.png" alt="">
+ <span (click)="showProfile()"><img *ngIf="isMobile" src="/icons/account_circle.png">Profil</span>
+ <span (click)="logOut()"><img *ngIf="isMobile" src="/icons/logout.png">Log out</span>
 </div>
-<app-actual-profile class="test" [showOverlay]="showProfileOverlay" (closeOverlayEmitter)="showProfileOverlay = false; 
+<app-actual-profile [showOverlay]="showProfileOverlay" (closeOverlayEmitter)="showProfileOverlay = false; 
 currentUserIndex = -1" [currentUser]="currentUser"></app-actual-profile>

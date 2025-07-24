@@ -71,7 +71,6 @@ section {
 
     .container-body-input {
         height: calc(100% - 80px);
-        // overflow: hidden;
         width: 100%;
         @include displayFlex($fd: column, $jc: flex-start, $ai: normal);
     }
@@ -79,7 +78,7 @@ section {
      .container-body {
             flex: 1;
             width: 100%;
-            // height: 100%;
+            height: 100%;
             overflow-y: scroll;
         }
         
@@ -363,3 +362,14 @@ section {
                 }
             }
 
+            @media (max-width: 575px) {
+                .main-container{
+                    margin-left: 0px !important;
+                     height: calc(100vh - 94px) !important;
+                }
+
+                section {
+                    height: 100%;
+                    border-radius: 0px;
+                }
+            }

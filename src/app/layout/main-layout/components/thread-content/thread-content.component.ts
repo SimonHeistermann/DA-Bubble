@@ -21,7 +21,7 @@ import { OverlayRef } from '@angular/cdk/overlay';
 import { OverlayService } from '../../../../core/services/overlay.service';
 import { ViewContainerRef } from '@angular/core';
 import { ProfileRefComponent } from "./profile-ref/profile-ref.component";
-import { object } from '@angular/fire/database';
+import { DashboardResponsiveService } from '../../../../core/services/dashboard-responsive/dashboard-responsive.service';
 
 @Component({
   selector: 'app-thread-content',
@@ -53,6 +53,10 @@ export class ThreadContentComponent {
 
   currentUserIndex = -1;
   emojis: {}[] = [];
+  smallScreen = false;
+  isTablet = false;
+  isMobile = false;
+
 
   emojiPickerOverlayRef!: OverlayRef;
   threadService = inject(ThreadService);
@@ -69,11 +73,21 @@ export class ThreadContentComponent {
   @ViewChild('containerBody') containerBody!: ElementRef;
   @ViewChild('emojiPickerTemplate') emojiPickerTemplate !: TemplateRef<any>;
 
+constructor(public dashboardResponsive: DashboardResponsiveService) {}
 
-  ngOnInit() {
+  ngOnInit() : void {
     this.threadService.message$.subscribe(msg => {
       this.selectedMessage = msg;
     });
+    this.dashboardResponsive.smallScreen$.subscribe(smallScreen => {
+      this.smallScreen = smallScreen;
+    })
+    this.dashboardResponsive.isTablet$.subscribe(isTablet => {
+      this.isTablet = isTablet;
+    })
+     this.dashboardResponsive.isMobile$.subscribe(isMobile => {
+      this.isMobile = isMobile;
+    })
   } 
 
   getReactionsArray(){
@@ -105,6 +119,7 @@ export class ThreadContentComponent {
 
   hideThreadContainer() {
     this.threadService.hide();
+    this.dashboardResponsive.setOpenMain(true);
   }
 
   buildMessageData(msg: string): ThreadMessage {
@@ -145,7 +160,6 @@ export class ThreadContentComponent {
   }
 
   onSelectedEmoji(emojiStr: string) {
-    // debugger;
     if (this.emojiPickerIndex == null) return;
 
     const index = this.emojiPickerIndex;

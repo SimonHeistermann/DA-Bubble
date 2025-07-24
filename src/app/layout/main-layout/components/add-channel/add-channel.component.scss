@@ -138,4 +138,13 @@ textarea:focus {
 }
 
 
+@media (max-width: 575px){
 
+    .content-scroll {
+        max-height: 100%;
+    }
+    
+    textarea {
+        height: 122px !important;
+    }
+}

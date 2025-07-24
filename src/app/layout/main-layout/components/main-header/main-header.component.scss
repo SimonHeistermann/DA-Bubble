@@ -32,6 +32,11 @@
     align-items: center;
     gap: 20px;
     cursor: pointer;
+    >span {
+        font-size: 2rem;
+        font-weight: 700;
+        white-space: nowrap;
+    }
 }
 
 .avatar {
@@ -48,4 +53,79 @@
     height: 14px;
     background-color: var(--green);
     border: 2px solid var(--white);
+}
+
+.mobile-nav {
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    gap: 2px;
+    :nth-child(1){
+        cursor: pointer;
+    }
+    >span {
+        font-size: 24px;
+        font-weight: 700;
+        margin-left: 10px;
+    }
+}
+
+
+@media (max-width: 1388px) {
+    .logo {
+        width: 18%;
+    }
+
+    .profile-container {
+        >span {
+            font-size: 1.8rem;
+        }
+    }
+}
+
+@media (max-width: 1180px) {
+  .profile-container {
+    gap: 14px;
+        >span {
+            font-size: 1.4rem;
+        }
+    }
+
+    .avatar {
+        height: 60px;
+    }
+}
+
+@media (max-width: 960px) {
+    .main-container {
+        justify-content: space-between;
+    }
+
+    .search-field {
+        display: none;
+    }
+    
+    .logo {
+        width: 10.20em;
+    }
+}
+
+@media (max-width: 730px) {
+     .main-container {
+        justify-content: space-around;
+    }
+}
+
+@media (max-width: 575px) {
+    .main-container {
+        justify-content: space-between;
+    }
+    .profile-container {
+        >span {
+            display: none;
+        }
+        :nth-child(3) {
+            display: none;
+        }
+    }
 }

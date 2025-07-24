@@ -1,7 +1,7 @@
 
-<div class="overlay" (click)="closeOverlay()" *ngIf="showOverlay" >
+<div class="overlay overlay-profile" (click)="closeOverlay()" *ngIf="showOverlay" >
     <div class="overlay-container">
-        <div class="overlay-content"  (click)="$event.stopPropagation()">
+        <div class="overlay-content profile"  (click)="$event.stopPropagation()">
             <div class="content-header">
                 <h3 class="content-title">Profile</h3>
                 <div class="close" (click)="closeOverlay()">

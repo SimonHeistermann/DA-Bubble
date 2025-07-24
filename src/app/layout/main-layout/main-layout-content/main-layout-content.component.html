@@ -1,24 +1,34 @@
 <section class="main-layout">
     <app-main-header></app-main-header>
     <div class="main-container">
-        <div class="side-bar" >
+        <div class="side-bar" [class.full-width]="isTablet" 
+        [class.d__none]="isTablet && ((dashboardResponsive.openMain$ | async) || (dashboardResponsive.openThread$ | async))"
+        [class.d__flex]="(dashboardResponsive.openSidebar$ | async)">
             <app-sidebar 
                 #sidebar
                 (addChannel)="onAddChannel()" 
                 (clickDevspaceEmiter)="onClickDevspace()"
-                [showSelf]="showSidebar">
+                [showSelf]="showSidebar"
+                [class.full-width]="isTablet"
+                [class.d__flex]="isTablet && ((dashboardResponsive.openSidebar$ | async) || (dashboardResponsive.openThread$ | async))"
+                [class.d__none]="isTablet && (dashboardResponsive.openMain$ | async)">
             </app-sidebar>
         </div>
-        <div class="message">
+        <div class="message" #message 
+                [class.d__none]="isTablet && ((dashboardResponsive.openSidebar$ | async) || (dashboardResponsive.openThread$ | async))"
+                [class.d__flex]="isTablet && (dashboardResponsive.openMain$ | async)">
                 <router-outlet></router-outlet>
         </div>
-        <app-thread-content 
+        <app-thread-content #thread 
+            [class.d__none]="isTablet && ((dashboardResponsive.openSidebar$ | async) || (dashboardResponsive.openMain$ | async))"
+            [class.d__flex]="isTablet && (dashboardResponsive.openThread$ | async)"
+            [class.full-width]="isTablet"
             [showSelf]="(threadService.showThread$ | async) ?? false"
              [selectedMessage]="selectedMessage"
             (threadMessageEmitter)="handleThreadMessage($event)"
             ></app-thread-content>
     </div>
-    <div class="overlay-bar" [ngClass]="{'show-menu': showSidebar, 'hide-menu': !showSidebar}" #overlay (click)="toggleMenu()">
+    <div *ngIf="!isTablet" class="overlay-bar" [ngClass]="{'show-menu': showSidebar, 'hide-menu': !showSidebar}" #overlay (click)="toggleMenu()">
         <img class="icon-show-menu">
     </div>
 </section>

@@ -82,3 +82,15 @@
         }
     }
 }
+
+@media (max-width: 1020px) {
+    .channel-message-alt {
+        justify-content: center;
+        >.channel-message-left-alt {
+            gap: 0;
+        }
+        >.channel-message-right-alt {
+            gap: 0;
+        }
+    }
+}

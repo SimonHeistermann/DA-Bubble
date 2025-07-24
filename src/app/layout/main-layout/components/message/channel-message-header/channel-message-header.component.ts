@@ -1,4 +1,5 @@
 import { AfterViewInit, Component, ElementRef, EventEmitter, inject, Input, OnInit, Output, SimpleChanges, TemplateRef, ViewChild, ViewContainerRef } from '@angular/core';
+import { CommonModule } from '@angular/common';
 import { AddChannelUserComponent } from './add-channel-user/add-channel-user.component';
 import { ChannelUserListComponent } from './channel-user-list/channel-user-list.component';
 import { UserService } from '../../../../../core/services/user-service/user.service';
@@ -9,10 +10,11 @@ import { OverlayService } from '../../../../../core/services/overlay.service';
 import { Channel } from '../../../../../core/models/channel.interface';
 import { EditChannelComponent } from './edit-channel/edit-channel.component';
 import { forkJoin, Subscription } from 'rxjs';
+import { ThreadService } from '../../../../../core/services/thread-service/thread.service';
 
 @Component({
   selector: 'app-channel-message-header',
-  imports: [AddChannelUserComponent, ChannelUserListComponent, EditChannelComponent],
+  imports: [AddChannelUserComponent, ChannelUserListComponent, EditChannelComponent, CommonModule],
   templateUrl: './channel-message-header.component.html',
   styleUrl: './channel-message-header.component.scss'
 })
@@ -29,6 +31,7 @@ export class ChannelMessageHeaderComponent implements AfterViewInit, OnInit {
   userListOverlayRef!: OverlayRef;
   editChannelOverlayRef!: OverlayRef;
   overlayService = inject(OverlayService);
+  threadService = inject(ThreadService);
   
   viewContainerRef = inject(ViewContainerRef);
   @Output() leaveChannelEmitter = new EventEmitter<void>();
