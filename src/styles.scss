@@ -201,4 +201,9 @@ app-message {
     right: auto !important;
     top: auto !important;
   }
+
+  .cdk-overlay-pane {
+    left: 0 !important;
+    width: 100% !important;
+  }
 }

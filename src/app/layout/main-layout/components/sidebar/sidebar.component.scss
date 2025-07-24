@@ -465,5 +465,14 @@
     .devspace{
         margin: 0px !important;
         border-radius: 0px !important;
+        >.devspace-wrapper {
+            >.devspace-content {
+                padding: 0px !important;
+            }
+        }
+    }
+
+    .edit_mobile {
+        right: 8px !important;
     }
 }

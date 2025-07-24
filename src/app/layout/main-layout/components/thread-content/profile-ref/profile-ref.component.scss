@@ -1,6 +1,7 @@
 
 @use './../../../../../../styles.scss' as *;
 @use './../../../../../../styles/overlay.scss' as *;
+@use './../../main-header/toggle/actual-profile/actual-profile.component.scss' as *;
 
 
 .overlay-content {
@@ -55,27 +56,32 @@
 
     }
 
-    .email-wrapper {
-        width: 100%;
-        @include displayFlex($g: 20px, $jc: flex-start);
+   .email-wrapper {
+            width: 100% !important;
+            @include displayFlex($fd: column, $g: 20px, $ai: flex-start);
 
-        .email-left {
-            height: 61px;
-            @include displayFlex($ai: flex-start);
-
+        .email-head {
+            width: 100% !important;
+            @include displayFlex($ai: center, $jc: flex-start, $g: 10px);
         }
 
-        .email-right {
-            @include displayFlex($g: 10px, $ai: flex-start, $fd: column);
-
+        .email-main {
+            @include displayFlex($g: 10px, $ai: flex-start, $jc: center, $fd: column);
+            width: 100% !important;
+            padding-left: 38px;
             >span {
                 font-size: 20px;
                 font-weight: 700;
             }
 
             >a {
+                width: 100% !important;
                 font-weight: 400;
                 font-size: 18px;
+                overflow-x: auto;
+            }
+            ::-webkit-scrollbar {
+                display: none;
             }
         }
 
@@ -93,5 +99,40 @@
                 color: var(--white);
             }
         }
+    }
+}
+
+    .mobile-version {
+     
+        top: auto !important;
+        left: auto !important;
+    }
+
+@media (max-width: 960px) {
+    .overlay-content {
+       width: 90%;
+       max-width: 380px;
+       top: auto;
+       bottom: auto;
+       border-top-right-radius: 30px !important;
+       left: auto;
+    }
+
+    .overlay-profile {
+        position: static !important;
+    }
+
+    .profile {
+        height: fit-content !important;
+        border-radius: 30px !important;
+    }
+}
+
+@media (max-width: 575px) {
+    .overlay-content {
+       width: 96% !important;
+       max-width: 380px !important;
+       height: unset !important;
+       border-radius: 30px !important;
     }
 }
