@@ -94,3 +94,18 @@
         }
     }
 }
+
+@media (max-width: 575px) {
+    .channel-message{
+     .channel-message-right{
+                 .logos-number {
+                    padding: 10px;
+                    height: 40px;
+                    width: 40px;
+                    .logos{
+                       display: none !important;
+                    }
+                 }
+        }
+    }
+}

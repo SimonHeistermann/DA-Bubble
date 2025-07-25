@@ -11,6 +11,7 @@ import { Channel } from '../../../../../core/models/channel.interface';
 import { EditChannelComponent } from './edit-channel/edit-channel.component';
 import { forkJoin, Subscription } from 'rxjs';
 import { ThreadService } from '../../../../../core/services/thread-service/thread.service';
+import {DashboardResponsiveService} from '../../../../../core/services/dashboard-responsive/dashboard-responsive.service';
 
 @Component({
   selector: 'app-channel-message-header',
@@ -35,6 +36,7 @@ export class ChannelMessageHeaderComponent implements AfterViewInit, OnInit {
   
   viewContainerRef = inject(ViewContainerRef);
   @Output() leaveChannelEmitter = new EventEmitter<void>();
+  @Output() closeOverlayEmitter = new EventEmitter<void>();
 
   @Input() channel: Channel | null = null;
   
@@ -44,12 +46,19 @@ export class ChannelMessageHeaderComponent implements AfterViewInit, OnInit {
 
   showAddChannelUserOverlay = false;
   showUserListOverlay = false;
+  isMobile = false;
 
   private subscriptions = new Subscription();
   userService = inject(UserService);
   allUsers: User[] = [];
   authService = inject(AuthService);
   currentUser: User | null = null;
+
+  constructor (private dashboardResponsive: DashboardResponsiveService) {
+    this.dashboardResponsive.isMobile$.subscribe(isMobile => {
+      this.isMobile = isMobile;
+    })
+  }
 
   ngOnInit() {
     this.subCurrentUser();

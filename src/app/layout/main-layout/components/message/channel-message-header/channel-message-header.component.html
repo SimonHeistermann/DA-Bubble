@@ -44,5 +44,6 @@
     <app-edit-channel 
     (closeEditChannelOverlayEmitter)="closeEditChannelOverlayByLeavingChannel($event)" 
     [currentChannel]="channel" 
-    [currentUser]="currentUser"></app-edit-channel>
+    [currentUser]="currentUser"
+    [class.full-width]="isMobile"></app-edit-channel>
 </ng-template>
