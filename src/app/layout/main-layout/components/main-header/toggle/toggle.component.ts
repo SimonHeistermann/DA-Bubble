@@ -1,10 +1,9 @@
-import { Component, Input, Inject } from '@angular/core';
+import { Component, Input, Inject, ViewChild, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { User } from '../../../../../core/models/user.interface';
-import { DIALOG_DATA } from '@angular/cdk/dialog';
+import { Dialog, DIALOG_DATA, DialogRef } from '@angular/cdk/dialog';
 import { ActualProfileComponent } from "./actual-profile/actual-profile.component";
 import { routes } from '../../../../../app.routes';
-import { NoAuthGuard } from '../../../../../core/guards/no-auth-guard/no-auth.guard';
 import { Router } from '@angular/router';
 import { AuthService } from '../../../../../core/services/auth-service/auth.service';
 import { DashboardResponsiveService } from '../../../../../core/services/dashboard-responsive/dashboard-responsive.service';
@@ -20,6 +19,9 @@ export class ToggleComponent {
 
   @Input() allChannelUsers: User[] = [];
   @Input() routes = routes;
+  @ViewChild(ActualProfileComponent) actualProfileComp!: ActualProfileComponent;
+  
+  // @Output() closeOverlayEmitter = new EventEmitter<void>();
 
   currentUser: User | null = null;
 
@@ -31,7 +33,8 @@ export class ToggleComponent {
   constructor( private router: Router, 
                private authService: AuthService, 
               @Inject(DIALOG_DATA) public data: { user: User },
-              public dashboardResponsive: DashboardResponsiveService
+              public dashboardResponsive: DashboardResponsiveService,
+              private dialogRef: DialogRef<{ action: string }>
   ) {
     this.currentUser = data.user;
     this.dashboardResponsive.isTablet$.subscribe(isTablet => {
@@ -47,6 +50,7 @@ export class ToggleComponent {
   }
 
   logOut() {
+    this.dialogRef.close({action: 'logout'});
     this.authService.signOut().subscribe();
   }  
 

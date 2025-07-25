@@ -107,6 +107,10 @@ export class InputComponent{
   }
 
   onTextareaKeyDown(event: KeyboardEvent) {
+    if (event.key === 'Enter' && !event.shiftKey) {
+      event.preventDefault();
+      this.sendMessage();
+    }
     
     if (event.key === 'Backspace' && this.mentionActive && this.mentionStartIndex !== null) {
       const cursorPos = this.textareaRef.nativeElement.selectionStart;

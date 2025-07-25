@@ -67,15 +67,26 @@ export class MainHeaderComponent implements OnDestroy {
   }
 
   showProfile( user: User) {
-  this.dialog.open(ToggleComponent, {
+  const dialogRef = this.dialog.open<{action: string}>(ToggleComponent, {
     data: { user },
     panelClass: 'profile-dialog',
   });
+  
+   dialogRef.closed.subscribe(result => {
+    if (result?.action === 'logout') {
+      this.closeProfile();
+    }
+  })
     this.showProfileOverlay = true;
   }
 
   navigateToMain(){
     this.dashboardResponsive.setOpenSidebar(true);
+  }
+
+  closeProfile() {
+    this.showProfileOverlay = false;
+    this.dialog.closeAll();
   }
 
 
