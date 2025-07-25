@@ -8,7 +8,7 @@
             <ul>
                 @for (user of filteredUsers; track user.id) {
                     <li (click)="clickUser(user)">
-                        <img [src]="user?.photoURL?.startsWith('http') ? '/icons/avatars/avatar_1.png' : user?.photoURL" alt="">
+                        <img [src]="user?.photoURL?.startsWith('http') ? 'icons/avatars/avatar_1.png' : user?.photoURL" alt="">
                         <h4>{{ user.displayName }}</h4>
                         <span>{{ user.email }}</span>
                     </li>
@@ -26,7 +26,7 @@
             <ul> 
                 @for (channel of filteredChannels; track channel.id) {
                     <li (click)="clickChannel(channel)">
-                        <img src="/icons/tag.png" alt="">
+                        <img src="images/icons/tag.png" alt="">
                         <h4>{{ channel.name }}</h4>
                         <span>
                             @if(channel.name == 'Allgemein'){

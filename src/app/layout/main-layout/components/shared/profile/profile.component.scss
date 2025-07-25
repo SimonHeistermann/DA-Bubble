@@ -75,14 +75,10 @@
             border-radius: 50px;
             padding: 12px 25px;
             @include displayFlex($g:10px);
-            >img {
-
-            }
+            
             >span {
                 color: var(--white);
             }
         }
     }
 }
-
-

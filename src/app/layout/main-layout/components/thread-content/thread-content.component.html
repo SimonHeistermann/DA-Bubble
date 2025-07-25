@@ -4,7 +4,7 @@
         <div class="thread-header">
             <div class="title">
                 <span>Thread</span>
-                <img src="/icons/tag_click.png">
+                <img src="images/icons/tag_click.png">
                 <p>{{ threadService.channel?.name }}</p>
             </div>
 
@@ -25,8 +25,8 @@
                     </div>
                     <div class="nerd-reacted-bar">
                         <div class="emoji" *ngFor="let reaction of getReactionsArray()">
-                            <img *ngIf="reaction.emoji === 'check-mark'" src="/icons/emojis/1.png">
-                            <img *ngIf="reaction.emoji === 'thumbs-up'" src="/icons/emojis/3.png">
+                            <img *ngIf="reaction.emoji === 'check-mark'" src="images/icons/emojis/1.png">
+                            <img *ngIf="reaction.emoji === 'thumbs-up'" src="images/icons/emojis/3.png">
                             <span *ngIf="reaction.emoji !== 'thumbs-up' && reaction.emoji !=='check-mark'">{{
                                 reaction.emoji }}</span>
                             <p> {{ reaction.users.length }} </p>
@@ -59,15 +59,15 @@
                             </div>
                             <div *ngIf="message.reactions.length > 0" class="nerd-reacted-bar">
                                 <div class="emoji" *ngFor="let reaction of message.reactions">
-                                    <img *ngIf="reaction.emojiStr == 'check-mark'" src="/icons/emojis/1.png">
-                                    <img *ngIf="reaction.emojiStr == 'thumbs-up'" src="/icons/emojis/3.png">
+                                    <img *ngIf="reaction.emojiStr == 'check-mark'" src="images/icons/emojis/1.png">
+                                    <img *ngIf="reaction.emojiStr == 'thumbs-up'" src="images/icons/emojis/3.png">
                                     <span
                                         *ngIf="reaction.emojiStr != 'thumbs-up' && reaction.emojiStr != 'check-mark'">{{
                                         reaction.emojiStr }}</span>
                                         <p> {{ reaction.user.length}} </p>
                                     <div class="reaction-hover">
-                                        <img *ngIf="reaction.emojiStr == 'check-mark'" src="/icons/emojis/1.png">
-                                        <img *ngIf="reaction.emojiStr == 'thumbs-up'" src="/icons/emojis/3.png">
+                                        <img *ngIf="reaction.emojiStr == 'check-mark'" src="images/icons/emojis/1.png">
+                                        <img *ngIf="reaction.emojiStr == 'thumbs-up'" src="images/icons/emojis/3.png">
                                         <span
                                             *ngIf="reaction.emojiStr != 'thumbs-up' && reaction.emojiStr != 'check-mark'">
                                             {{ reaction.emojiStr }}</span>
@@ -83,7 +83,7 @@
                         </div>
 
                         <div class="reaction-bar alter" style="right: 13px;">
-                            <img (click)="showEmojiPicker(i)" src="/icons/add_reaction_thread.png">
+                            <img (click)="showEmojiPicker(i)" src="images/icons/add_reaction_thread.png">
                         </div>
                     </div>
 
@@ -114,14 +114,14 @@
                             </div>
                             <div *ngIf="message.reactions.length > 0" class="nerd-reacted-bar">
                                 <div class="emoji" *ngFor="let reaction of message.reactions">
-                                    <img *ngIf="reaction.emojiStr == 'check-mark'" src="/icons/emojis/1.png">
-                                    <img *ngIf="reaction.emojiStr == 'thumbs-up'" src="/icons/emojis/3.png">
+                                    <img *ngIf="reaction.emojiStr == 'check-mark'" src="images/icons/emojis/1.png">
+                                    <img *ngIf="reaction.emojiStr == 'thumbs-up'" src="images/icons/emojis/3.png">
                                     <span *ngIf="reaction.emojiStr != 'thumbs-up' && reaction.emojiStr != 'check-mark'">
                                         {{ reaction.emojiStr }}</span>
                                     <p> {{ reaction.user.length }} </p>
                                     <div class="reaction-hover">
-                                        <img *ngIf="reaction.emojiStr == 'check-mark'" src="/icons/emojis/1.png">
-                                        <img *ngIf="reaction.emojiStr == 'thumbs-up'" src="/icons/emojis/3.png">
+                                        <img *ngIf="reaction.emojiStr == 'check-mark'" src="images/icons/emojis/1.png">
+                                        <img *ngIf="reaction.emojiStr == 'thumbs-up'" src="images/icons/emojis/3.png">
                                         <span *ngIf="reaction.emojiStr != 'thumbs-up' && reaction.emojiStr != 'check-mark'">
                                             {{ reaction.emojiStr }}</span>
                                            <div *ngIf="reaction.user.length > 1; else singleUser">
@@ -137,8 +137,8 @@
 
                         <div class="reaction-bar">
                             <img (mouseenter)="hideEditBar = false" (mouseleave)="hideEditBar = true"
-                                (click)="showEmojiPicker(i)" src="/icons/add_reaction_thread.png">
-                            <img (mouseenter)="hideEditBar = true" src="/icons/burger_icon.png">
+                                (click)="showEmojiPicker(i)" src="images/icons/add_reaction_thread.png">
+                            <img (mouseenter)="hideEditBar = true" src="images/icons/burger_icon.png">
                         </div>
                         <div *ngIf="hideEditBar && !editingMode" class="edit-bar">
                             <span (click)="editMessage(i)">Nachricht bearbeiten</span>

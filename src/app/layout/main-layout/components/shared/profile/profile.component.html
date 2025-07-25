@@ -9,7 +9,7 @@
                 </div>
             </div>
             <div class="img-wrapper">
-                <img [src]="currentUser?.photoURL?.startsWith('http') ? '/icons/avatars/avatar_1.png' : currentUser?.photoURL" alt="">
+                <img [src]="currentUser?.photoURL?.startsWith('http') ? 'images/icons/avatars/avatar_1.png' : currentUser?.photoURL" alt="">
             </div>
             <div class="name-wrapper">
                 <span>{{ currentUser?.displayName }}</span>
@@ -29,7 +29,7 @@
             </div>
             <div class="email-wrapper">
                 <div class="email-left">
-                    <img src="icons/mail.png" alt="">
+                    <img src="images/icons/mail.png" alt="">
                     
                 </div>
                 <div class="email-right">
@@ -39,7 +39,7 @@
             </div>
             <div class="footer">
                 <div class="button pointer">
-                    <img src="icons/message.png" alt="">
+                    <img src="images/icons/message.png" alt="">
                     <span>Nachricht</span>
                 </div>
             </div>

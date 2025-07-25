@@ -7,9 +7,9 @@
     <div class="channel-message-right">
         <div class="logos-number pointer" [class.active]="activeUserListButton" #userList  (click)="openUserListOverlay()">
             <div class="logos">
-                <img [src]="currentUser?.photoURL?.startsWith('http') ? '/icons/avatars/avatar_1.png' : currentUser?.photoURL">
+                <img [src]="currentUser?.photoURL?.startsWith('http') ? 'images/icons/avatars/avatar_1.png' : currentUser?.photoURL">
                 @for (user of allUsers.slice(0, 3); let index = $index; track $index) {
-                    <img [src]="user?.photoURL?.startsWith('http') ? '/icons/avatars/avatar_1.png' : user?.photoURL">
+                    <img [src]="user?.photoURL?.startsWith('http') ? 'images/icons/avatars/avatar_1.png' : user?.photoURL">
                 }
             </div>
             <span class="number">{{allUsers.length + 1}}</span>

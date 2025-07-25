@@ -3,7 +3,7 @@
     <section class="devspace-wrapper">
         <div class="devspace-head">
             <div class="dev-logo-cont">
-                <img src="/icons/devspaceIcon.png">
+                <img src="images/icons/devspaceIcon.png">
                 <span>Devspace</span>
             </div>
             <div class="pointer devspace-icon" (click)="clickDevspace()">
@@ -21,12 +21,12 @@
 
                             </div>
                             <div class="icon-title">
-                                <img class="channel-img" src="/icons/channels.png">
+                                <img class="channel-img" src="images/icons/channels.png">
                                 <span>Channels</span>
                             </div>
                             
                         </div>
-                        <img class="add-btn" src="/icons/add.png" (click)="clickAddChannel()">
+                        <img class="add-btn" src="images/icons/add.png" (click)="clickAddChannel()">
                     </div>
                     <div class="channel-names" [@toggleMarginTop25]="openChannel ? 'open' : 'closed'">
                         <ul>
@@ -65,7 +65,7 @@
                                 
                             </div>
                             <div class="icon-title">
-                                <img  class="account-img" src="/icons/account.png">
+                                <img  class="account-img" src="images/icons/account.png">
                                 <span>Direktnachrichten</span>
                             </div>
                         </div>
@@ -77,7 +77,7 @@
                                 <div class="li-content">
                                     <div class="li-content-left">
                                         <div class="avatar-div">
-                                            <img *ngIf="currentUser" [src]="currentUser.photoURL.startsWith('http') ? '/icons/avatars/avatar_1.png' : currentUser.photoURL">
+                                            <img *ngIf="currentUser" [src]="currentUser.photoURL.startsWith('http') ? 'images/icons/avatars/avatar_1.png' : currentUser.photoURL">
                                         
                                             @if(!currentUser?.isActive) {
                                                 <span class="active-status offline"></span>
@@ -100,7 +100,7 @@
                                         
                                         <div class="li-content-left">
                                             <div class="avatar-div">
-                                                <img [src]="user?.photoURL?.startsWith('http') ? '/icons/avatars/avatar_1.png' : user?.photoURL">
+                                                <img [src]="user?.photoURL?.startsWith('http') ? 'images/icons/avatars/avatar_1.png' : user?.photoURL">
                                                 @if(!user?.isActive) {
                                                     <span class="active-status offline"></span>
                                                 } @else {
