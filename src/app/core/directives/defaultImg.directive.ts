@@ -9,6 +9,6 @@ export class DefaultImgDirective {
   onError(img: HTMLImageElement) {
     console.log('img loading error');
     
-    img.src = '/icons/avatars/avatar_1.png';
+    img.src = 'images/icons/avatars/avatar_1.png';
   }
 }

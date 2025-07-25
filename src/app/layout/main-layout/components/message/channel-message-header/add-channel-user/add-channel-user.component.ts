@@ -179,6 +179,4 @@ export class AddChannelUserComponent implements OnDestroy {
 
     this.overlayRef.backdropClick().subscribe(() => this.closeOverlay());
   }
-
-   
 }

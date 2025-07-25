@@ -1,5 +1,3 @@
-
-
 @use './../../../../../styles.scss' as *;
 @use './../../../../../styles/overlay.scss' as *;
 
@@ -36,11 +34,11 @@ section {
 
     >img {
              cursor: pointer;
-             content: url('/icons/close.png'); 
+             content: url('/images/icons/close.png'); 
              border-radius: 50%;
              padding: 4px;
              &:hover {
-                  content: url('/icons/close_hover.png');
+                  content: url('/images/icons/close_hover.png');
                   transition: .35s ease-in-out;
                     background-color: var(--bg-color);
 
@@ -234,7 +232,7 @@ section {
         }
          >img:nth-child(1):hover {
                 background-color: var(--bg-color);
-                content: url('/icons/add_reaction_thread_hvr.png');
+                content: url('/images/icons/add_reaction_thread_hvr.png');
                 cursor: pointer;
             }
         &:hover {
@@ -360,7 +358,6 @@ section {
                     padding: 5px 10px;
                     border-radius: 10px;
                 }
-            }
 
             @media (max-width: 575px) {
                 .main-container{

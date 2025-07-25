@@ -290,7 +290,7 @@ export class GuestLoginService {
 
   private getRandomAvatar(): string {
     const num = Math.floor(Math.random() * 6) + 1;
-    return `/icons/avatars/avatar_${num}.png`;
+    return `images/icons/avatars/avatar_${num}.png`;
   }
 
   private cleanupGuestReferences(guest: GuestUser): Observable<void> {

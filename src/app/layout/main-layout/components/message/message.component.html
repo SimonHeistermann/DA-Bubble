@@ -9,7 +9,7 @@
         
         <div class="direct-message" *ngIf="showHeader == 'direct'">
             <div class="avatar-div">
-                <img *ngIf="messageUser" [src]="messageUser.photoURL.startsWith('http') ? '/icons/avatars/avatar_1.png' : messageUser.photoURL">
+                <img *ngIf="messageUser" [src]="messageUser.photoURL.startsWith('http') ? 'images/icons/avatars/avatar_1.png' : messageUser.photoURL">
                 
                 @if(!messageUser?.isActive) {
                     <span class="active-status offline"></span>

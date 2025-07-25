@@ -30,12 +30,12 @@ export class ChooseAvatarComponent implements OnInit, OnDestroy {
   private destroy$ = new Subject<void>();
 
   avatars: Avatar[] = [
-    { id: 'avatar_1', path: '/icons/avatars/avatar_1.png', alt: 'Avatar 1' },
-    { id: 'avatar_2', path: '/icons/avatars/avatar_2.png', alt: 'Avatar 2' },
-    { id: 'avatar_3', path: '/icons/avatars/avatar_3.png', alt: 'Avatar 3' },
-    { id: 'avatar_4', path: '/icons/avatars/avatar_4.png', alt: 'Avatar 4' },
-    { id: 'avatar_5', path: '/icons/avatars/avatar_5.png', alt: 'Avatar 5' },
-    { id: 'avatar_6', path: '/icons/avatars/avatar_6.png', alt: 'Avatar 6' }
+    { id: 'avatar_1', path: 'images/icons/avatars/avatar_1.png', alt: 'Avatar 1' },
+    { id: 'avatar_2', path: 'images/icons/avatars/avatar_2.png', alt: 'Avatar 2' },
+    { id: 'avatar_3', path: 'images/icons/avatars/avatar_3.png', alt: 'Avatar 3' },
+    { id: 'avatar_4', path: 'images/icons/avatars/avatar_4.png', alt: 'Avatar 4' },
+    { id: 'avatar_5', path: 'images/icons/avatars/avatar_5.png', alt: 'Avatar 5' },
+    { id: 'avatar_6', path: 'images/icons/avatars/avatar_6.png', alt: 'Avatar 6' }
   ];
 
   constructor(

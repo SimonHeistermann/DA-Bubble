@@ -1,11 +1,11 @@
 <div class="main-container">
     <img *ngIf="!isTablet || (isTablet && (dashboardResponsive.openSidebar$ | async))" 
-        class="logo" src="/icons/logo.png">
+        class="logo" src="images/icons/logo.png">
     <div *ngIf="isTablet && ((dashboardResponsive.openMain$ | async) || (dashboardResponsive.openThread$ | async))" 
                     (click)="navigateToMain()" 
                     class="mobile-nav">
-    <img src="/icons/arrow_left.png">
-    <img src="/icons/devspaceIcon.png">
+    <img src="images/icons/arrow_left.png">
+    <img src="images/icons/devspaceIcon.png">
     <span>Devspace</span>
     </div>
 
@@ -17,7 +17,7 @@
             <img src="{{ currentUser?.photoURL }}" class="avatar">
             <span class="show-status"></span>
         </div>
-        <img src="/icons/arrow-dwn.png">
+        <img src="images/icons/arrow-dwn.png">
     </div>
 
 </div>

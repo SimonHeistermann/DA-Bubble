@@ -70,18 +70,18 @@ textarea {
         @include displayFlex($g:5px);
        
         .emoji {
-            @include imgButton($wh: 40px, $url:'/icons/emoji.png');
+            @include imgButton($wh: 40px, $url:'/images/icons/emoji.png');
             &:hover {
-                background-image: url('/icons/emoji_hover.png');
+                background-image: url('/images/icons/emoji_hover.png');
             }
         }
     
 
     
         .at {
-            @include imgButton($wh: 40px, $url:'/icons/at.png');
+            @include imgButton($wh: 40px, $url:'/images/icons/at.png');
             &:hover {
-                background-image: url('/icons/at_hover.png');
+                background-image: url('/images/icons/at_hover.png');
             }
         }
     
@@ -89,9 +89,9 @@ textarea {
     }
 
     .send-button {
-        @include imgButton($wh: 23px, $url:'/icons/send.png');
+        @include imgButton($wh: 23px, $url:'/images/icons/send.png');
         &:hover {
-            background-image: url('/icons/send_hover.png');
+            background-image: url('/images/icons/send_hover.png');
         }
     }
 
