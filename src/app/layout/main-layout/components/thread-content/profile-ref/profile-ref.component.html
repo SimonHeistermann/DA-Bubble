@@ -1,7 +1,7 @@
 
 <div class="overlay" (click)="closeOverlay()" *ngIf="showOverlay" >
     <div class="overlay-container">
-        <div class="overlay-content"  (click)="$event.stopPropagation()">
+        <div class="overlay-content mobile-version"  (click)="$event.stopPropagation()">
             <div class="content-header">
                 <h3 class="content-title">Profile</h3>
                 <div class="close" (click)="closeOverlay()">
@@ -24,16 +24,13 @@
                         <span>Abwesend</span>
                     </div>
                 }
-               
-               
             </div>
-            <div class="email-wrapper">
-                <div class="email-left">
+             <div class="email-wrapper">
+                <div class="email-head">
                     <img src="images/icons/mail.png">
-                    
-                </div>
-                <div class="email-right">
                     <span>E-Mail-Addresse</span>
+                </div>
+                <div class="email-main">
                     <a href="mailto:{{currentUser?.email}}">{{currentUser?.email}}</a>
                 </div>
             </div>
@@ -43,7 +40,6 @@
                     <span>Nachricht</span>
                 </div>
             </div>
-            
         </div>
     </div>
 </div>

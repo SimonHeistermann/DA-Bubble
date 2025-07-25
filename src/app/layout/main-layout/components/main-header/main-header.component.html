@@ -1,5 +1,13 @@
 <div class="main-container">
-    <img src="images/icons/logo.png">
+    <img *ngIf="!isTablet || (isTablet && (dashboardResponsive.openSidebar$ | async))" 
+        class="logo" src="images/icons/logo.png">
+    <div *ngIf="isTablet && ((dashboardResponsive.openMain$ | async) || (dashboardResponsive.openThread$ | async))" 
+                    (click)="navigateToMain()" 
+                    class="mobile-nav">
+    <img src="images/icons/arrow_left.png">
+    <img src="images/icons/devspaceIcon.png">
+    <span>Devspace</span>
+    </div>
 
     <input type="text" class="search-field">
 

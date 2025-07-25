@@ -5,10 +5,11 @@ import { padding20Animation } from '../../../../animations/padding.animation';
 import { AutoResizeDirective } from '../../../../../../core/directives/auto-resize.directive';
 import { Channel } from '../../../../../../core/models/channel.interface';
 import { FormsModule } from '@angular/forms';
-import { Subscription } from 'rxjs';
+import { Observable, Subscription } from 'rxjs';
 import { UserService } from '../../../../../../core/services/user-service/user.service';
 import { User } from '../../../../../../core/models/user.interface';
 import { ChannelService } from '../../../../../../core/services/channel.service';
+import { DashboardResponsiveService } from '../../../../../../core/services/dashboard-responsive/dashboard-responsive.service';
 
 
 @Component({
@@ -27,6 +28,9 @@ export class EditChannelComponent implements OnChanges, OnDestroy {
 
   showChannelNameInput = false;
   showDescriptionInput = false;
+  showAddChannelUserOverlay = false;
+  activeAddChannelUserButton = false;
+  isMobile = false;
   channelName: string = '';
   channelDescription: string = '';
 
@@ -34,6 +38,18 @@ export class EditChannelComponent implements OnChanges, OnDestroy {
   userService = inject(UserService);
   channelService = inject(ChannelService);
   createdUser: User | null = null;
+  userMap: { [uId: string]: Observable<User | null> } = {};
+
+  constructor(public dashboardResponsive: DashboardResponsiveService) {
+    this.dashboardResponsive.isMobile$.subscribe(isMobile => {
+      this.isMobile = isMobile;
+    })
+    
+  }
+
+  ngOnInit() {
+    this.prepareAllUsers();
+  }
   
 
   ngOnChanges(changes: SimpleChanges): void {
@@ -50,6 +66,18 @@ export class EditChannelComponent implements OnChanges, OnDestroy {
         })
       }));
     }
+  }
+
+  prepareAllUsers() {
+    if (this.currentChannel?.userIDs) {
+     this.currentChannel.userIDs.forEach(uid => {
+       this.userMap[uid] = this.userService.getUserById(uid);
+     })
+    }
+  }
+
+  getUserById(uid: string) {
+    return this.userService.getUserById(uid);
   }
 
   updateChannel() {

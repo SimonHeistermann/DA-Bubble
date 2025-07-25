@@ -9,12 +9,15 @@ import { UserService } from '../../../../core/services/user-service/user.service
 import { ActivatedRoute, Router } from '@angular/router';
 import { SimplebarAngularModule } from 'simplebar-angular';
 import { CommonModule } from '@angular/common';
+import { MainLayoutContentComponent } from '../../main-layout-content/main-layout-content.component';
 import { MessageService } from '../../../../core/services/message.service';
 import { UserChannelActivityService } from '../../../../core/services/userReadActivity.service';
 import { UserReadActivity, UserReadActivityData } from '../../../../core/models/userReadActivity.interface';
 import { user } from '@angular/fire/auth';
 import { Message } from '../../../../core/models/message.interface';
 import { CommunicatorService } from '../message/search-message-header/search-message-header.component';
+import { ThreadService } from '../../../../core/services/thread-service/thread.service';
+import { DashboardResponsiveService } from '../../../../core/services/dashboard-responsive/dashboard-responsive.service';
 
 @Component({
   selector: 'app-sidebar',
@@ -28,6 +31,7 @@ import { CommunicatorService } from '../message/search-message-header/search-mes
 export class SidebarComponent implements OnInit, OnDestroy {
   @ViewChildren('channelItem') channelItems!: QueryList<ElementRef>;
   @ViewChildren('userItem') userItems!: QueryList<ElementRef>;
+  @ViewChild('devspace') devspaceItems!: ElementRef;
 
   route = inject(ActivatedRoute);
 
@@ -38,7 +42,9 @@ export class SidebarComponent implements OnInit, OnDestroy {
   messageService = inject(MessageService)
   userChannelActivityService = inject(UserChannelActivityService);
   communicator = inject(CommunicatorService);
+  threadService = inject(ThreadService);
   cdRef = inject(ChangeDetectorRef);
+  mainLayoutContentComponent = inject(MainLayoutContentComponent);
   
   channels: Channel[] = [];
   allUsers: User[] = [];
@@ -46,6 +52,9 @@ export class SidebarComponent implements OnInit, OnDestroy {
   currentUser: User | null = null;
   imgLoadStatus: Record<string, boolean> = {};
   isOverflowing = false;
+  smallScreen = false;
+  isTablet = false;
+  isMobile = false;
 
   @Input() showSelf: boolean = true;
   @Output() addChannel = new EventEmitter<void>();
@@ -63,10 +72,20 @@ export class SidebarComponent implements OnInit, OnDestroy {
 
   ngOnInit(): void {
     this.subCurrentUser();
-
     this.subChannelMessage();
     this.subUserMessage();
+    this.dashboardResponsive.smallScreen$.subscribe(smallScreen => {
+      this.smallScreen = smallScreen;
+    })
+    this.dashboardResponsive.isTablet$.subscribe(isTablet => {
+        this.isTablet = isTablet;
+    })
+    this.dashboardResponsive.isMobile$.subscribe(isMobile => {
+        this.isMobile = isMobile;
+    })
   }
+
+  constructor(public dashboardResponsive: DashboardResponsiveService) {}
 
   subChannelMessage() {
     this.communicator.channelMessage$.subscribe(channel => {
@@ -200,6 +219,7 @@ export class SidebarComponent implements OnInit, OnDestroy {
 
   
   clickDevspace() {
+    this.dashboardResponsive.setOpenMain(true);
      this.router.navigate(['/dashboard', 'search']);
   }
 
@@ -218,6 +238,7 @@ export class SidebarComponent implements OnInit, OnDestroy {
   }
 
   clickChannelName(index: number, channel: Channel) {
+    this.dashboardResponsive.setOpenMain(true);
     this.currentChannelIndex = index;
     this.currentUserIndex = -1;
     if (this.currentUser) {
@@ -227,6 +248,7 @@ export class SidebarComponent implements OnInit, OnDestroy {
   }
 
   clickUserName(index: number | 'currentUser', user: User | null) {
+    this.dashboardResponsive.setOpenMain(true);
     this.currentChannelIndex = -1;
     this.currentUserIndex = index;
     let id;

@@ -1,5 +1,5 @@
 
-<div class="add-channel-user-content overlay-content" @slideFadeIn (click)="$event.stopPropagation()">
+<div class="add-channel-user-content overlay-content mobile-version" @slideFadeIn (click)="$event.stopPropagation()">
     <div class="content-header">
         <h3 class="content-title">Leute hinzufügen</h3>
         <div class="close" (click)="closeOverlay()">
@@ -53,11 +53,25 @@
                 <div class="subtitle">Erstellt von</div>
                 <p class="createdby">
                     @if (currentChannel?.name === 'Allgemein') { 
-                        {{ currentChannel?.createdBy }}
+                        {{ createdUser?.displayName }}
                     } @else { 
                         {{ createdUser?.displayName }}
                     }
                 </p>
+            </div>
+        </div>
+        <div *ngIf="dashboardResponsive.isMobile$ | async" class="content-bottom" [class.no-border]="showDescriptionInput" [@padding20]="!showDescriptionInput ? 'open' : 'closed'">
+             <div class="createdby-wrapper">
+                <div class="subtitle">Mitglieder</div>
+               <div class="members-wrapper">
+                <div *ngFor="let member of currentChannel?.userIDs" class="member"> 
+                    <ng-container *ngIf="userMap[member] | async as user">
+                        <img src="{{ user?.photoURL }}" alt="">
+                        <p>{{ user?.displayName }}</p>
+                        <p *ngIf="user == currentUser">(Du)</p>
+                    </ng-container>
+                </div>
+               </div>
             </div>
         </div>
     </div>
@@ -67,5 +81,6 @@
             <button class="pointer active" (click)="clickLeaveChannel()">Channel verlasssen</button>
         </div>
     }
-   
 </div>
+
+

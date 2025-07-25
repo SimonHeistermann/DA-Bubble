@@ -1,18 +1,23 @@
-<section class="devspace" [@toggleMarginRight20]="showSelf ? 'open' : 'closed'">
+<section [class.full-width]="isTablet" 
+         [class.full-height]="isTablet" 
+        *ngIf="(smallScreen && !threadService.threadOpen) || !smallScreen || (isTablet && (dashboardResponsive.openSidebar$ | async))" class="devspace" 
+         [@toggleMarginRight20]="showSelf ? 'open' : 'closed'"> 
 
     <section class="devspace-wrapper">
-        <div class="devspace-head">
+        <div *ngIf="!isTablet; else search" class="devspace-head">
             <div class="dev-logo-cont">
                 <img src="images/icons/devspaceIcon.png">
                 <span>Devspace</span>
             </div>
-            <div class="pointer devspace-icon" (click)="clickDevspace()">
-
-            </div>
+            <div class="pointer devspace-icon" (click)="clickDevspace()"></div>
         </div>
+
+        <ng-template #search>  
+             <input type="text" class="search-field">
+        </ng-template>
+
         <ngx-simplebar class="devspace-content">
             
-        
             <div class="devlist-container">
                 <section>
                     <div class="devlist-head">
@@ -127,5 +132,5 @@
             </div>
         </ngx-simplebar>
     </section>
-
 </section>
+    <img *ngIf="isTablet" class="edit_mobile" (click)="clickDevspace()" src="/icons/edit_square_mobile.png">

@@ -83,6 +83,14 @@ input:focus, textarea:focus {
   display: flex !important;
 }
 
+.full-width {
+  width: 100% !important;
+}
+
+.full-height {
+  height: 100vh !important;
+}
+
 @mixin imgButton($wh:30px, $url) {
   background-image: url($url);
   width: $wh;
@@ -177,10 +185,25 @@ input:focus, textarea:focus {
 
 .profile-dialog {
    position: absolute !important;
-    top: 100px;
-    right: 300px;
+   top: 100px;
+   right: 300px;
 }
 
-.test {
-  width: 800px !important;
+app-message {
+  width: 100%;
+}
+
+@media (max-width: 575px) {
+  .profile-dialog {
+    width: 100%;
+    height: auto !important;
+    bottom: 0;
+    right: auto !important;
+    top: auto !important;
+  }
+
+  .cdk-overlay-pane {
+    left: 0 !important;
+    width: 100% !important;
+  }
 }

@@ -135,4 +135,14 @@ textarea {
 
 textarea:focus {
     border: 1px solid var(--purple-2) !important;
+
+@media (max-width: 575px){
+
+    .content-scroll {
+        max-height: 100%;
+    }
+    
+    textarea {
+        height: 122px !important;
+    }
 }

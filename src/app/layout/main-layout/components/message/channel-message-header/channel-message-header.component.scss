@@ -87,3 +87,30 @@
         }
     }
 }
+
+@media (max-width: 1020px) {
+    .channel-message-alt {
+        justify-content: center;
+        >.channel-message-left-alt {
+            gap: 0;
+        }
+        >.channel-message-right-alt {
+            gap: 0;
+        }
+    }
+}
+
+@media (max-width: 575px) {
+    .channel-message{
+     .channel-message-right{
+                 .logos-number {
+                    padding: 10px;
+                    height: 40px;
+                    width: 40px;
+                    .logos{
+                       display: none !important;
+                    }
+                 }
+        }
+    }
+}
