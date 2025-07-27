@@ -26,8 +26,10 @@
                         <li (click)="clickUser(user)">
                             <!-- <img [src]="user?.photoURL"> -->
                             <img class="avatar" src="/icons/avatars/avatar_1.png">
-                            <h4>{{ user.displayName }}</h4>
-                            <span>{{ user.email }}</span>
+                            <div class="user-info">
+                                <h4>{{ user.displayName }}</h4>
+                                <span>{{ user.email }}</span>
+                            </div>
                         </li>
                         } @empty {
                         Kein Nuzter gefunden.
@@ -57,10 +59,10 @@
                             </div>
                             <div class="msg-li-right">
                                 <div>
-                                     <h4>{{ findUserNameByID(message.authorID) }}</h4>
-                                     <span>{{ dateService.getGermanRelativeDateWithTime(message.createdAt)}}</span>
+                                    <h4>{{ findUserNameByID(message.authorID) }}</h4>
+                                    <span>{{ dateService.getGermanRelativeDateWithTime(message.createdAt)}}</span>
                                 </div>
-                               
+
                                 <p>{{ message.content}} </p>
                             </div>
 
@@ -78,8 +80,8 @@
                             </div>
                             <div class="msg-li-right">
                                 <div>
-                                <h4>{{ findUserNameByID(message.authorID) }}</h4>
-                                <span>{{ dateService.getGermanRelativeDateWithTime(message.createdAt)}}</span>
+                                    <h4>{{ findUserNameByID(message.authorID) }}</h4>
+                                    <span>{{ dateService.getGermanRelativeDateWithTime(message.createdAt)}}</span>
                                 </div>
                                 <p>{{ message.content}} </p>
                             </div>

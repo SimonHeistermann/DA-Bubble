@@ -69,12 +69,8 @@
 .filter-result {
     width: 100%;
     @include displayFlex($fd: column, $ai: center, $jc: flex-start, $g: 22px);
-    overflow-y: auto;
 }
 
-::-webkit-scrollbar {
-    display: none;
-}
 
 .filter-result-main {
     width: 100%;
@@ -83,8 +79,11 @@
 
     >ul {
         width: 100%;
-        @include displayFlex($fd: column, $g: 20px);
-
+        height: 572px;
+        @include displayFlex($fd: column, $g: 20px, $jc: flex-start);
+        overflow-y: auto;
+        padding-bottom: 20px;
+ 
         >li {
             width: 100%;
             @include displayFlex($fd: row, $ai: center, $jc: flex-start, $g: 10px);
@@ -108,7 +107,12 @@
                 background-color: var(--bg-color);
                 border-radius: 20px;
                 cursor: pointer;
-            }}}
+            }
+        }
+    }
+    ::-webkit-scrollbar {
+        display: none;
+    }
 }
 
 
@@ -151,12 +155,15 @@
                         font-size: 14px;
                         font-weight: 400;
                     }
-                }}
+                }
+            }
 
             &:hover {
                 background-color: var(--bg-color);
                 border-radius: 20px;
-            }}}
+            }
+        }
+    }
 }
 
 
@@ -166,10 +173,11 @@
         display: none !important;
     }
 
-    .search-container{
-       @include displayFlex($fd: column, $ai: center, $jc: center !important);
-       width: 100%;
+    .search-container {
+        @include displayFlex($fd: column, $ai: center, $jc: flex-start !important);
+        width: 100%;
     }
+   
 
     .devspace-wrapper {
         @include displayFlex($fd: column, $ai: center, $jc: normal);
@@ -195,7 +203,7 @@
 
 @media (max-width: 495px) {
     .filter-result-main {
-        padding: 0px 20px 42px 20px;
+        padding: 0px 12px 42px 0px;
 
         >ul {
             >li {
@@ -204,12 +212,17 @@
                 .avatar {
                     margin-right: 6px;
                 }
+
+                .user-info {
+                    flex-direction: column;
+                }
             }
         }
     }
 
     .filter-result-msg {
-        padding: 0px 20px 42px 20px;
+        // padding: 0px 20px 42px 20px;
+        margin: 0px 20px 42px 20px;
 
         >ul {
             >li {
