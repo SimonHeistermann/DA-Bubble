@@ -1,4 +1,5 @@
 @use './../../../../../styles.scss' as *;
+@use './search.scss' as *;
 
 .devspace {
     position: relative;
@@ -16,10 +17,8 @@
         position: absolute;
         top: 0;
         left: 0;
-
         width: 100%;
         height: calc(100% - 80px);
-        padding: 30px 0;
 
         .devspace-content {
             width: 100%;
@@ -30,7 +29,6 @@
     }
 }
 
-
 .devspace-head {
     padding: 0 30px;
     width: 100%;
@@ -38,10 +36,10 @@
     flex-direction: row;
     align-items: center;
     justify-content: space-between;
-    margin-bottom: 20px;
+    margin: 20px 0px;
 
     .devspace-icon {
-        @include imgButton($wh:40px, $url: '/icons/edit_square.png');
+        @include imgButton($wh: 40px, $url: '/icons/edit_square.png');
 
         &:hover {
             background-image: url('/icons/edit_square_hover.png');
@@ -85,8 +83,6 @@
                         position: center;
                         image: url('./../../../../../../public/icons/arrow_down.png');
                     }
-
-                    ;
                 }
 
                 .icon-title {
@@ -105,8 +101,6 @@
                         background: {
                             image: url('/icons/arrow_down_hover.png');
                         }
-
-                        ;
                     }
 
                     .channel-img {
@@ -123,8 +117,6 @@
                         background: {
                             image: url('/icons/arrow_down_click.png');
                         }
-
-                        ;
                     }
                 }
 
@@ -138,10 +130,6 @@
                             image: url('/icons/arrow_right.png');
 
                         }
-
-                        ;
-
-
                     }
 
                     &:hover {
@@ -151,8 +139,6 @@
                             background: {
                                 image: url('/icons/arrow_right_hover.png');
                             }
-
-                            ;
                         }
 
                         .channel-img {
@@ -172,20 +158,12 @@
                             background: {
                                 position: center;
                                 image: url('/icons/arrow_right_click.png');
-                            }
-
-                            ;
-                        }
-                    }
-                }
-            }
+                            }}}}}
 
             .add-btn {
                 &:hover {
                     content: url('/icons/add_hover.png');
-                }
-            }
-        }
+                }}}
 
         .channel-names {
             overflow: hidden;
@@ -215,18 +193,13 @@
                             width: 24px;
                             height: 24px;
                             background-image: url('/icons/add_circle.png');
-                        }
-
-                    }
-
+                        }}
                     &:hover {
                         color: var(--purple-3);
-
                         .add-btn-circle {
                             background-image: url('/icons/add_circle_hover.png') !important;
                         }
                     }
-
                     &:active,
                     &.active {
                         .add-btn-circle {
@@ -245,15 +218,17 @@
                         border-radius: 30px;
                         padding: 4px 20px;
                         @include displayFlex($jc: space-between, $g: 10px);
+
                         .tag-channel-name {
                             @include displayFlex($jc: flex-start, $g: 10px);
-                             .tag {
+
+                            .tag {
                                 width: 24px;
                                 height: 24px;
                                 background-image: url('/icons/tag.png');
                             }
                         }
-                       
+
                         .banner {
                             min-width: 24px;
                             height: 24px;
@@ -267,11 +242,13 @@
 
                         &:hover {
                             background-color: var(--bg-color);
+
                             .tag-channel-name {
-                               
+
                                 .tag {
                                     background-image: url('/icons/tag_hover.png');
                                 }
+
                                 .channel-name {
                                     font-weight: 700;
                                     color: var(--purple-3);
@@ -286,7 +263,7 @@
                             background-color: var(--bg-color);
 
                             .tag-channel-name {
-                               
+
                                 .tag {
                                     background-image: url('/icons/tag_click.png');
                                 }
@@ -333,10 +310,12 @@
                         border-radius: 20px;
                         padding: 4px 20px;
                         @include displayFlex($g: 15px, $jc: space-between);
+
                         .li-content-left {
                             @include displayFlex($g: 15px, $jc: flex-start);
+
                             .avatar-div {
-                                
+
                                 width: 50px;
                                 height: 50px;
                                 position: relative;
@@ -380,8 +359,6 @@
                             text-align: center;
                             line-height: 24px;
                         }
-
-                        
                     }
 
                     &.selected {
@@ -401,78 +378,5 @@
                 }
             }
         }
-    }
-
-
-}
-
-.devlist-head {
-    width: 100%;
-    display: flex;
-    flex-direction: row;
-    align-items: center;
-    justify-content: space-between;
-
-    >div {
-        display: flex;
-        flex-direction: row;
-        align-items: center;
-        gap: 10px;
-        cursor: pointer;
-    }
-
-    >img {
-        cursor: pointer;
-    }
-
-}
-
-.search-field {
-    background-color: #FFFFFF !important;
-    @include displayFlex($fd: row, $ai: center);
-    border: 1px solid #ADB0D9;
-    padding: 17.5px 45px;
-    width: 94%;
-    max-width: 989px;
-    height: 70px;
-    border-radius: 42px;
-    font-size: 24px;
-    margin: 30px 0px;
-    background: url('/icons/search.png') no-repeat scroll right 20px center;
-
-    &:focus {
-        outline: none;
-    }
-}
-
-.edit_mobile {
-    position: absolute;
-    bottom: 16px;
-    right: 78px;
-    height: 6em;
-    width: 6em;
-    cursor: pointer;
-}
-
-@media (max-width: 960px) {
-   .devspace-wrapper {
-    padding: 0px !important;
-    @include displayFlex($fd: column, $ai: center, $jc: normal);
-   }
-}
-
-@media (max-width: 575px) {
-    .devspace{
-        margin: 0px !important;
-        border-radius: 0px !important;
-        >.devspace-wrapper {
-            >.devspace-content {
-                padding: 0px !important;
-            }
-        }
-    }
-
-    .edit_mobile {
-        right: 8px !important;
     }
 }
