@@ -324,6 +324,18 @@ export class SidebarComponent implements OnInit, OnDestroy {
     }
   }
 
+  findUserPhotoUrlByID(id: string) {
+    const user = this.allUsers?.find(u => id == u.id);
+    if (user) {
+      return user.photoURL;
+    } else {
+      if(id == this.currentUser?.id) {
+        return this.currentUser.photoURL;
+      } else {
+        return '';
+      }
+    }
+  }
 
   renewSubscriptions() {
     this.subscriptions.unsubscribe();

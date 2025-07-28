@@ -24,8 +24,7 @@
                     <ul>
                         @for (user of filteredUsers; track user.id) {
                         <li (click)="clickUser(user)">
-                            <!-- <img [src]="user?.photoURL"> -->
-                            <img class="avatar" src="/icons/avatars/avatar_1.png">
+                            <img [src]="user?.photoURL">
                             <div class="user-info">
                                 <h4>{{ user.displayName }}</h4>
                                 <span>{{ user.email }}</span>
@@ -55,7 +54,8 @@
                         @for (message of filteredPrivateMessages; track $index) {
                         <li class="msg-li">
                             <div class="msg-li-left">
-                                <img src="/icons/avatars/avatar_1.png">
+                                <!-- <img src="/icons/avatars/avatar_1.png"> -->
+                                <img [src]="findUserPhotoUrlByID(message.authorID)">
                             </div>
                             <div class="msg-li-right">
                                 <div>
@@ -76,7 +76,8 @@
                         @for (message of filteredChannelMessages; track $index) {
                         <li class="msg-li">
                             <div class="msg-li-left">
-                                <img src="/icons/avatars/avatar_1.png">
+                                <!-- <img src="/icons/avatars/avatar_1.png"> -->
+                                <img [src]="findUserPhotoUrlByID(message.authorID)">
                             </div>
                             <div class="msg-li-right">
                                 <div>
