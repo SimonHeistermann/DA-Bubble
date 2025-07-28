@@ -11,6 +11,7 @@ import { SuccessNotificationComponent } from '../notifications/success-notificat
 import { ErrorNotificationComponent } from '../notifications/error-notification/error-notification.component';
 import { NotificationService } from '../../../../core/services/notification-service/notification.service';
 
+
 @Component({
   selector: 'app-choose-avatar',
   standalone: true,
