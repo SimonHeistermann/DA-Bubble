@@ -36,7 +36,7 @@
                 background-image: url('/images/icons/tag_click.png');
             }
             .arrow-down {
-                background-image: url('/icons/arrow_down1_hover.png');
+                background-image: url('/images/icons/arrow_down1_hover.png');
             }
         }
     }   
@@ -44,7 +44,7 @@
     .channel-message-right {
         position: relative;
         @include displayFlex($g: 10px);
-        
+
         .logos-number {
             border-radius: 30px;
             padding: 5px 10px 5px 20px;

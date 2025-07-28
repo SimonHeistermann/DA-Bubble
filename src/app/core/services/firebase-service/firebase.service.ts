@@ -25,7 +25,6 @@ export class FirebaseService {
         this.googleProvider.setCustomParameters({
             prompt: 'select_account'
         });
-        console.log('🔥 Firebase Core Service initialized');
     }
 
     // ==================== AUTH METHODS ====================

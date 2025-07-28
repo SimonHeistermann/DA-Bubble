@@ -97,6 +97,8 @@ app-main-header {
     width: 74%;
     margin-left: auto;
     transition: width 0.1s;
+
+}
   
 @media (max-width: 960px) {
     .main-layout{
@@ -114,4 +116,4 @@ app-main-header {
         padding: 20px 0px 0px 0px;
         gap: 8px;
     }
-  }
+}
