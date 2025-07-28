@@ -1,5 +1,6 @@
-import { AfterViewInit, ChangeDetectorRef, Component, ElementRef, EventEmitter, inject, Input, OnDestroy, OnInit, Output, QueryList, ViewChild, ViewChildren } from '@angular/core';
-import { Subscription, take } from 'rxjs';
+import {  ChangeDetectorRef, Component, ElementRef, EventEmitter, inject, Input, OnDestroy, OnInit, Output, QueryList, ViewChild, ViewChildren } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import { Subscription } from 'rxjs';
 import { ChannelService } from '../../../../core/services/channel.service';
 import { Channel } from '../../../../core/models/channel.interface';
 import { toggleMarginRight20Animation, toggleMarginTop25Animation } from '../../animations/expand-collapse.animation';
@@ -12,19 +13,19 @@ import { CommonModule } from '@angular/common';
 import { MainLayoutContentComponent } from '../../main-layout-content/main-layout-content.component';
 import { MessageService } from '../../../../core/services/message.service';
 import { UserChannelActivityService } from '../../../../core/services/userReadActivity.service';
-import { UserReadActivity, UserReadActivityData } from '../../../../core/models/userReadActivity.interface';
-import { user } from '@angular/fire/auth';
+import { UserReadActivity } from '../../../../core/models/userReadActivity.interface';
 import { Message } from '../../../../core/models/message.interface';
+import { DateService } from '../../../../core/services/date.service';
 import { CommunicatorService } from '../message/search-message-header/search-message-header.component';
 import { ThreadService } from '../../../../core/services/thread-service/thread.service';
 import { DashboardResponsiveService } from '../../../../core/services/dashboard-responsive/dashboard-responsive.service';
 
 @Component({
   selector: 'app-sidebar',
-  imports: [SimplebarAngularModule, CommonModule],
+  imports: [SimplebarAngularModule, CommonModule, FormsModule],
   standalone: true,
   templateUrl: './sidebar.component.html',
-  styleUrl: './sidebar.component.scss',
+  styleUrls: ['./sidebar.component.scss', './search.scss'],
   animations: [toggleMarginTop25Animation, toggleMarginRight20Animation],
 
 })
@@ -32,6 +33,7 @@ export class SidebarComponent implements OnInit, OnDestroy {
   @ViewChildren('channelItem') channelItems!: QueryList<ElementRef>;
   @ViewChildren('userItem') userItems!: QueryList<ElementRef>;
   @ViewChild('devspace') devspaceItems!: ElementRef;
+  @ViewChild('input') input!: ElementRef;
 
   route = inject(ActivatedRoute);
 
@@ -44,17 +46,32 @@ export class SidebarComponent implements OnInit, OnDestroy {
   communicator = inject(CommunicatorService);
   threadService = inject(ThreadService);
   cdRef = inject(ChangeDetectorRef);
+  dateService = inject(DateService);
+  dashboardResponsive = inject(DashboardResponsiveService);
   mainLayoutContentComponent = inject(MainLayoutContentComponent);
   
+
+  inputContent: string = ''
   channels: Channel[] = [];
   allUsers: User[] = [];
   userChannelActivities: UserReadActivity[] = [];
   currentUser: User | null = null;
   imgLoadStatus: Record<string, boolean> = {};
+
+  allChannel: Channel[]  = [];
+  allChannelMessages: Message[] = [];
+  allPrivateMessages: Message[] = [];
+  filteredUsers: User[] = [];
+  filteredChannels: Channel[] = [];
+  filteredPrivateMessages: Message[] = []
+  filteredChannelMessages: Message[] = []
+
+  showList = false;
   isOverflowing = false;
   smallScreen = false;
   isTablet = false;
   isMobile = false;
+  searchBreakpoint = false;
 
   @Input() showSelf: boolean = true;
   @Output() addChannel = new EventEmitter<void>();
@@ -76,6 +93,10 @@ export class SidebarComponent implements OnInit, OnDestroy {
     this.subUserMessage();
     this.dashboardResponsive.smallScreen$.subscribe(smallScreen => {
       this.smallScreen = smallScreen;
+      this.showList = false;
+      this.inputContent = '';
+      this.input.nativeElement.placeholder = '';
+      this.cdRef.detectChanges();
     })
     this.dashboardResponsive.isTablet$.subscribe(isTablet => {
         this.isTablet = isTablet;
@@ -83,9 +104,10 @@ export class SidebarComponent implements OnInit, OnDestroy {
     this.dashboardResponsive.isMobile$.subscribe(isMobile => {
         this.isMobile = isMobile;
     })
+    this.dashboardResponsive.searchBreakpoint$.subscribe(searchBreakpoint => {
+      this.searchBreakpoint = searchBreakpoint;
+    })
   }
-
-  constructor(public dashboardResponsive: DashboardResponsiveService) {}
 
   subChannelMessage() {
     this.communicator.channelMessage$.subscribe(channel => {
@@ -205,11 +227,11 @@ export class SidebarComponent implements OnInit, OnDestroy {
 
   subAllChannels() {
     if(!this.currentUser) return;
-    
     this.subscriptions.add(
       this.channelService.getChannelsOrderByCreatedAt(this.currentUser.id, (data) => {
         this.channels = [...data];
-        
+        this.subAllChannelMessages()
+        this.subAllPrivateMessages()
         if (this.channels.length > 0) {
           this.clickChannelNameEmitter.emit(this.channels[this.currentChannelIndex]);
         }
@@ -217,7 +239,34 @@ export class SidebarComponent implements OnInit, OnDestroy {
     );
   }
 
-  
+
+  subAllChannelMessages() {
+    if(!this.currentUser) return;
+    this.allChannelMessages = [];
+    for (let index = 0; index < this.channels.length; index++) {
+      let c = this.channels[index]
+      this.subscriptions.add(
+        this.messageService.getChannelMessageOrderByCreatedAt(c.id, (data) => {
+          this.allChannelMessages = this.allChannelMessages.concat([...data])
+        })
+      );
+    }
+  }
+
+  subAllPrivateMessages() {
+    if(!this.currentUser) return;
+    this.allPrivateMessages = [];
+    for (let index = 0; index < this.allUsers.length; index++) {
+      const user = this.allUsers[index];
+      const userID = user.id;
+      this.subscriptions.add(
+        this.messageService.getPrivateMessageOrderByCreatedAt(this.messageService.buildConversationID(this.currentUser.id, userID), (data) => {
+          this.allPrivateMessages = this.allPrivateMessages.concat([...data])
+      }));
+      
+    }
+  }
+
   clickDevspace() {
     this.dashboardResponsive.setOpenMain(true);
      this.router.navigate(['/dashboard', 'search']);
@@ -261,6 +310,33 @@ export class SidebarComponent implements OnInit, OnDestroy {
     this.router.navigate(['/dashboard', 'users', id]);
   }
 
+
+  findUserNameByID(id: string) {
+    const user = this.allUsers?.find(u => id == u.id);
+    if (user) {
+      return user.displayName;
+    } else {
+      if(id == this.currentUser?.id) {
+        return this.currentUser.displayName;
+      } else {
+        return '';
+      }
+    }
+  }
+
+  findUserPhotoUrlByID(id: string) {
+    const user = this.allUsers?.find(u => id == u.id);
+    if (user) {
+      return user.photoURL;
+    } else {
+      if(id == this.currentUser?.id) {
+        return this.currentUser.photoURL;
+      } else {
+        return '';
+      }
+    }
+  }
+
   renewSubscriptions() {
     this.subscriptions.unsubscribe();
     this.subscriptions = new Subscription();
@@ -270,4 +346,119 @@ export class SidebarComponent implements OnInit, OnDestroy {
     this.subscriptions.unsubscribe();
   }
 
+  clickUser(user: User){ 
+    this.clearFilter();
+    this.communicator.sendUserMessage(user);
+    if(user && this.currentUser) {
+      this.userChannelActivityService.markMessageAsReadByCurrentUser(this.currentUser?.id, user.id);
+    } 
+    this.dashboardResponsive.setOpenMain(true);
+    this.router.navigate(['/dashboard', 'users', user.id]);
+  }
+
+  clickChannel(channel: Channel) {
+    this.clearFilter();
+    this.communicator.sendChannelMessage(channel);
+    
+    if (this.currentUser) {
+       this.userChannelActivityService.markMessageAsReadByCurrentUser(this.currentUser?.id, channel.id);
+    }
+    this.dashboardResponsive.setOpenMain(true);
+    this.router.navigate(['/dashboard', 'channels', channel.id]);
+  }
+
+
+   clearFilter() {
+    this.filteredChannelMessages = [];
+    this.filteredPrivateMessages = [];
+    this.filteredUsers = [];
+    this.filteredChannels = [];
+    this.showList = false;
+    this.inputContent = ''
+  }
+
+  filterUsers(value: string) {
+    this.filteredChannels = [];
+    this.filteredChannelMessages = [];
+    this.filteredPrivateMessages = [];
+
+    if (value == '@') {
+      this.filteredUsers = this.allUsers;
+    } else {
+      const search = value.slice(1).toLowerCase(); // remove '@'
+      this.filteredUsers = this.allUsers?.filter(user =>
+        user.displayName.toLowerCase().includes(search)
+      ) || [];
+    }
+  }
+
+  filterChannel(value: string) {
+    this.filteredUsers = [];
+    this.filteredChannelMessages = [];
+    this.filteredPrivateMessages = [];
+     if (value == '#') {
+      this.filteredChannels = this.channels;
+    } else {
+    const search = value.slice(1).toLowerCase(); // remove '#'
+    this.filteredChannels = this.channels?.filter(channel =>
+      channel.name.toLowerCase().includes(search)
+    ) || [];
+  }
+  }
+
+  filterByAll(value: string) {
+    this.filteredChannels = [];
+    this.filteredUsers = [];
+    this.filteredChannelMessages = []
+    this.filteredPrivateMessages = []
+
+    this.filteredUsers = this.allUsers?.filter(user =>
+      user.email.toLowerCase().includes(value)
+    ) || [];
+
+    this.filteredChannels = this.channels?.filter(channel =>
+      channel.name.toLowerCase().includes(value)
+    ) || [];
+
+    this.filterPrivateMessage(value);
+    this.filterChannelMessage(value);
+  }
+
+  filterPrivateMessage(value: string) {
+    this.filteredPrivateMessages = this.allPrivateMessages?.filter(message =>
+      message.content.toLowerCase().includes(value)
+    ) || [];
+  }
+
+  filterChannelMessage(value: string) {
+     this.filteredChannelMessages = this.allChannelMessages?.filter(message =>
+      message.content.toLowerCase().includes(value)
+    ) || [];
+  }
+
+
+  inputText() {
+    const value = this.inputContent.trim();
+
+    if (!value) {
+      this.showList = false;
+      return;
+    }
+    
+    this.showList = true;
+    if (value.startsWith('@')) {
+      this.filterUsers(value);
+    } else if (value.startsWith('#')) {
+      this.filterChannel(value);
+    } else {
+            this.filterByAll(value);
+    }
+  }
+
+  closeSearch() {
+    this.showList = false;
+    this.inputContent = '';
+  }
+
 }
+

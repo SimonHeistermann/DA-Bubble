@@ -10,6 +10,7 @@ export class DashboardResponsiveService {
   private smallScreen = new BehaviorSubject<boolean>(false);
   private isMobile = new BehaviorSubject<boolean>(false);
   private isTablet = new BehaviorSubject<boolean>(false);
+  private searchBreakpoint = new BehaviorSubject<boolean>(false);
 
   private openMain = new BehaviorSubject<boolean>(false);
   private openSidebar = new BehaviorSubject<boolean>(true);
@@ -18,6 +19,7 @@ export class DashboardResponsiveService {
   smallScreen$ = this.smallScreen.asObservable();
   isTablet$ = this.isTablet.asObservable();
   isMobile$ = this.isMobile.asObservable();
+  searchBreakpoint$ = this.searchBreakpoint.asObservable(); 
 
   openMain$ = this.openMain.asObservable();
   openSidebar$ = this.openSidebar.asObservable();
@@ -32,6 +34,10 @@ export class DashboardResponsiveService {
     this.breakpointObserver.observe(['(max-width: 1024px)']).subscribe(result => {
       this.isTablet.next(result.matches);
     });
+
+    this.breakpointObserver.observe(['(max-width: 960px)']).subscribe(result =>{
+      this.searchBreakpoint.next(result.matches);
+    })
 
     this.breakpointObserver.observe(['(max-width: 575px)']).subscribe(result => {
       this.isMobile.next(result.matches);

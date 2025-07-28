@@ -1,0 +1,234 @@
+@use './../../../../../styles.scss' as *;
+
+
+.devlist-head {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+
+    >div {
+        display: flex;
+        flex-direction: row;
+        align-items: center;
+        gap: 10px;
+        cursor: pointer;
+    }
+
+    >img {
+        cursor: pointer;
+    }
+
+}
+
+.search-field {
+    background-color: #FFFFFF !important;
+    @include displayFlex($fd: row, $ai: center);
+    border: 1px solid #ADB0D9;
+    padding: 17.5px 45px;
+    width: 94%;
+    max-width: 989px;
+    height: 70px;
+    border-radius: 42px;
+    font-size: 24px;
+    margin: 30px 0px;
+    background: url('/icons/search.png') no-repeat scroll right 20px center;
+
+    &:focus {
+        outline: none;
+    }
+}
+
+.search-overhead {
+    width: 100%;
+    @include displayFlex($fd: row, $ai: center, $jc: space-between);
+    margin: 20px 0px;
+    padding: 0px 30px 15px 30px;
+    box-shadow: 0px 10px 10px -10px #00000014;
+
+    >p {
+        font-size: 18px;
+        font-weight: 700;
+    }
+
+    >img {
+        cursor: pointer;
+    }
+}
+
+.edit_mobile {
+    position: absolute;
+    bottom: 16px;
+    right: 78px;
+    height: 6em;
+    width: 6em;
+    cursor: pointer;
+}
+
+.filter-result {
+    width: 100%;
+    @include displayFlex($fd: column, $ai: center, $jc: flex-start, $g: 22px);
+}
+
+
+.filter-result-main {
+    width: 100%;
+    padding: 0px 42px 42px 42px;
+    @include displayFlex($fd: column, $ai: center, $g: 22px);
+
+    >ul {
+        width: 100%;
+        height: 572px;
+        @include displayFlex($fd: column, $g: 20px, $jc: flex-start);
+        overflow-y: auto;
+        padding-bottom: 20px;
+ 
+        >li {
+            width: 100%;
+            @include displayFlex($fd: row, $ai: center, $jc: flex-start, $g: 10px);
+            min-height: 70px;
+            padding: 10px 0px 10px 12px;
+
+            .avatar {
+                width: 50px;
+                height: 50px;
+                border-radius: 50%;
+                margin-right: 18px;
+            }
+
+            >span {
+                font-size: 15px;
+                font-weight: 500;
+                color: var(--grey);
+            }
+
+            &:hover {
+                background-color: var(--bg-color);
+                border-radius: 20px;
+                cursor: pointer;
+            }
+        }
+    }
+    ::-webkit-scrollbar {
+        display: none;
+    }
+}
+
+
+.filter-result-msg {
+    width: 100%;
+    padding: 0px 42px 42px 42px;
+    @include displayFlex($fd: column, $ai: center, $g: 22px);
+
+    >ul {
+        width: 100%;
+        @include displayFlex($fd: column, $g: 20px, $ai: flex-start, $jc: center);
+
+        >li {
+            width: 100%;
+            @include displayFlex($fd: row, $ai: center, $jc: flex-start, $g: 28px);
+            padding: 10px 0px 10px 12px;
+
+            .msg-li-left {
+                >img {
+                    width: 50px;
+                    height: 50px;
+                    border-radius: 50%
+                }
+            }
+
+            .msg-li-right {
+                @include displayFlex($fd: column, $ai: flex-start, $jc: flex-start);
+                gap: 5px;
+
+                >div {
+                    @include displayFlex($fd: row, $ai: flex-start, $g: 10px);
+
+                    >span {
+                        font-size: 15px;
+                        font-weight: 500;
+                        color: var(--grey);
+                    }
+
+                    >p {
+                        font-size: 14px;
+                        font-weight: 400;
+                    }
+                }
+            }
+
+            &:hover {
+                background-color: var(--bg-color);
+                border-radius: 20px;
+            }
+        }
+    }
+}
+
+
+@media (max-width: 960px) {
+
+    .devspace-head {
+        display: none !important;
+    }
+
+    .search-container {
+        @include displayFlex($fd: column, $ai: center, $jc: flex-start !important);
+        width: 100%;
+    }
+   
+
+    .devspace-wrapper {
+        @include displayFlex($fd: column, $ai: center, $jc: normal);
+    }
+}
+
+@media (max-width: 575px) {
+    .devspace {
+        margin: 0px !important;
+        border-radius: 0px !important;
+
+        >.devspace-wrapper {
+            >.devspace-content {
+                padding: 0px !important;
+            }
+        }
+    }
+
+    .edit_mobile {
+        right: 8px !important;
+    }
+}
+
+@media (max-width: 495px) {
+    .filter-result-main {
+        padding: 0px 12px 42px 0px;
+
+        >ul {
+            >li {
+                gap: 4px;
+
+                .avatar {
+                    margin-right: 6px;
+                }
+
+                .user-info {
+                    flex-direction: column;
+                }
+            }
+        }
+    }
+
+    .filter-result-msg {
+        // padding: 0px 20px 42px 20px;
+        margin: 0px 20px 42px 20px;
+
+        >ul {
+            >li {
+                gap: 10px;
+            }
+        }
+    }
+
+}

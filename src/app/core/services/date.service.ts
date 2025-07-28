@@ -49,6 +49,24 @@ export class DateService {
     return `${weekday}, ${day} ${month}`;
   }
 
+  getGermanRelativeDateWithTime(timestamp?: Timestamp): string {
+    if (!timestamp) return '';
+    const date = this.toDate(timestamp);
+    const now = new Date();
+    const today = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+    const givenDate = new Date(date.getFullYear(), date.getMonth(), date.getDate());
+    const diffInTime = today.getTime() - givenDate.getTime();
+    const diffInDays = diffInTime / (1000 * 60 * 60 * 24);
+
+    const timeString = date.toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit',});
+
+    if (diffInDays === 0) return `Heute ${timeString} Uhr`;
+    if (diffInDays === 1) return `Gestern ${timeString} Uhr`;
+  
+    const fullDate = date.toLocaleDateString('de-DE', {day: '2-digit', month: '2-digit', year: 'numeric',});
+    return ` ${fullDate} ${timeString} Uhr`;
+  }
+
 
 
 }

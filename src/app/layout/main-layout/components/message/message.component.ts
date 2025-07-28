@@ -91,7 +91,6 @@ export class MessageComponent implements OnInit{
   }
 
   loadUser(userId:string) {
-    console.log('loadUser');
     this.showHeader = 'direct';
     this.subscriptions.add(
       this.userService.getUserById(userId).subscribe({
@@ -106,7 +105,6 @@ export class MessageComponent implements OnInit{
   }
 
   loadChannel(channelId: string) {
-    console.log('loadChannel');
     this.showHeader = 'channel';
     this.subscriptions.add(
       this.channelService.getChannelById(channelId).subscribe({

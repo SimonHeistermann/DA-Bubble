@@ -1,4 +1,4 @@
-import { Component, ElementRef, Input, TemplateRef, ViewChild, inject } from '@angular/core';
+import { Component, ElementRef, Inject, Input, TemplateRef, ViewChild, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { toggleMarginLeft20Animation } from '../../animations/expand-collapse.animation';
@@ -70,10 +70,10 @@ export class ThreadContentComponent {
   route = inject(ActivatedRoute);
   overlayService = inject(OverlayService);
   viewContainerRef = inject(ViewContainerRef);
+  dashboardResponsive = inject(DashboardResponsiveService);
   @ViewChild('containerBody') containerBody!: ElementRef;
   @ViewChild('emojiPickerTemplate') emojiPickerTemplate !: TemplateRef<any>;
 
-constructor(public dashboardResponsive: DashboardResponsiveService) {}
 
   ngOnInit() : void {
     this.threadService.message$.subscribe(msg => {
@@ -157,6 +157,19 @@ constructor(public dashboardResponsive: DashboardResponsiveService) {}
     );
 
     this.emojiPickerOverlayRef.backdropClick().subscribe(() => this.emojiPickerOverlayRef.dispose());
+  }
+
+  shouldShowDateDivider(index: number) {
+    if (index === 0) return true;
+
+    const current =  this.threadService.currentThreadMessages[index];
+    const previous = this.threadService.currentThreadMessages[index - 1];
+    if (!current.createdAt || !previous.createdAt) return false;
+
+    const currentDate = this.dateService.toDate(current.createdAt);
+    const previousDate = this.dateService.toDate(previous.createdAt);
+
+    return !this.dateService.isSameDay(currentDate, previousDate);
   }
 
   onSelectedEmoji(emojiStr: string) {

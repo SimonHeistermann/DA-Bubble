@@ -4,7 +4,7 @@
       [@toggleMarginLeft20]="showSelf ? 'open' : 'closed'"
       >
 
-    <section [class.full-width]="isTablet || smallScreen && (dashboardResponsive.openSidebar$ | async)">
+    <section class="thread-container" [class.full-width]="isTablet || smallScreen && (dashboardResponsive.openSidebar$ | async)">
         <div class="thread-header">
             <div class="title">
                 <span>Thread</span>
@@ -48,6 +48,15 @@
 
             <div class="scrollbar__none container-body" #containerBody>
                 <ng-container *ngFor="let message of threadService.currentThreadMessages; let i = index">
+                    @if (message.createdAt) {
+                             @if (shouldShowDateDivider(i)) {
+                            <div class="data-divider">
+                                <div class="divider-line"></div>
+                                <div class="data">{{ dateService.getGermanFullDate(message.createdAt) }}</div>
+                            </div>
+                        }
+                    }
+                
 
                     <div *ngIf="threadService.threadUsers[i] && (threadService.threadUsers[i].id != threadService.currentUser?.id)"
                         class="thread-content">
@@ -151,13 +160,14 @@
                     </div>
                 </ng-container>
             </div>
-            <div class="container-input">
+        </div>
+    </section>
+
+      <div class="container-input">
                 <app-input (sendMessageEmitter)="sendMessage($event)"
                     placeHolder="{{ threadService.mainUser?.displayName }} "
                     [allChannelUser]="this.threadService.allUsersWithOutCurrentUser"></app-input>
             </div>
-        </div>
-    </section>
 
 </main>
 

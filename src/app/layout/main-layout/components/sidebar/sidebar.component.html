@@ -1,10 +1,9 @@
-<section [class.full-width]="isTablet" 
-         [class.full-height]="isTablet" 
-        *ngIf="(smallScreen && !threadService.threadOpen) || !smallScreen || (isTablet && (dashboardResponsive.openSidebar$ | async))" class="devspace" 
-         [@toggleMarginRight20]="showSelf ? 'open' : 'closed'"> 
+<section [class.full-width]="isTablet" [class.full-height]="isTablet"
+    *ngIf="(smallScreen && !threadService.threadOpen) || !smallScreen || (isTablet && (dashboardResponsive.openSidebar$ | async))"
+    class="devspace" [@toggleMarginRight20]="showSelf ? 'open' : 'closed'">
 
     <section class="devspace-wrapper">
-        <div *ngIf="!isTablet; else search" class="devspace-head">
+        <div class="devspace-head">
             <div class="dev-logo-cont">
                 <img src="images/icons/devspaceIcon.png">
                 <span>Devspace</span>
@@ -12,16 +11,94 @@
             <div class="pointer devspace-icon" (click)="clickDevspace()"></div>
         </div>
 
-        <ng-template #search>  
-             <input type="text" class="search-field">
-        </ng-template>
+        <section *ngIf="smallScreen || isTablet || isMobile" #search class="search-container d__none">
+            <div *ngIf="showList" class="search-overhead">
+                <p>Search</p>
+                <img src="/icons/close.png" (click)="closeSearch()">
+            </div>
+            <input #input type="text" class="search-field" placeholder="Gehe zu..." [(ngModel)]="inputContent"
+                (input)="inputText()">
+            <div class="filter-result" *ngIf="showList">
+                <div class="filter-result-main" *ngIf="filteredUsers.length > 0">
+                    <h3>User</h3>
+                    <ul>
+                        @for (user of filteredUsers; track user.id) {
+                        <li (click)="clickUser(user)">
+                            <img [src]="user?.photoURL">
+                            <div class="user-info">
+                                <h4>{{ user.displayName }}</h4>
+                                <span>{{ user.email }}</span>
+                            </div>
+                        </li>
+                        } @empty {
+                        Kein Nuzter gefunden.
+                        }
+                    </ul>
+                </div>
+                <div class="filter-result-main" *ngIf="filteredChannels.length > 0">
+                    <h3>Channel</h3>
+                    <ul>
+                        @for (channel of filteredChannels; track channel.id) {
+                        <li (click)="clickChannel(channel)">
+                            <img src="/icons/tag.png" alt="">
+                            <h3>{{ channel.name }}</h3>
+                        </li>
+                        } @empty {
+                        Kein Channel gefunden.
+                        }
+                    </ul>
+                </div>
+                <div class="filter-result-msg" *ngIf="filteredPrivateMessages.length > 0">
+                    <h3>Private Messages</h3>
+                    <ul>
+                        @for (message of filteredPrivateMessages; track $index) {
+                        <li class="msg-li">
+                            <div class="msg-li-left">
+                                <!-- <img src="images/icons/avatars/avatar_1.png"> -->
+                                <img [src]="findUserPhotoUrlByID(message.authorID)">
+                            </div>
+                            <div class="msg-li-right">
+                                <div>
+                                    <h4>{{ findUserNameByID(message.authorID) }}</h4>
+                                    <span>{{ dateService.getGermanRelativeDateWithTime(message.createdAt)}}</span>
+                                </div>
 
-        <ngx-simplebar class="devspace-content">
-            
+                                <p>{{ message.content}} </p>
+                            </div>
+
+                        </li>
+                        }
+                    </ul>
+                </div>
+                <div class="filter-result-msg" *ngIf="filteredChannelMessages.length > 0">
+                    <h3>Channel Messages</h3>
+                    <ul>
+                        @for (message of filteredChannelMessages; track $index) {
+                        <li class="msg-li">
+                            <div class="msg-li-left">
+                                <!-- <img src="/icons/avatars/avatar_1.png"> -->
+                                <img [src]="findUserPhotoUrlByID(message.authorID)">
+                            </div>
+                            <div class="msg-li-right">
+                                <div>
+                                    <h4>{{ findUserNameByID(message.authorID) }}</h4>
+                                    <span>{{ dateService.getGermanRelativeDateWithTime(message.createdAt)}}</span>
+                                </div>
+                                <p>{{ message.content}} </p>
+                            </div>
+
+                        </li>
+                        }
+                    </ul>
+                </div>
+            </div>
+        </section>
+
+        <ngx-simplebar *ngIf="!showList || (showList && !searchBreakpoint)" class="devspace-content">
             <div class="devlist-container">
                 <section>
                     <div class="devlist-head">
-                        <div class="devlist-head-left"  (click)="clickChannelHead()" [class.closed]="!openChannel">
+                        <div class="devlist-head-left" (click)="clickChannelHead()" [class.closed]="!openChannel">
                             <div class="arrow-down">
 
                             </div>
@@ -29,32 +106,33 @@
                                 <img class="channel-img" src="images/icons/channels.png">
                                 <span>Channels</span>
                             </div>
-                            
+
                         </div>
                         <img class="add-btn" src="images/icons/add.png" (click)="clickAddChannel()">
                     </div>
                     <div class="channel-names" [@toggleMarginTop25]="openChannel ? 'open' : 'closed'">
                         <ul>
                             @for(channel of channels; let index = $index; track channel.id) {
-                                <li class="channel-li pointer" [class.selected]="index === currentChannelIndex"  (click)="clickChannelName(index, channel)" #channelItem>
-                                    <div class="channel-li-content">
-                                        <div class="tag-channel-name">
-                                            <div class="tag"></div>
-                                            <span class="channel-name">{{channel.name}}</span>
-                                        </div>
-                                        @if(newMessageMap[channel.id]) {
-                                             @if( newMessageMap[channel.id].unreadCount > 0) {
-                                                <span class="banner"> {{ newMessageMap[channel.id].unreadCount }}</span>
-                                            }
-                                          
-                                        }
-                                       
-                                       
+                            <li class="channel-li pointer" [class.selected]="index === currentChannelIndex"
+                                (click)="clickChannelName(index, channel)" #channelItem>
+                                <div class="channel-li-content">
+                                    <div class="tag-channel-name">
+                                        <div class="tag"></div>
+                                        <span class="channel-name">{{channel.name}}</span>
                                     </div>
-                                    
-                                </li>
+                                    @if(newMessageMap[channel.id]) {
+                                    @if( newMessageMap[channel.id].unreadCount > 0) {
+                                    <span class="banner"> {{ newMessageMap[channel.id].unreadCount }}</span>
+                                    }
+
+                                    }
+
+
+                                </div>
+
+                            </li>
                             }
-                            <li class="add-channel-li pointer"  (click)="clickAddChannel()">
+                            <li class="add-channel-li pointer" (click)="clickAddChannel()">
                                 <div class="add-channel-li-content">
                                     <div class="add-btn-circle"></div>
                                     <span>Channel hinzufügen</span>
@@ -65,31 +143,31 @@
                 </section>
                 <section>
                     <div class="devlist-head">
-                        <div class="devlist-head-left"   (click)="clickMessageHead()" [class.closed]="!openMessage">
+                        <div class="devlist-head-left" (click)="clickMessageHead()" [class.closed]="!openMessage">
                             <div class="arrow-down">
-                                
+
                             </div>
                             <div class="icon-title">
-                                <img  class="account-img" src="images/icons/account.png">
+                                <img class="account-img" src="images/icons/account.png">
                                 <span>Direktnachrichten</span>
                             </div>
                         </div>
-        
+
                     </div>
                     <div class="users" [@toggleMarginTop25]="openMessage ? 'open' : 'closed'">
                         <ul>
-                            <li class="current-user pointer"  [class.selected]="'currentUser' == currentUserIndex" (click)="clickUserName('currentUser' , null)">
+                            <li class="current-user pointer" [class.selected]="'currentUser' == currentUserIndex"
+                                (click)="clickUserName('currentUser' , null)">
                                 <div class="li-content">
                                     <div class="li-content-left">
                                         <div class="avatar-div">
-                                            <img *ngIf="currentUser" [src]="currentUser.photoURL.startsWith('http') ? 'images/icons/avatars/avatar_1.png' : currentUser.photoURL">
-                                        
+                                            <img *ngIf="currentUser"
+                                                [src]="currentUser.photoURL.startsWith('http') ? 'images/icons/avatars/avatar_1.png' : currentUser.photoURL">
                                             @if(!currentUser?.isActive) {
-                                                <span class="active-status offline"></span>
+                                            <span class="active-status offline"></span>
                                             } @else {
-                                                <span class="active-status"></span>
+                                            <span class="active-status"></span>
                                             }
-                                            
                                         </div>
                                         <span class="name">
                                             {{ currentUser?.displayName }} (Du)
@@ -97,40 +175,41 @@
                                     </div>
                                 </div>
                             </li>
-                            
-                            @for (user of allUsers; let index = $index; track $index) {
-                                <li [class.selected]="index === currentUserIndex" #userItem>
 
-                                    <div class="li-content pointer"  (click)="clickUserName(index, user)">
-                                        
-                                        <div class="li-content-left">
-                                            <div class="avatar-div">
-                                                <img [src]="user?.photoURL?.startsWith('http') ? 'images/icons/avatars/avatar_1.png' : user?.photoURL">
-                                                @if(!user?.isActive) {
-                                                    <span class="active-status offline"></span>
-                                                } @else {
-                                                    <span class="active-status"></span>
-                                                }
-                                                
-                                            </div>
-                                            <span class="name">
-                                                {{ user?.displayName }}
-                                            </span>
-                                        </div>
-                                        @if(newMessageMap[user.id]) {
-                                             @if( newMessageMap[user.id].unreadCount > 0) {
-                                                <span class="banner"> {{ newMessageMap[user.id].unreadCount }}</span>
+                            @for (user of allUsers; let index = $index; track $index) {
+                            <li [class.selected]="index === currentUserIndex" #userItem>
+
+                                <div class="li-content pointer" (click)="clickUserName(index, user)">
+
+                                    <div class="li-content-left">
+                                        <div class="avatar-div">
+                                            <img
+                                                [src]="user?.photoURL?.startsWith('http') ? 'images/icons/avatars/avatar_1.png' : user?.photoURL">
+                                            @if(!user?.isActive) {
+                                            <span class="active-status offline"></span>
+                                            } @else {
+                                          <span class="active-status"></span>
                                             }
-                                        }
+
+                                        </div>
+                                        <span class="name">
+                                            {{ user?.displayName }}
+                                        </span>
                                     </div>
-                                </li>
+                                    @if(newMessageMap[user.id]) {
+                                    @if( newMessageMap[user.id].unreadCount > 0) {
+                                    <span class="banner"> {{ newMessageMap[user.id].unreadCount }}</span>
+                                    }
+                                    }
+                                </div>
+                            </li>
                             }
                         </ul>
                     </div>
-        
+
                 </section>
             </div>
         </ngx-simplebar>
     </section>
 </section>
-    <img *ngIf="isTablet" class="edit_mobile" (click)="clickDevspace()" src="images/icons/edit_square_mobile.png">
+<img *ngIf="isTablet" class="edit_mobile" (click)="clickDevspace()" src="images/icons/edit_square_mobile.png">

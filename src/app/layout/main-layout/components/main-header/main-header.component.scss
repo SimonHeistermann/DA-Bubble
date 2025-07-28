@@ -1,3 +1,5 @@
+@use './../../../../../styles.scss' as *;
+
 .main-container {
     display: flex;
     flex-direction: row;
@@ -7,16 +9,22 @@
     gap: 45px;
 }
 
-.search-field {
-    background-color: #FFFFFF !important;
+.search-field-container {
+    position: relative;
     display: flex;
     flex-direction: row;
     align-items: center;
-    border: none;
-    padding: 17.5px 45px;
     width: 60%;
     max-width: 989px;
     height: 70px;
+}
+
+.search-field {
+    width: 100%;
+    height: 70px;
+    padding: 17.5px 45px;
+    border: none;
+    background-color: #FFFFFF !important;
     border-radius: 42px;
     font-size: 24px;
     background: url('/images/icons/search.png') no-repeat scroll right 20px center;
@@ -24,6 +32,70 @@
     &:focus {
         outline: none;
     }
+}
+
+.search-result {
+    width: 100%;
+    padding: 20px;
+    border: 1px solid var(--light-purple);
+    border-radius: 30px;
+    background-color: var(--white);
+    position: absolute;
+    top: 100%;
+    left: 0;
+    z-index: 9999;
+    max-height: 60vh;
+    overflow-y: auto;
+
+    .divider {
+        background-color: var(--grey) ;
+        width: 100%;
+        height: 1px;
+        margin-top: 10px;
+        margin-bottom: 10px;
+    }
+
+    .search-result-user,  .search-result-channel, .search-result-messages {
+
+        ul {
+            li {
+                
+                width: 100%;
+                padding: 10px;
+                border-radius: 20px;
+                cursor: pointer;
+                @include displayFlex($g: 10px, $jc: flex-start);
+
+                    &:hover {
+                    background-color: var(--bg-color);
+                }
+
+                img {
+                    width: 25px;
+                    height: 25px;
+                    border-radius: 50%;
+                }
+            }
+            
+        }
+    }  
+    
+    .search-result-messages {
+        .message-li {
+            align-items: flex-start !important;
+            
+            .message-li-right {
+                h4 {
+                    span {
+                        margin-left: 10px;
+                        color: var(--grey);
+                        font-size: 14px;
+                    }
+                }
+            }
+        }
+    }
+    
 }
 
 .profile-container {
@@ -127,5 +199,12 @@
         :nth-child(3) {
             display: none;
         }
+    }
+}
+
+@media (max-width : 342px) {
+    .main-container {
+        justify-content: center;
+        gap: 0px;
     }
 }
