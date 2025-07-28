@@ -32,7 +32,7 @@
 	top: 4%;
 	width: 40px;
 	height: 40px;
-	background-image: url('/images//icons/arrow_left_default.png');
+	background-image: url('/angular-projects/dabubble/images/icons/arrow_left_default.png');
 	background-size: contain;
 	background-repeat: no-repeat;
 	background-position: center;
@@ -42,7 +42,7 @@
 
 	&:hover {
 		transform: translateX(-2px);
-		background-image: url('/images//icons/arrow_left_hover.png');
+		background-image: url('/angular-projects/dabubble/images/icons/arrow_left_hover.png');
 	}
 }
 

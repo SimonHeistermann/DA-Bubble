@@ -39,10 +39,10 @@
     margin: 20px 0px;
 
     .devspace-icon {
-        @include imgButton($wh: 40px, $url: '/images/icons/edit_square.png');
+        @include imgButton($wh: 40px, $url: '/angular-projects/dabubble/images/icons/edit_square.png');
 
         &:hover {
-            background-image: url('/images/icons/edit_square_hover.png');
+            background-image: url('/angular-projects/dabubble/images/icons/edit_square_hover.png');
         }
     }
 
@@ -81,7 +81,7 @@
 
                     background: {
                         position: center;
-                        image: url('/images/icons/arrow_down.png');
+                        image: url('/angular-projects/dabubble/images/icons/arrow_down.png');
                     }
                 }
 
@@ -99,23 +99,23 @@
 
                     .arrow-down {
                         background: {
-                            image: url('/images/icons/arrow_down_hover.png');
+                            image: url('/angular-projects/dabubble/images/icons/arrow_down_hover.png');
                         }
                     }
 
                     .channel-img {
-                        content: url('/images/icons/channels_hover.png');
+                        content: url('/angular-projects/dabubble/images/icons/channels_hover.png');
                     }
 
                     .account-img {
-                        content: url('/images/icons/account_hover.png');
+                        content: url('/angular-projects/dabubble/images/icons/account_hover.png');
                     }
                 }
 
                 &:active {
                     .arrow-down {
                         background: {
-                            image: url('/images/icons/arrow_down_click.png');
+                            image: url('/angular-projects/dabubble/images/icons/arrow_down_click.png');
                         }
                     }
                 }
@@ -127,7 +127,7 @@
 
                         background: {
                             position: center;
-                            image: url('/images/icons/arrow_right.png');
+                            image: url('/angular-projects/dabubble/images/icons/arrow_right.png');
 
                         }
                     }
@@ -137,16 +137,16 @@
 
                         .arrow-down {
                             background: {
-                                image: url('/images/icons/arrow_right_hover.png');
+                                image: url('/angular-projects/dabubble/images/icons/arrow_right_hover.png');
                             }
                         }
 
                         .channel-img {
-                            content: url('/images/icons/channels_hover.png');
+                            content: url('/angular-projects/dabubble/images/icons/channels_hover.png');
                         }
 
                         .account-img {
-                            content: url('/images/icons/account_hover.png');
+                            content: url('/angular-projects/dabubble/images/icons/account_hover.png');
                         }
                     }
 
@@ -157,7 +157,7 @@
 
                             background: {
                                 position: center;
-                                image: url('/images/icons/arrow_right_click.png');
+                                image: url('/angular-projects/dabubble/images/icons/arrow_right_click.png');
                             }
 
                             ;
@@ -168,7 +168,7 @@
           
             .add-btn {
                 &:hover {
-                    content: url('/images/icons/add_hover.png');
+                    content: url('/angular-projects/dabubble/images/icons/add_hover.png');
                 }}}
 
 
@@ -199,20 +199,20 @@
                         .add-btn-circle {
                             width: 24px;
                             height: 24px;
-                            background-image: url('/images/icons/add_circle.png');
+                            background-image: url('/angular-projects/dabubble/images/icons/add_circle.png');
                         }
 
                     }
                     &:hover {
                         color: var(--purple-3);
                         .add-btn-circle {
-                            background-image: url('/images/icons/add_circle_hover.png') !important;
+                            background-image: url('/angular-projects/dabubble/images/icons/add_circle_hover.png') !important;
                         }
                     }
                     &:active,
                     &.active {
                         .add-btn-circle {
-                            background-image: url('/images/icons/add_circle_click.png') !important;
+                            background-image: url('/angular-projects/dabubble/images/icons/add_circle_click.png') !important;
                         }
                     }
 
@@ -234,7 +234,7 @@
                             .tag {
                                 width: 24px;
                                 height: 24px;
-                                background-image: url('/images/icons/tag.png');
+                                background-image: url('/angular-projects/dabubble/images/icons/tag.png');
                             }
                         }
 
@@ -255,7 +255,7 @@
                             .tag-channel-name {
 
                                 .tag {
-                                    background-image: url('/images/icons/tag_hover.png');
+                                    background-image: url('/angular-projects/dabubble/images/icons/tag_hover.png');
                                 }
 
                                 .channel-name {
@@ -274,7 +274,7 @@
                             .tag-channel-name {
 
                                 .tag {
-                                    background-image: url('/images/icons/tag_click.png');
+                                    background-image: url('/angular-projects/dabubble/images/icons/tag_click.png');
                                 }
                             }
 
@@ -289,7 +289,7 @@
                     &:active {
                         .channel-li-content {
                             .tag {
-                                background-image: url('/images/icons/tag_click.png');
+                                background-image: url('/angular-projects/dabubble/images/icons/tag_click.png');
                             }
 
                             .channel-name {
