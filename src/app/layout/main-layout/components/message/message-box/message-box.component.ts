@@ -98,7 +98,7 @@ export class MessageBoxComponent implements OnInit, OnDestroy, AfterViewInit{
 
     const currentDate = this.dateService.toDate(current.createdAt);
     const previousDate = this.dateService.toDate(previous.createdAt);
-
+ 
     return !this.dateService.isSameDay(currentDate, previousDate);
   }
 

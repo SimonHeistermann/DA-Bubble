@@ -201,3 +201,10 @@
         }
     }
 }
+
+@media (max-width : 342px) {
+    .main-container {
+        justify-content: center;
+        gap: 0px;
+    }
+}

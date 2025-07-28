@@ -1,5 +1,3 @@
-
-
 @use './../../../../../styles.scss' as *;
 @use './../../../../../styles/overlay.scss' as *;
 
@@ -12,15 +10,18 @@
     z-index: 0;
 }
 
-section {
+.thread-container {
     position: relative;
     width: 485px;
-    height: calc(100vh - 136px);
-    @include displayFlex($fd: column, $ai: center);
+    @include displayFlex($fd: column, $ai: center, $jc: flex-start);
     border-radius: 30px;
     background-color: #FFFFFF;
-    overflow: hidden;
+    height: 824px !important;
+    overflow-y: scroll !important;
 }
+    ::-webkit-scrollbar {
+        display: none;
+    }
 
 .thread-header {
     height: 80px;
@@ -35,16 +36,17 @@ section {
     gap: 0px;
 
     >img {
-             cursor: pointer;
-             content: url('/icons/close.png'); 
-             border-radius: 50%;
-             padding: 4px;
-             &:hover {
-                  content: url('/icons/close_hover.png');
-                  transition: .35s ease-in-out;
-                    background-color: var(--bg-color);
+        cursor: pointer;
+        content: url('/icons/close.png');
+        border-radius: 50%;
+        padding: 4px;
 
-             }
+        &:hover {
+            content: url('/icons/close_hover.png');
+            transition: .35s ease-in-out;
+            background-color: var(--bg-color);
+
+        }
     }
 }
 
@@ -69,307 +71,365 @@ section {
 }
 
 
-    .container-body-input {
-        height: calc(100% - 80px);
-        width: 100%;
-        @include displayFlex($fd: column, $jc: flex-start, $ai: normal);
+.container-body-input {
+    height: calc(100% - 80px);
+    width: 100%;
+    @include displayFlex($fd: column, $jc: flex-start, $ai: normal);
+}
+
+.container-body {
+    flex: 1;
+    width: 100%;
+    height: 100%;
+    // overflow-y: scroll;
+}
+
+.container-input {
+    flex-shrink: 0;
+    width: 100%;
+}
+
+.thread-content {
+    position: relative;
+    @include displayFlex($fd: row, $ai: flex-start);
+    gap: 20px;
+    justify-content: flex-start;
+    width: 100%;
+    padding: 10px 20px;
+    margin-top: 20px;
+
+    >img {
+        border-radius: 50%;
+        width: 70px;
+        height: 70px;
     }
 
-     .container-body {
-            flex: 1;
-            width: 100%;
-            height: 100%;
-            overflow-y: scroll;
-        }
-        
-        .container-input {
-            flex-shrink: 0;
-            width: 100%;
-        }
-
-    .thread-content {
-            position: relative;
-            @include displayFlex($fd: row, $ai: flex-start);
-            gap: 20px;
-            justify-content: flex-start;
-            width: 100%;
-            padding: 10px 20px;
-            margin-top: 20px;
-              >img {
-                  border-radius: 50%;
-                  width: 70px;
-                  height: 70px;
-              }
-               &:hover {
-                    background-color: var(--bg-color);
-                    .thread-message {
-                        background-color: var(--white);
-                        color: var(--black);
-                    }
-                    &:hover .reaction-bar {
-                         display: flex !important;
-                         transition: .35s ease-in-out;
-                        }
-                }
-    }
-
-
-    .thread-details {
-        width: auto;
-        @include displayFlex($fd: column, $ai: flex-start);
-    }
-
-    .thread-content-header {
-        @include displayFlex($fd: row, $ai: flex-start);
-        gap: 20px;
-        >span {
-            font-weight: 700;
-            font-size: 16px;
-            &:hover {
-                cursor: pointer;
-                color: #444DF2;
-            }
-        }
-        >p {
-            color: var(--grey);
-            font-size: 14px;
-        }
-    }
-
-    .thread-message {
-        margin-top: 10px;
-        font-weight: 400;
-        font-size: 16px;
-        padding: 10px 20px;
-        border-radius: 20px;
-        border-top-left-radius: 0;
+    &:hover {
         background-color: var(--bg-color);
-        color: var(--black);
-    }
 
-
-    .divider {
-        width: 100%;
-        @include displayFlex($fd: row, $ai: center, $jc: center);
-        gap: 20px;
-        margin-top: 10px;
-        >span {
-            color: #ADB0D9;
-            font-size: 18px;
-            font-weight: 400;
-            text-align: center;
+        .thread-message {
+            background-color: var(--white);
+            color: var(--black);
         }
-        >section {
-            width: 55%;
-            height: 1px;
-            background-color: #ADB0D9;
-        }
-    }
 
-    .crnt-user-content {
-          position: relative;
-            @include displayFlex($fd: row-reverse, $ai: flex-start);
-            gap: 20px;
-            justify-content: flex-start;
-            width: 100%;
-            padding: 10px 20px;
-            margin-top: 20px;
-              >img {
-                  border-radius: 50%;
-                  width: 70px;
-                  height: 70px;
-              }
-            &:hover .reaction-bar {
+        &:hover .reaction-bar {
             display: flex !important;
             transition: .35s ease-in-out;
-            }
-            &:hover .edit-bar {
-            display: flex !important;
-            transition: .35s ease-in-out;
-            }
-    }
-
-    .crnt-usr-thread-header {
-         @include displayFlex($fd: row-reverse, $ai: flex-start);
-         gap: 20px;
-          >span {
-            font-weight: 700;
-            font-size: 16px;
-            &:hover {
-                cursor: pointer;
-                color: #444DF2;
-            }
-        }
-        >p {
-            color: var(--grey);
-            font-size: 14px;
         }
     }
+}
 
-    .crnt-usr-thread {
-        margin-top: 10px;
-        font-weight: 400;
+
+.thread-details {
+    width: auto;
+    @include displayFlex($fd: column, $ai: flex-start);
+}
+
+.thread-content-header {
+    @include displayFlex($fd: row, $ai: flex-start);
+    gap: 20px;
+
+    >span {
+        font-weight: 700;
         font-size: 16px;
-        padding: 10px 20px;
-        border-radius: 20px 0px 20px 20px;
-        background-color: var(--purple-2);
-        color: var(--white);
-    }
 
-    .reaction-bar {
-        position: absolute;
-        top: 3px;
-        left: 13px;
-        width: fit-content;
-        display: none;
-        background-color: var(--white);
-        border: 1px solid var(--light-purple);
-        gap: 5px;
-        padding: 3px 13px;
-        border-radius: 25px;
-        border-bottom-right-radius: 0;
-        >img {
-            border-radius: 50%;
-            padding: 5px;
-        }
-         >img:nth-child(1):hover {
-                background-color: var(--bg-color);
-                content: url('/icons/add_reaction_thread_hvr.png');
-                cursor: pointer;
-            }
         &:hover {
             cursor: pointer;
+            color: #444DF2;
         }
     }
 
-    .alter {
-        top: 0px !important;
-        right: 4% !important;
-        left: auto !important;
-        border-radius: 25px 25px 25px 0px !important;
+    >p {
+        color: var(--grey);
+        font-size: 14px;
+    }
+}
+
+.thread-message {
+    margin-top: 10px;
+    font-weight: 400;
+    font-size: 16px;
+    padding: 10px 20px;
+    border-radius: 20px;
+    border-top-left-radius: 0;
+    background-color: var(--bg-color);
+    color: var(--black);
+}
+
+
+.divider {
+    width: 100%;
+    @include displayFlex($fd: row, $ai: center, $jc: center);
+    gap: 20px;
+    margin-top: 10px;
+
+    >span {
+        color: #ADB0D9;
+        font-size: 18px;
+        font-weight: 400;
+        text-align: center;
     }
 
-    .edit-bar {
-        display: none;
-        position: absolute;
-        left: 86px;
-        top: 23px;
-        background-color: var(--white);
-        box-shadow: 0px 6px 14px 0px #00000033;
-        border-radius: 0px 30px 30px 30px;
-        gap: 15px;
+    >section {
+        width: 55%;
+        height: 1px;
+        background-color: #ADB0D9;
+    }
+}
+
+.crnt-user-content {
+    position: relative;
+    @include displayFlex($fd: row-reverse, $ai: flex-start);
+    gap: 20px;
+    justify-content: flex-start;
+    width: 100%;
+    padding: 10px 20px;
+    margin-top: 20px;
+
+    >img {
+        border-radius: 50%;
+        width: 70px;
+        height: 70px;
+    }
+
+    &:hover .reaction-bar {
+        display: flex !important;
+        transition: .35s ease-in-out;
+    }
+
+    &:hover .edit-bar {
+        display: flex !important;
+        transition: .35s ease-in-out;
+    }
+}
+
+.crnt-usr-thread-header {
+    @include displayFlex($fd: row-reverse, $ai: flex-start);
+    gap: 20px;
+
+    >span {
+        font-weight: 700;
+        font-size: 16px;
+
+        &:hover {
+            cursor: pointer;
+            color: #444DF2;
+        }
+    }
+
+    >p {
+        color: var(--grey);
+        font-size: 14px;
+    }
+}
+
+.crnt-usr-thread {
+    margin-top: 10px;
+    font-weight: 400;
+    font-size: 16px;
+    padding: 10px 20px;
+    border-radius: 20px 0px 20px 20px;
+    background-color: var(--purple-2);
+    color: var(--white);
+}
+
+.reaction-bar {
+    position: absolute;
+    top: 3px;
+    left: 13px;
+    width: fit-content;
+    display: none;
+    background-color: var(--white);
+    border: 1px solid var(--light-purple);
+    gap: 5px;
+    padding: 3px 13px;
+    border-radius: 25px;
+    border-bottom-right-radius: 0;
+
+    >img {
+        border-radius: 50%;
+        padding: 5px;
+    }
+
+    >img:nth-child(1):hover {
+        background-color: var(--bg-color);
+        content: url('/icons/add_reaction_thread_hvr.png');
+        cursor: pointer;
+    }
+
+    &:hover {
+        cursor: pointer;
+    }
+}
+
+.alter {
+    top: 0px !important;
+    right: 4% !important;
+    left: auto !important;
+    border-radius: 25px 25px 25px 0px !important;
+}
+
+.edit-bar {
+    display: none;
+    position: absolute;
+    left: 86px;
+    top: 23px;
+    background-color: var(--white);
+    box-shadow: 0px 6px 14px 0px #00000033;
+    border-radius: 0px 30px 30px 30px;
+    gap: 15px;
+    padding: 10px 20px;
+
+    >span {
+        font-size: 20px;
+        font-weight: 600;
+        line-height: 100%;
+        letter-spacing: 0%;
+        text-align: center;
+        white-space: nowrap;
         padding: 10px 20px;
+        border-radius: 30px;
+    }
+
+    &:hover {
+        cursor: pointer;
+
         >span {
-            font-size: 20px;
-            font-weight: 600;
-            line-height: 100%;
-            letter-spacing: 0%;
-            text-align: center;
-            white-space: nowrap;
-            padding: 10px 20px;
-            border-radius: 30px;
-        }
-        &:hover {
-            cursor: pointer;
-            >span{
             background-color: var(--bg-color);
             color: var(--purple-3);
-            }
         }
+    }
+}
+
+.nerd-reacted-bar {
+    display: flex;
+    margin-top: 5px;
+    gap: 5px;
+}
+
+.emoji {
+    @include displayFlex($fd: row, $ai: center !important);
+    gap: 4px;
+    flex-direction: row;
+    border: 1px solid var(--purple-1);
+    padding: 3px 8px;
+    border-radius: 20px;
+    position: relative;
+
+    &:hover {
+        .reaction-hover {
+            display: flex !important;
+        }
+    }
+}
+
+.reaction-hover {
+    position: absolute;
+    @include displayFlex($fd: column, $ai: center, $jc: center !important);
+    bottom: 30px;
+    left: 50%;
+    padding: 10px;
+    border-radius: 20px;
+    border-bottom-left-radius: 0;
+    color: var(--white);
+    background-color: var(--purple-3);
+    z-index: 999;
+    gap: 5px;
+    white-space: nowrap;
+    display: none !important;
+
+    >div {
+
+        >p {
+            @include displayFlex($fd: column, $ai: center !important);
+        }
+    }
+}
+
+
+.thread-editor {
+    @include displayFlex($fd: column, $ai: center, $jc: center !important);
+    position: relative;
+
+    >textarea {
+        resize: none;
+        border-radius: 12px;
+        border: none;
+        min-width: 182px;
+        font-size: 16px;
+        padding: 0 12px 55px 12px;
+        color: #686868;
+        line-height: 20px;
+        min-height: 60px;
+        overflow-y: scroll;
+    }
+
+    ::-webkit-scrollbar {
+        display: none;
+    }
+}
+
+.btns-container {
+    @include displayFlex($fd: row, $ai: center, $jc: space-between !important);
+    position: absolute;
+    gap: 10px;
+    bottom: 2%;
+
+    :nth-child(1) {
+        background-color: var(--white);
+        color: var(--purple-3);
+        border: 1px solid var(--purple-3);
+        padding: 5px 10px;
+        border-radius: 10px;
+    }
+
+    :nth-child(2) {
+        background-color: var(--purple-3);
+        color: var(--white);
+        padding: 5px 10px;
+        border-radius: 10px;
+    }
+}
+
+@media (max-width: 575px) {
+    .main-container {
+        margin-left: 0px !important;
+        height: calc(100vh - 94px) !important;
+    }
+
+    section {
+        height: 100%;
+        border-radius: 0px;
     }
 
     .nerd-reacted-bar {
-        display: flex;
-        margin-top: 5px;
-        gap: 5px;
+        width: 100%;
+        overflow-x: auto;
+     }
+    ::-webkit-scrollbar {
+        display: none;
+    }
+}
+
+.data-divider {
+    position: relative;
+    @include displayFlex($jc: center, $ai: center);
+
+    .divider-line {
+        width: calc(100% - 40px);
+        border: 0.5px solid var(--light-purple);
+        opacity: 0.5;
+        position: absolute;
+        z-index: 1;
     }
 
-    .emoji {
-            @include displayFlex($fd: row, $ai: center !important);
-            gap: 4px;
-            flex-direction: row;
-            border: 1px solid var(--purple-1);
-            padding: 3px 8px;
-            border-radius: 20px;
-            position: relative;
-             &:hover {
-            .reaction-hover {
-                display: flex !important;
-            }
-        }
-        }
-
-        .reaction-hover {
-            position: absolute;
-            @include displayFlex($fd: column, $ai: center, $jc: center !important);
-            bottom: 30px;
-            left: 50%;
-            padding: 10px;
-            border-radius: 20px;
-            border-bottom-left-radius: 0;
-            color: var(--white);
-            background-color: var(--purple-3);
-            z-index: 999;
-            gap: 5px;
-            white-space: nowrap;
-            display: none !important;
-            >div {
-                
-                >p {
-                    @include displayFlex($fd: column, $ai: center !important);
-                }
-            }
-            }
-
-
-            .thread-editor {
-                @include displayFlex($fd: column, $ai: center, $jc: center !important);
-                position: relative;
-                >textarea {
-                    resize: none;
-                    border-radius: 12px;
-                    border: none;
-                    min-width: 182px;
-                    font-size: 16px;
-                    padding: 0 12px 55px 12px;
-                    color: #686868;
-                    line-height: 20px;
-                    min-height: 60px;
-                    overflow-y: scroll;
-                }
-                ::-webkit-scrollbar {
-                    display: none;
-                    }
-            }
-
-            .btns-container {
-                @include displayFlex($fd: row, $ai: center, $jc: space-between !important);
-                position: absolute;
-                gap: 10px;
-                bottom: 2%;
-                :nth-child(1){
-                    background-color: var(--white);
-                    color: var(--purple-3);
-                    border: 1px solid var(--purple-3);
-                    padding: 5px 10px;
-                    border-radius: 10px;
-                }
-                :nth-child(2){
-                    background-color: var(--purple-3);
-                    color: var(--white);
-                    padding: 5px 10px;
-                    border-radius: 10px;
-                }
-            }
-
-            @media (max-width: 575px) {
-                .main-container{
-                    margin-left: 0px !important;
-                     height: calc(100vh - 94px) !important;
-                }
-
-                section {
-                    height: 100%;
-                    border-radius: 0px;
-                }
-            }
+    .data {
+        border-radius: 30px;
+        border: 1px solid var(--light-purple);
+        padding: 5px 15px;
+        font-size: 16px;
+        font-weight: 400;
+        z-index: 2;
+        background-color: var(--white);
+    }
+}

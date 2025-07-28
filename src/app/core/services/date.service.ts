@@ -60,11 +60,11 @@ export class DateService {
 
     const timeString = date.toLocaleTimeString('de-DE', { hour: '2-digit', minute: '2-digit',});
 
-    if (diffInDays === 0) return `Heute um ${timeString} Uhr`;
-    if (diffInDays === 1) return `Gestern um ${timeString} Uhr`;
+    if (diffInDays === 0) return `Heute ${timeString} Uhr`;
+    if (diffInDays === 1) return `Gestern ${timeString} Uhr`;
   
     const fullDate = date.toLocaleDateString('de-DE', {day: '2-digit', month: '2-digit', year: 'numeric',});
-    return `Am ${fullDate} um ${timeString} Uhr`;
+    return ` ${fullDate} ${timeString} Uhr`;
   }
 
 

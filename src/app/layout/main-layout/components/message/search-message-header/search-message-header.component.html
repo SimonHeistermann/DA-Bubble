@@ -9,8 +9,10 @@
                 @for (user of filteredUsers; track user.id) {
                     <li (click)="clickUser(user)">
                         <img [src]="user?.photoURL?.startsWith('http') ? '/icons/avatars/avatar_1.png' : user?.photoURL" alt="">
-                        <h4>{{ user.displayName }}</h4>
-                        <span>{{ user.email }}</span>
+                        <div>
+                            <h4>{{ user.displayName }}</h4>
+                            <span>{{ user.email }}</span>
+                        </div>
                     </li>
                 } @empty {
                    Kein Nuzter gefunden.
