@@ -49,7 +49,7 @@
         height: 20px;
         
         background: {
-            image: url('/icons/cb.png');
+            image: url('/images/icons/cb.png');
         };
         
     }
@@ -57,7 +57,7 @@
         >span{
             filter: brightness(1) !important;
             background: {
-                image: url('/icons/cb_checked.png');
+                image: url('/images/icons/cb_checked.png');
             };
         }
     }
@@ -94,7 +94,7 @@
             left: 18px;
             top: 50%;
             transform: translateY(-50%);
-            background-image: url('/icons/tag_gray.png');
+            background-image: url('/images/icons/tag_gray.png');
         }
         >input {
             padding-left: 50px !important;
@@ -136,7 +136,6 @@ textarea {
 textarea:focus {
     border: 1px solid var(--purple-2) !important;
 }
-
 
 @media (max-width: 575px){
 

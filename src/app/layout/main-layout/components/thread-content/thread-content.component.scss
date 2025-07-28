@@ -37,12 +37,12 @@
 
     >img {
         cursor: pointer;
-        content: url('/icons/close.png');
+        content: url('/images/icons/close.png');
         border-radius: 50%;
         padding: 4px;
 
         &:hover {
-            content: url('/icons/close_hover.png');
+            content: url('/images/icons/close_hover.png');
             transition: .35s ease-in-out;
             background-color: var(--bg-color);
 

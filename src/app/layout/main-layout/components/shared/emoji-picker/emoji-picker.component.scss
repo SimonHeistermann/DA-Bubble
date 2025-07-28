@@ -1,4 +1,3 @@
-
 @use './../../../../../../styles.scss' as *;
 
 .emoji-picker {
@@ -29,7 +28,7 @@
                 width: 24px;
                 height: 24px;
                 background: {
-                    image: url('/icons/close.png');
+                    image: url('/images/icons/close.png');
                 };
             }
 
@@ -37,7 +36,7 @@
                 background: var(--bg-color);
                 .close-content {
                     background: {
-                        image: url('/icons/close_hover.png');
+                        image: url('/images/icons/close_hover.png');
                         
                     };
                 }

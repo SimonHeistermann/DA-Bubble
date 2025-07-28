@@ -30,7 +30,7 @@
                 width: 24px;
                 height: 24px;
                 background: {
-                    image: url('/icons/close.png');
+                    image: url('/images/icons/close.png');
                 };
             }
 
@@ -38,7 +38,7 @@
                 background: var(--bg-color);
                 .close-content {
                     background: {
-                        image: url('/icons/close_hover.png');
+                        image: url('/images/icons/close_hover.png');
                         
                     };
                 }
@@ -116,7 +116,7 @@
             .add-member{
                 margin-left: 20px;
                 border-radius: 50%;
-                @include imgButton($wh:40px, $url:'/icons/add_member.png');
+                @include imgButton($wh:40px, $url:'/images/icons/add_member.png');
                 
             }
             span {
@@ -127,7 +127,7 @@
                 color: var(--purple-3);
                 background-color: var(--bg-color);
                 .add-member{
-                    background-image: url('/icons/add_member_hover.png');
+                    background-image: url('/images/icons/add_member_hover.png');
                 }
             }
         }

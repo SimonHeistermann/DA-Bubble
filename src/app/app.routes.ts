@@ -22,7 +22,6 @@ function caseInsensitiveMatch(path: string) {
   };
 }
 
-
 export const routes: Routes = [
   {
     path: 'auth',
