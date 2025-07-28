@@ -2,7 +2,7 @@
 @use './../../../../../styles/overlay.scss' as *;
 
 .main-container {
-    @include displayFlex($fd: column, $ai: center);
+    @include displayFlex($fd: column, $ai: center, $jc: flex-start);
     border-radius: 30px;
     background-color: #FFFFFF;
     height: calc(100vh - 136px);
