@@ -9,7 +9,83 @@
     <span>Devspace</span>
     </div>
 
-    <input type="text" class="search-field">
+
+    <div class="search-field-container">
+        <input type="text" class="search-field" placeholder="Devspace durchsuchen" [(ngModel)]="inputContent" (input)="inputText()">
+        <div class="search-result scrollbar__none" *ngIf="showList">
+            <div class="search-result-user" *ngIf="filteredUsers.length > 0">
+                <h3>User</h3>
+                <ul>
+                    @for (user of filteredUsers; track user.id) {
+                        <li  (click)="clickUser(user)"> 
+                            <img [src]="user?.photoURL?.startsWith('http') ? '/icons/avatars/avatar_1.png' : user?.photoURL" alt="">
+                            <h4>{{ user.displayName }}</h4>
+                            <span>{{ user.email }}</span>
+                        </li>
+                    } @empty {
+                        Kein Nuzter gefunden.
+                    }
+                
+                </ul>
+            </div>
+            <div class="search-result-channel " *ngIf="filteredChannels.length > 0">
+                <h3>Channel</h3>
+                <ul> 
+                    @for (channel of filteredChannels; track channel.id) {
+                        <li  (click)="clickChannel(channel)"> 
+                            <img src="/icons/tag.png" alt="">
+                            <h4>{{ channel.name }}</h4>
+                            <span>
+                                @if(channel.name == 'Allgemein'){
+                                    System Admin
+                                } @else () {
+                                    {{ findUserNameByID(channel.createdBy) }}
+                                }
+                            </span>
+                        </li>
+                    } @empty {
+                        Kein Channel gefunden.
+                    }
+                
+                </ul>
+            </div>
+            <div class="search-result-messages" *ngIf="filteredPrivateMessages.length > 0">
+                <h3>Private Messages</h3>
+                <ul>
+                     @for (message of filteredPrivateMessages; track $index) {
+                        <li class="message-li">
+                            <div class="message-li-left">
+                                <img src="/icons/avatars/avatar_1.png" alt="">
+                            </div>
+                            <div class="message-li-right">
+                                <h4>{{ findUserNameByID(message.authorID) }}<span>{{ dateService.getGermanRelativeDateWithTime(message.createdAt)}}</span></h4>
+                                <p>{{ message.content}} </p>
+                            </div>
+                        
+                        </li>
+                    }
+                 </ul>
+            </div>
+            <div class="search-result-messages" *ngIf="filteredChannelMessages.length > 0">
+                <h3>Channel Messages</h3>
+                <ul>
+                     @for (message of filteredChannelMessages; track $index) {
+                        <li class="message-li">
+                            <div class="message-li-left">
+                                <img src="/icons/avatars/avatar_1.png" alt="">
+                            </div>
+                            <div class="message-li-right">
+                                <h4>{{ findUserNameByID(message.authorID) }}<span>{{ dateService.getGermanRelativeDateWithTime(message.createdAt)}}</span></h4>
+                                <p>{{ message.content}} </p>
+                            </div>
+                        
+                        </li>
+                    }
+                 </ul>
+            </div>
+        </div>
+    </div>
+   
 
     <div class="profile-container" (click)="currentUser && showProfile(currentUser)">
         <span>{{currentUser?.displayName}}</span>

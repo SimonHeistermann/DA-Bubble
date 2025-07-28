@@ -1,10 +1,10 @@
-
 @use './../../../../../../styles.scss' as *;
 
 .search-message-header-container {
     width: 100%;
     position: relative;
     @include displayFlex($fd: column, $g: 10px, $ai: flex-start);
+
     h2 {
         font-size: 24px;
     }
@@ -20,7 +20,7 @@
         &:focus {
             border: 1px solid var(--purple-2);
         }
-        
+
     }
 
     .search-result {
@@ -37,25 +37,26 @@
         overflow-y: auto;
 
         .divider {
-            background-color: var(--grey) ;
+            background-color: var(--grey);
             width: 100%;
             height: 1px;
             margin-top: 10px;
             margin-bottom: 10px;
         }
 
-        .search-result-user,  .search-result-channel {
+        .search-result-user,
+        .search-result-channel {
 
             ul {
                 li {
-                    
+
                     width: 100%;
                     padding: 10px;
                     border-radius: 20px;
                     cursor: pointer;
                     @include displayFlex($g: 10px, $jc: flex-start);
 
-                     &:hover {
+                    &:hover {
                         background-color: var(--bg-color);
                     }
 
@@ -65,9 +66,61 @@
                         border-radius: 50%;
                     }
                 }
-               
+
             }
-        }   
-        
+        }
+
+    }
+}
+
+@media (max-width: 420px) {
+    .search-message-header-container {
+        align-items: center;
+    }
+
+    .search-message-header-container {
+        .search-result {
+            left: auto;
+            margin-top: 10px;
+            padding: 6px;
+
+            .search-result-user {
+                h3 {
+                    padding-left: 30px;
+                }
+
+                ul {
+                    width: 96%;
+
+                    li {
+                        width: max-content;
+
+                        >span {
+                            font-size: 14px;
+                        }
+                    }
+                }
+
+            }
+        }
+    }
+
+    .search-result-user {
+        h3 {
+            padding-left: 30px;
+        }
+
+        ul {
+            width: 96%;
+
+            li {
+                gap: 2px;
+
+                >span {
+                    font-size: 14px;
+                }
+            }
+        }
+
     }
 }
