@@ -376,6 +376,11 @@ form.submitting {
     opacity: 0.8;
 }
   
+.input__wrapper {
+    position: relative;
+}
+  
+  
 @keyframes spin {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }

@@ -12,6 +12,12 @@ import { SuccessNotificationComponent } from '../notifications/success-notificat
 import { NotificationService } from '../../../../core/services/notification-service/notification.service';
 import { IntroAnimationComponent } from '../intro-animation/intro-animation.component';
 
+interface LoginErrorMessages {
+  email: { [key: string]: string };
+  password: { [key: string]: string };
+  honeypot: { [key: string]: string };
+}
+
 @Component({
   selector: 'app-login',
   standalone: true,
@@ -32,6 +38,20 @@ export class LoginComponent implements OnInit, OnDestroy {
   showGuestInfo = false;
   private destroy$ = new Subject<void>();
   private redirectTimeoutId?: number;
+
+  private readonly errorMessages: LoginErrorMessages = {
+    email: {
+      required: '*E-Mail-Adresse ist erforderlich.',
+      email: '*Diese E-Mail-Adresse ist leider ungültig.'
+    },
+    password: {
+      required: '*Passwort ist erforderlich.',
+      simplePassword: '*Passwort muss mindestens 6 Zeichen haben.'
+    },
+    honeypot: {
+      honeypot: '*Verdächtige Aktivität erkannt.'
+    }
+  };
 
   constructor(
     private fb: FormBuilder,
@@ -75,14 +95,14 @@ export class LoginComponent implements OnInit, OnDestroy {
   private createForm(): void {
     this.loginForm = this.fb.group({
       email: ['', [
-        Validators.required,
+        AuthValidators.required,
         AuthValidators.email
       ]],
       password: ['', [
-        Validators.required,
+        AuthValidators.required,
         AuthValidators.simplePassword
       ]],
-      honeypot: ['']
+      honeypot: ['', [AuthValidators.honeypot]]
     });
   }
 
@@ -91,6 +111,7 @@ export class LoginComponent implements OnInit, OnDestroy {
   onSubmit(): void {
     if (this.loginForm.get('honeypot')?.value) {
       console.warn('Honeypot field filled. Possible bot.');
+      this.notificationService.showError('Verdächtige Aktivität erkannt.');
       return;
     }
     if (this.loginForm.valid && !this.loading) {
@@ -147,8 +168,19 @@ export class LoginComponent implements OnInit, OnDestroy {
   }
   
   private handleEmailLoginError(error: any): void {
-    console.error('Login error:', error);
-    this.notificationService.showError('Fehler beim Anmelden.');
+    let errorMessage = 'Fehler beim Anmelden.';
+    if (error.code === 'auth/user-not-found') {
+      errorMessage = 'Benutzer nicht gefunden.';
+    } else if (error.code === 'auth/wrong-password') {
+      errorMessage = 'Falsches Passwort.';
+    } else if (error.code === 'auth/invalid-email') {
+      errorMessage = 'Ungültige E-Mail-Adresse.';
+    } else if (error.code === 'auth/user-disabled') {
+      errorMessage = 'Ihr Konto wurde deaktiviert.';
+    } else if (error.code === 'auth/too-many-requests') {
+      errorMessage = 'Zu viele Anmeldeversuche. Bitte versuchen Sie es später erneut.';
+    }
+    this.notificationService.showError(errorMessage);
   }
 
   private handleGoogleLoginSuccess(): void {
@@ -159,8 +191,13 @@ export class LoginComponent implements OnInit, OnDestroy {
   }  
 
   private handleGoogleLoginError(error: any): void {
-    console.error('Google login error:', error);
-    this.notificationService.showError('Fehler bei der Google-Anmeldung.');
+    let errorMessage = 'Fehler bei der Google-Anmeldung.';
+    if (error.code === 'auth/popup-closed-by-user') {
+      errorMessage = 'Anmeldung abgebrochen.';
+    } else if (error.code === 'auth/popup-blocked') {
+      errorMessage = 'Popup wurde blockiert. Bitte erlauben Sie Popups für diese Seite.';
+    }
+    this.notificationService.showError(errorMessage);
   }
 
   private handleGuestLoginSuccess(): void {
@@ -178,7 +215,6 @@ export class LoginComponent implements OnInit, OnDestroy {
 
   private handleGuestLoginError(error: any): void {
     this.guestLoading = false;
-    console.error('Guest login error:', error);
     this.notificationService.showError('Fehler beim Gast-Login!');
   }
 
@@ -186,8 +222,8 @@ export class LoginComponent implements OnInit, OnDestroy {
 
   private extractLoginCredentials(): LoginCredentials {
     return {
-      email: this.loginForm.get('email')?.value.trim(),
-      password: this.loginForm.get('password')?.value
+      email: this.loginForm.get('email')?.value?.trim() || '',
+      password: this.loginForm.get('password')?.value || ''
     };
   }
 
@@ -200,36 +236,38 @@ export class LoginComponent implements OnInit, OnDestroy {
   private touchAndAnimateInvalidField(key: string): void {
     const control = this.loginForm.get(key);
     control?.markAsTouched();
+    
     if (control?.invalid) {
-      const element = document.getElementById(`${key}-group`);
-      if (element) {
-        element.classList.add('error__state');
-        setTimeout(() => element.classList.remove('error__state'), 300);
-      }
+      this.triggerErrorAnimation(key);
+    }
+  }
+
+  private triggerErrorAnimation(fieldName: string): void {
+    const element = document.getElementById(`${fieldName}-group`);
+    if (element) {
+      element.classList.remove('error__state');
+      element.offsetHeight;
+      element.classList.add('error__state');
+      setTimeout(() => {
+        element.classList.remove('error__state');
+      }, 300);
     }
   }
 
   getFieldError(fieldName: string): string | null {
-    const field = this.loginForm.get(fieldName);
-    if (field?.touched && field.invalid) {
-      return this.getControlErrorMessage(fieldName, field.errors);
+    const control = this.loginForm.get(fieldName);
+    if (!control || (!control.touched && !control.dirty)) {
+      return null;
+    }
+    if (control.errors) {
+      const firstErrorKey = Object.keys(control.errors)[0];
+      const fieldErrors = this.errorMessages[fieldName as keyof LoginErrorMessages];
+      if (fieldErrors && fieldErrors[firstErrorKey]) {
+        return fieldErrors[firstErrorKey];
+      }
+      return `*${firstErrorKey} error`;
     }
     return null;
-  }
-
-  private getControlErrorMessage(fieldName: string, errors: any): string | null {
-    if (errors?.['required']) return this.getRequiredErrorMessage(fieldName);
-    if (errors?.['email']) return '*Diese E-Mail-Adresse ist leider ungültig.';
-    if (errors?.['simplePassword']) return '*Passwort muss mindestens 6 Zeichen haben.';
-    return null;
-  }
-
-  private getRequiredErrorMessage(fieldName: string): string {
-    const errorMessages: { [key: string]: string } = {
-      email: '*E-Mail-Adresse ist erforderlich.',
-      password: '*Passwort ist erforderlich.'
-    };
-    return errorMessages[fieldName] || '*Dieses Feld ist erforderlich.';
   }
 
   isFieldInvalid(fieldName: string): boolean {
@@ -244,7 +282,7 @@ export class LoginComponent implements OnInit, OnDestroy {
 
   hasFieldContent(fieldName: string): boolean {
     const field = this.loginForm.get(fieldName);
-    return !!(field?.value && field.value.toString().length > 0);
+    return !!(field?.value && field.value.toString().trim().length > 0);
   }
 
   // ========== UI INTERACTION METHODS ==========
