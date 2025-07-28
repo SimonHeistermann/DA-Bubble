@@ -16,7 +16,7 @@
     height: 40px;
     cursor: pointer;
     transition: all 0.2s ease;
-    background-image: url('/images/icons/arrow_left_default.png');
+    background-image: url('/angular-projects/dabubble/images/icons/arrow_left_default.png');
     background-size: contain;
     background-repeat: no-repeat;
     background-position: center;
@@ -24,7 +24,7 @@
 
     &:hover {
         transform: translateX(-2px);
-        background-image: url('/images/icons/arrow_left_hover.png');
+        background-image: url('/angular-projects/dabubble/images/icons/arrow_left_hover.png');
     }
 }
 
@@ -200,7 +200,7 @@ label {
         .checkbox__icon {
             width: 24px;
             height: 24px;
-            background-image: url('/images/icons/checkbox_default.png');
+            background-image: url('/angular-projects/dabubble/images/icons/checkbox_default.png');
             background-size: contain;
             background-repeat: no-repeat;
             background-position: center;
@@ -208,15 +208,15 @@ label {
         }
 
         &:hover .checkbox__icon {
-            background-image: url('/images/icons/checkbox_hover.png');
+            background-image: url('/angular-projects/dabubble/images/icons/checkbox_hover.png');
         }
 
         input[type="checkbox"]:checked + .checkbox__icon {
-            background-image: url('/images/icons/checkbox_checked.png');
+            background-image: url('/angular-projects/dabubble/images/icons/checkbox_checked.png');
         }
 
         input[type="checkbox"]:checked:hover + .checkbox__icon {
-            background-image: url('/images/icons/checkbox_checked_hover.png');
+            background-image: url('/angular-projects/dabubble/images/icons/checkbox_checked_hover.png');
         }
     }
 
