@@ -33,9 +33,7 @@ export class LoginComponent implements OnInit, OnDestroy {
   showIntro = false;
   loginForm!: FormGroup;
   loading = false;
-  showPassword = false;
   guestLoading = false;
-  showGuestInfo = false;
   private destroy$ = new Subject<void>();
   private redirectTimeoutId?: number;
 
@@ -287,22 +285,8 @@ export class LoginComponent implements OnInit, OnDestroy {
 
   // ========== UI INTERACTION METHODS ==========
 
-  togglePasswordVisibility(): void {
-    this.showPassword = !this.showPassword;
-  }
-
-  toggleGuestInfo(): void {
-    this.showGuestInfo = !this.showGuestInfo;
-  }
-
   hideAllNotifications(): void {
     this.notificationService.clearAll();
-  }
-
-  onEscapeKey(): void {
-    if (this.showGuestInfo) {
-      this.showGuestInfo = false;
-    }
   }
 
   // ========== INTRO ANIMATION ==========
