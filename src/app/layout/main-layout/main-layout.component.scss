@@ -52,7 +52,7 @@ app-main-header {
 
 
     >img {
-        content: url('/images/icons/show-navigation.png');
+        content: url('/angular-projects/dabubble/images/icons/show-navigation.png');
     }
 
     &::after {
@@ -65,7 +65,7 @@ app-main-header {
         transition: 0.6s;
 
         >img {
-            content: url('/images/icons/show_navigation_hover.png');
+            content: url('/angular-projects/dabubble/images/icons/show_navigation_hover.png');
             transition: 0.6s;
         }
     }
@@ -74,7 +74,7 @@ app-main-header {
 .show-menu {
 
     >img {
-        content: url('/images/icons/hide_navigation.png');
+        content: url('/angular-projects/dabubble/images/icons/hide_navigation.png');
     }
 
     &::after {
@@ -87,7 +87,7 @@ app-main-header {
         transition: 0.6s;
 
         >img {
-            content: url('/images/icons/hide_navigation_hover.png');
+            content: url('/angular-projects/dabubble/images/icons/hide_navigation_hover.png');
             transition: 0.6s;
         }
     }
