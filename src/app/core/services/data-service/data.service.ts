@@ -9,7 +9,6 @@ export class DataService {
     private firebaseCore = inject(FirebaseService);
 
     constructor() {
-        console.log('📊 Data Service initialized');
     }
 
     // ==================== ENHANCED DOCUMENT OPERATIONS ====================

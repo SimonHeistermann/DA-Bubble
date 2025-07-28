@@ -1,12 +1,11 @@
-# RewriteEngine aktivieren
 RewriteEngine On
-RewriteBase /
 
-# 1. Wenn Datei oder Verzeichnis existiert, keine Umschreibung
 RewriteCond %{REQUEST_FILENAME} -s [OR]
+
 RewriteCond %{REQUEST_FILENAME} -l [OR]
+
 RewriteCond %{REQUEST_FILENAME} -d
+
 RewriteRule ^.*$ - [NC,L]
 
-# 3. SPA-Fallback: Alle anderen Anfragen gehen an index.html
 RewriteRule ^(.*)$ index.html [NC,L]
