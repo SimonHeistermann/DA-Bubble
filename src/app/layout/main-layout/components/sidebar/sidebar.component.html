@@ -14,7 +14,7 @@
         <section *ngIf="smallScreen || isTablet || isMobile" #search class="search-container d__none">
             <div *ngIf="showList" class="search-overhead">
                 <p>Search</p>
-                <img src="/icons/close.png" (click)="closeSearch()">
+                <img src="images/icons/close.png" (click)="closeSearch()">
             </div>
             <input #input type="text" class="search-field" placeholder="Gehe zu..." [(ngModel)]="inputContent"
                 (input)="inputText()">
@@ -24,7 +24,7 @@
                     <ul>
                         @for (user of filteredUsers; track user.id) {
                         <li (click)="clickUser(user)">
-                            <img [src]="user?.photoURL">
+                            <img class="avatar" [src]="user?.photoURL">
                             <div class="user-info">
                                 <h4>{{ user.displayName }}</h4>
                                 <span>{{ user.email }}</span>
@@ -40,7 +40,7 @@
                     <ul>
                         @for (channel of filteredChannels; track channel.id) {
                         <li (click)="clickChannel(channel)">
-                            <img src="/icons/tag.png" alt="">
+                            <img class="avatar" src="images/icons/tag.png" alt="">
                             <h3>{{ channel.name }}</h3>
                         </li>
                         } @empty {
@@ -54,8 +54,7 @@
                         @for (message of filteredPrivateMessages; track $index) {
                         <li class="msg-li">
                             <div class="msg-li-left">
-                                <!-- <img src="images/icons/avatars/avatar_1.png"> -->
-                                <img [src]="findUserPhotoUrlByID(message.authorID)">
+                                <img class="avatar" [src]="findUserPhotoUrlByID(message.authorID)">
                             </div>
                             <div class="msg-li-right">
                                 <div>
@@ -76,8 +75,7 @@
                         @for (message of filteredChannelMessages; track $index) {
                         <li class="msg-li">
                             <div class="msg-li-left">
-                                <!-- <img src="/icons/avatars/avatar_1.png"> -->
-                                <img [src]="findUserPhotoUrlByID(message.authorID)">
+                                <img class="avatar" [src]="findUserPhotoUrlByID(message.authorID)">
                             </div>
                             <div class="msg-li-right">
                                 <div>

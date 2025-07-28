@@ -18,7 +18,7 @@
                 <ul>
                     @for (user of filteredUsers; track user.id) {
                         <li  (click)="clickUser(user)"> 
-                            <img [src]="user?.photoURL?.startsWith('http') ? '/icons/avatars/avatar_1.png' : user?.photoURL" alt="">
+                            <img [src]="user?.photoURL?.startsWith('http') ? 'images/icons/avatars/avatar_1.png' : user?.photoURL" alt="">
                             <h4>{{ user.displayName }}</h4>
                             <span>{{ user.email }}</span>
                         </li>
@@ -33,7 +33,7 @@
                 <ul> 
                     @for (channel of filteredChannels; track channel.id) {
                         <li  (click)="clickChannel(channel)"> 
-                            <img src="/icons/tag.png" alt="">
+                            <img src="images/icons/tag.png" alt="">
                             <h4>{{ channel.name }}</h4>
                             <span>
                                 @if(channel.name == 'Allgemein'){
@@ -55,7 +55,7 @@
                      @for (message of filteredPrivateMessages; track $index) {
                         <li class="message-li">
                             <div class="message-li-left">
-                                <img src="/icons/avatars/avatar_1.png" alt="">
+                                <img src="images/icons/avatars/avatar_1.png" alt="">
                             </div>
                             <div class="message-li-right">
                                 <h4>{{ findUserNameByID(message.authorID) }}<span>{{ dateService.getGermanRelativeDateWithTime(message.createdAt)}}</span></h4>
@@ -72,7 +72,7 @@
                      @for (message of filteredChannelMessages; track $index) {
                         <li class="message-li">
                             <div class="message-li-left">
-                                <img src="/icons/avatars/avatar_1.png" alt="">
+                                <img src="images/icons/avatars/avatar_1.png" alt="">
                             </div>
                             <div class="message-li-right">
                                 <h4>{{ findUserNameByID(message.authorID) }}<span>{{ dateService.getGermanRelativeDateWithTime(message.createdAt)}}</span></h4>
