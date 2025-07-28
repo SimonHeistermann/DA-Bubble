@@ -95,7 +95,6 @@ export class SidebarComponent implements OnInit, OnDestroy {
       this.smallScreen = smallScreen;
       this.showList = false;
       this.inputContent = '';
-      this.input.nativeElement.placeholder = '';
       this.cdRef.detectChanges();
     })
     this.dashboardResponsive.isTablet$.subscribe(isTablet => {
@@ -111,19 +110,23 @@ export class SidebarComponent implements OnInit, OnDestroy {
 
   subChannelMessage() {
     this.communicator.channelMessage$.subscribe(channel => {
-      
       const index = this.channels.findIndex(c => c.id == channel.id);
       this.currentChannelIndex = index;
       this.currentUserIndex = -1;
       this.cdRef.detectChanges();
-
       setTimeout(() => {
-        const el = this.channelItems.get(index)?.nativeElement;
-        console.log(el);
-        
-        el?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      });
-    })
+        if (this.channelItems && index >= 0 && index < this.channelItems.length) {
+          const el = this.channelItems.get(index)?.nativeElement;
+          if (el) {
+            el.scrollIntoView({ behavior: 'smooth', block: 'center' });
+          } else {
+            console.warn('Element not found at index', index);
+          }
+        } else {
+          console.warn('channelItems not ready or index out of bounds', index, this.channelItems?.length);
+        }
+      }, 0);
+    });
   }
 
   subUserMessage() {

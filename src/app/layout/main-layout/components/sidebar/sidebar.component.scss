@@ -39,7 +39,7 @@
     margin: 20px 0px;
 
     .devspace-icon {
-        @include imgButton($wh: 40px, $url: 'images/icons/edit_square.png');
+        @include imgButton($wh: 40px, $url: '/images/icons/edit_square.png');
 
         &:hover {
             background-image: url('/images/icons/edit_square_hover.png');
@@ -305,6 +305,7 @@
         .users {
             width: 100%;
             overflow: hidden;
+            margin-bottom: 54px;
 
             ul {
 
@@ -388,3 +389,4 @@
             }
         }
     }
+}
