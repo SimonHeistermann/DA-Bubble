@@ -4,10 +4,14 @@ import { map, switchMap, catchError, tap } from 'rxjs/operators';
 import { AuthUser } from '../../models/auth.interface';
 import { User } from '../../models/user.interface';
 import { Channel } from '../../models/channel.interface';
+import { Message } from '../../models/message.interface';
+import { ThreadMessage } from '../../models/message.interface';
 import { UserService } from '../user-service/user.service';
 import { ChannelService } from '../channel.service';
 import { MessageService } from '../message.service';
 import { UserChannelActivityService } from '../userReadActivity.service';
+import { ConversationService } from './../conversation-service/conversation.service';
+import { ThreadMessageService } from './../thread-message-service/thread-message.service';
 import { Timestamp } from 'firebase/firestore';
 import { v4 as uuidv4 } from 'uuid';
 
@@ -32,7 +36,9 @@ export class GuestLoginService {
     private userService: UserService,
     private channelService: ChannelService,
     private messageService: MessageService,
-    private UserChannelActivityService: UserChannelActivityService
+    private UserChannelActivityService: UserChannelActivityService,
+    private conversationService: ConversationService,
+    private threadMessageService: ThreadMessageService
   ) {
     this.restoreGuestFromLocalStorage();
   }
@@ -59,7 +65,8 @@ export class GuestLoginService {
     const guest = this.currentGuestSubject.value;
     this.currentGuestSubject.next(null);
     if (!guest) return of(void 0);
-    return this.cleanupGuestReferences(guest).pipe(
+    
+    return this.performCompleteGuestCleanup(guest).pipe(
       switchMap(() => this.userService.deleteUser(guest.uid)),
       tap(() => localStorage.removeItem(this.GUEST_STORAGE_KEY)),
       map(() => void 0),
@@ -137,6 +144,209 @@ export class GuestLoginService {
     return `${m} Minute${m > 1 ? 'n' : ''}`;
   }
 
+  // ========== PRIVATE HELPER METHODS ==========
+
+  private performCompleteGuestCleanup(guest: GuestUser): Observable<void> {
+    if (!this.isGuestUser(guest.uid)) {
+      console.warn('Attempted cleanup of non-guest user:', guest.uid);
+      return of(void 0);
+    }
+    return forkJoin([
+      this.cleanupGuestChannelReferences(guest),
+      this.cleanupGuestConversations(guest),
+      this.cleanupGuestThreadMessages(guest),
+      this.cleanupGuestReactions(guest),
+      this.cleanupGuestActivities(guest)
+    ]).pipe(
+      map(() => void 0),
+      catchError(error => {
+        console.error('Failed to perform complete guest cleanup:', error);
+        return of(void 0);
+      })
+    );
+  }
+
+  private cleanupGuestChannelReferences(guest: GuestUser): Observable<void> {
+    return this.channelService.getAllChannelsOnce().pipe(
+      switchMap(channels => this.removeGuestFromAllChannels(channels, guest)),
+      catchError(() => of(void 0))
+    );
+  }
+
+  private cleanupGuestConversations(guest: GuestUser): Observable<void> {
+    return this.conversationService.getConversationsByUser(guest.uid).pipe(
+      switchMap(conversations => this.deleteGuestConversations(conversations)),
+      catchError(() => of(void 0))
+    );
+  }
+
+  private cleanupGuestThreadMessages(guest: GuestUser): Observable<void> {
+    return this.threadMessageService.getThreadMessagesByAuthor(guest.uid).pipe(
+      switchMap(threadMessages => this.processGuestThreadMessages(threadMessages)),
+      catchError(() => of(void 0))
+    );
+  }
+
+  private cleanupGuestReactions(guest: GuestUser): Observable<void> {
+    return forkJoin([
+      this.removeGuestReactionsFromMessages(guest.uid),
+      this.removeGuestReactionsFromThreadMessages(guest.uid)
+    ]).pipe(
+      map(() => void 0),
+      catchError(() => of(void 0))
+    );
+  }
+
+  private cleanupGuestActivities(guest: GuestUser): Observable<void> {
+    return forkJoin([
+      this.messageService.deleteMessagesByUser(guest.uid),
+      this.UserChannelActivityService.deleteActivitiesByUser(guest.uid)
+    ]).pipe(
+      map(() => void 0),
+      catchError(() => of(void 0))
+    );
+  }
+
+  private removeGuestFromAllChannels(channels: Channel[], guest: GuestUser): Observable<void> {
+    const updateOperations = channels
+      .filter(channel => channel.userIDs.includes(guest.uid))
+      .map(channel => this.updateChannelWithoutGuest(channel, guest.uid));
+    
+    return updateOperations.length > 0 
+      ? forkJoin(updateOperations).pipe(map(() => void 0))
+      : of(void 0);
+  }
+
+  private deleteGuestConversations(conversations: any[]): Observable<void> {
+    const deleteOperations = conversations.map(conv => 
+      this.conversationService.deleteConversation(conv.coversationID)
+    );
+    
+    return deleteOperations.length > 0 
+      ? forkJoin(deleteOperations).pipe(map(() => void 0))
+      : of(void 0);
+  }
+
+  private processGuestThreadMessages(threadMessages: ThreadMessage[]): Observable<void> {
+    const processOperations = threadMessages.map(threadMsg => 
+      this.deleteThreadMessageAndUpdateCount(threadMsg)
+    );
+    
+    return processOperations.length > 0 
+      ? forkJoin(processOperations).pipe(map(() => void 0))
+      : of(void 0);
+  }
+
+  private deleteThreadMessageAndUpdateCount(threadMessage: ThreadMessage): Observable<void> {
+    return this.threadMessageService.deleteThreadMessage(threadMessage.id!).pipe(
+      switchMap(() => this.decrementMessageThreadCount(threadMessage.messageId)),
+      catchError(() => of(void 0))
+    );
+  }
+
+  private decrementMessageThreadCount(messageId: string): Observable<void> {
+    return this.messageService.getMessageById(messageId).pipe(
+      switchMap(message => {
+        if (!message) return of(void 0);
+        const updatedCount = Math.max(0, message.threadCount - 1);
+        return this.messageService.updateMessage(messageId, { 
+          threadCount: updatedCount 
+        });
+      }),
+      map(() => void 0),
+      catchError(() => of(void 0))
+    );
+  }
+
+  private removeGuestReactionsFromMessages(guestId: string): Observable<void> {
+    return this.messageService.getAllMessages().pipe(
+      switchMap(messages => this.updateMessagesWithoutGuestReactions(messages, guestId)),
+      catchError(() => of(void 0))
+    );
+  }
+
+  private removeGuestReactionsFromThreadMessages(guestId: string): Observable<void> {
+    return this.threadMessageService.getAllThreadMessages().pipe(
+      switchMap(threadMessages => this.updateThreadMessagesWithoutGuestReactions(threadMessages, guestId)),
+      catchError(() => of(void 0))
+    );
+  }
+
+  private updateMessagesWithoutGuestReactions(messages: Message[], guestId: string): Observable<void> {
+    const updateOperations = messages
+      .filter(msg => this.messageHasGuestReactions(msg, guestId))
+      .map(msg => this.updateMessageReactions(msg, guestId));
+    
+    return updateOperations.length > 0 
+      ? forkJoin(updateOperations).pipe(map(() => void 0))
+      : of(void 0);
+  }
+
+  private updateThreadMessagesWithoutGuestReactions(threadMessages: ThreadMessage[], guestId: string): Observable<void> {
+    const updateOperations = threadMessages
+      .filter(msg => this.threadMessageHasGuestReactions(msg, guestId))
+      .map(msg => this.updateThreadMessageReactions(msg, guestId));
+    
+    return updateOperations.length > 0 
+      ? forkJoin(updateOperations).pipe(map(() => void 0))
+      : of(void 0);
+  }
+
+  private messageHasGuestReactions(message: Message, guestId: string): boolean {
+    if (!message.reactions) return false;
+    return Object.values(message.reactions).some(reaction => 
+      reaction.users.includes(guestId)
+    );
+  }
+
+  private threadMessageHasGuestReactions(threadMessage: ThreadMessage, guestId: string): boolean {
+    return threadMessage.reactions?.some(reaction => 
+      reaction.user.includes(guestId)
+    ) ?? false;
+  }
+
+  private updateMessageReactions(message: Message, guestId: string): Observable<void> {
+    const cleanedReactions = this.removeGuestFromMessageReactions(message.reactions!, guestId);
+    return this.messageService.updateMessage(message.id, { reactions: cleanedReactions });
+  }
+
+  private updateThreadMessageReactions(threadMessage: ThreadMessage, guestId: string): Observable<void> {
+    const cleanedReactions = this.removeGuestFromThreadReactions(threadMessage.reactions!, guestId);
+    return this.threadMessageService.updateThreadMessage(threadMessage.id!, { 
+      reactions: cleanedReactions 
+    });
+  }
+
+  private removeGuestFromMessageReactions(reactions: any, guestId: string): any {
+    const cleaned: any = {};
+    for (const [emoji, reaction] of Object.entries(reactions)) {
+      const filteredUsers = (reaction as any).users.filter((userId: string) => userId !== guestId);
+      if (filteredUsers.length > 0) {
+        cleaned[emoji] = { users: filteredUsers };
+      }
+    }
+    return cleaned;
+  }
+
+  private removeGuestFromThreadReactions(reactions: any[], guestId: string): any[] {
+    return reactions
+      .map(reaction => ({
+        ...reaction,
+        user: reaction.user.filter((userId: string) => userId !== guestId)
+      }))
+      .filter(reaction => reaction.user.length > 0);
+  }
+
+  private updateChannelWithoutGuest(channel: Channel, guestId: string): Observable<void> {
+    const updatedUserIDs = channel.userIDs.filter(id => id !== guestId);
+    return this.channelService.updateChannel(channel.id, {
+      ...channel,
+      userIDs: updatedUserIDs
+    });
+  }
+
+  // ========== EXISTING HELPER METHODS (UNCHANGED) ==========
+
   private restoreGuestFromLocalStorage(): void {
     const deviceId = localStorage.getItem(this.GUEST_STORAGE_KEY);
     if (!deviceId) return;
@@ -199,21 +409,6 @@ export class GuestLoginService {
     );
   }
 
-  private removeGuestFromDefaultChannel(guest: GuestUser): Observable<GuestUser> {
-    return this.channelService.getChannelByNameOnce('Allgemein').pipe(
-      switchMap(channels => {
-        if (!channels.length) return of(guest);
-        const channel = channels[0];
-        const filtered = (channel.userIDs || []).filter(id => id !== guest.uid);
-        return this.channelService.updateChannel(channel.id, {
-          ...channel,
-          userIDs: filtered
-        }).pipe(map(() => guest));
-      }),
-      catchError(() => of(guest))
-    );
-  }
-
   private saveGuest(guest: GuestUser): Observable<GuestUser> {
     const user: User = {
       id: guest.uid,
@@ -232,13 +427,6 @@ export class GuestLoginService {
     return from(this.userService.createUser(user)).pipe(
       map(() => guest),
       catchError(error => throwError(() => error))
-    );
-  }
-
-  private deleteGuest(uid: string): Observable<void> {
-    return this.userService.deleteUser(uid).pipe(
-      map(() => void 0),
-      catchError(() => of(void 0))
     );
   }
 
@@ -293,38 +481,7 @@ export class GuestLoginService {
     return `images/icons/avatars/avatar_${num}.png`;
   }
 
-  private cleanupGuestReferences(guest: GuestUser): Observable<void> {
-    return this.channelService.getAllChannelsOnce().pipe(
-      switchMap(channels => this.performGuestCleanup(channels, guest)),
-      catchError(error => {
-        console.error('Failed to clean up guest references:', error);
-        return of(void 0);
-      })
-    );
+  private isGuestUser(userId: string): boolean {
+    return userId.startsWith('guest_');
   }
-  
-  private performGuestCleanup(channels: Channel[], guest: GuestUser): Observable<void> {
-    const removeFromChannels$ = this.removeGuestFromChannels(channels, guest);
-    const deleteMessages$ = this.messageService.deleteMessagesByUser(guest.uid);
-    const deleteActivities$ = this.UserChannelActivityService.deleteActivitiesByUser(guest.uid);
-    return forkJoin([
-      ...removeFromChannels$,
-      deleteMessages$,
-      deleteActivities$
-    ]).pipe(map(() => void 0));
-  }
-  
-  private removeGuestFromChannels(channels: Channel[], guest: GuestUser): Observable<void>[] {
-    return channels
-      .filter(channel => channel.userIDs.includes(guest.uid))
-      .map(channel => this.updateChannelWithoutGuest(channel, guest.uid));
-  }
-  
-  private updateChannelWithoutGuest(channel: Channel, guestId: string): Observable<void> {
-    const updatedUserIDs = channel.userIDs.filter(id => id !== guestId);
-    return this.channelService.updateChannel(channel.id, {
-      ...channel,
-      userIDs: updatedUserIDs
-    });
-  }  
 }

@@ -149,7 +149,6 @@ export class LoginComponent implements OnInit, OnDestroy {
       takeUntil(this.destroy$)
     ).subscribe({
       next: (guestUser) => {
-        console.log('Guest user logged in:', guestUser);
         this.handleGuestLoginSuccess();
       },
       error: (error) => this.handleGuestLoginError(error)
@@ -312,7 +311,6 @@ export class LoginComponent implements OnInit, OnDestroy {
       takeUntil(this.destroy$)
     ).subscribe(user => {
       if (user) {
-        console.log('User authenticated, redirecting to dashboard');
         this.router.navigate(['/dashboard']);
       }
     });
