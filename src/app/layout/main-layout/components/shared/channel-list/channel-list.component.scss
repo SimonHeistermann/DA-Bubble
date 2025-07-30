@@ -1,0 +1,42 @@
+
+@use './../../../../../../styles.scss' as *;
+
+.simple-bar {
+     max-height: 30vh;
+     width: 300px;
+    padding-bottom: 3px !important;
+}
+
+.ul-list-container {
+    
+    border-bottom-right-radius: 20px;
+    border-bottom-left-radius: 20px;
+    border-top-right-radius: 20px;
+
+
+    ul {
+        @include displayFlex($fd: column, $g: 15px);
+        list-style: none;
+
+        li {
+            width: calc(100% - 20px);
+            padding: 5px 10px;
+            border-radius: 35px;
+            
+            &:hover {
+                background-color: var(--bg-color);
+            }
+            &.no-li:hover {
+                background-color: transparent !important;
+            }
+           
+            .li-content {
+                @include displayFlex($g: 20px, $jc: flex-start);
+                .name {
+                    font-size: 18px;
+                    font-weight: 400;
+                }
+            }
+        }
+    }
+}
