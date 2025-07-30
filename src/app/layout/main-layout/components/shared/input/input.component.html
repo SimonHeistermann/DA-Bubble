@@ -2,6 +2,9 @@
     <div class="user-list" *ngIf="showUserListOverlay" [style.left]="editingMode ? '50%' : '20px'" [style.transform]="editingMode ? 'translateX(-50%)' : 'none'">
          <app-user-list (closeOverlayEmitter)="closeAtUserListOverlay()" (clickedUser)="onClickUser($event)"  [dataSource]="allChannelUser" [maxHeight]="editingMode ? '25vh' : '50vh'" ></app-user-list>
     </div>
+     <div class="user-list" *ngIf="showChannelListOverlay" [style.left]="editingMode ? '50%' : '20px'" [style.transform]="editingMode ? 'translateX(-50%)' : 'none'">
+         <app-channel-list (closeOverlayEmitter)="closeChannelListOverlay()" (clickChannelNameEmitter)="onclickChannel($event)" [maxHeight]="editingMode ? '25vh' : '50vh'" ></app-channel-list>
+    </div>
     <textarea 
         #textarea
          autoResize
