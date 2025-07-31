@@ -452,8 +452,6 @@ export class AuthService {
   private scheduleGuestCleanup(): void {
     setInterval(() => {
       this.cleanupExpiredGuests().subscribe({
-        next: () => console.log('Guest cleanup completed'),
-        error: (error) => console.error('Guest cleanup failed:', error)
       });
     }, 24 * 60 * 60 * 1000);
   }

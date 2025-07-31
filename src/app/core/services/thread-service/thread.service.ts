@@ -167,8 +167,9 @@ setSelectedUser(user: User) {
     this.allSelectedUsers.push(user);
   }
 
- this.allUsersWithOutCurrentUser = this.allUsers.filter(u =>
-  u.id !== this.currentUser?.id &&
-  !this.allSelectedUsers.some(selected => selected.id === u.id)
-);
-}
+  this.allUsersWithOutCurrentUser = this.allUsers.filter(u =>
+    u.id !== this.currentUser?.id &&
+    !this.allSelectedUsers.some(selected => selected.id === u.id)
+  );
+};
+};
