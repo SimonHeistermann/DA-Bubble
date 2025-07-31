@@ -143,7 +143,7 @@ export class MainHeaderComponent implements OnDestroy {
     this.filteredChannelMessages = [];
     this.filteredPrivateMessages = [];
 
-    const search = value.slice(1).toLowerCase(); // remove '#'
+    const search = value.slice(1).toLowerCase(); 
 
     this.filteredChannels = this.allChannel?.filter(channel =>
       channel.name.toLowerCase().includes(search)

@@ -1,4 +1,4 @@
-import { Component, ElementRef, Inject, Input, TemplateRef, ViewChild, inject } from '@angular/core';
+import { AfterViewChecked, Component, ElementRef, Inject, Input, TemplateRef, ViewChild, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { toggleMarginLeft20Animation } from '../../animations/expand-collapse.animation';
@@ -30,7 +30,7 @@ import { DashboardResponsiveService } from '../../../../core/services/dashboard-
   styleUrl: './thread-content.component.scss',
   animations: [toggleMarginLeft20Animation]
 })
-export class ThreadContentComponent {
+export class ThreadContentComponent implements AfterViewChecked {
 
   @Input() showSelf: boolean = true;
   @Input() channel: ChannelData | null = null;
@@ -72,6 +72,7 @@ export class ThreadContentComponent {
   viewContainerRef = inject(ViewContainerRef);
   dashboardResponsive = inject(DashboardResponsiveService);
   @ViewChild('containerBody') containerBody!: ElementRef;
+  @ViewChild('threadContainer') threadContainer!: ElementRef;
   @ViewChild('emojiPickerTemplate') emojiPickerTemplate !: TemplateRef<any>;
 
 
@@ -89,6 +90,12 @@ export class ThreadContentComponent {
       this.isMobile = isMobile;
     })
   } 
+
+  ngAfterViewChecked(): void {
+    if (this.dashboardResponsive.openThread$ && this.threadContainer) {
+      this.threadContainer.nativeElement.scrollTop = this.threadContainer.nativeElement.scrollHeight;
+    }
+  }
 
   getReactionsArray(){
     const reaction = this.selectedMessage?.reactions ?? {};
@@ -147,7 +154,6 @@ export class ThreadContentComponent {
   }
 
   showEmojiPicker(index: number) {
-  
     this.emojiPickerIndex = index;
 
     this.emojiPickerOverlayRef = this.overlayService.openTemplateOverlay(
