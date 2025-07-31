@@ -34,7 +34,7 @@ import { MainLayoutContentComponent } from '../../main-layout-content/main-layou
   styleUrl: './message.component.scss',
   animations: [],
 })
-export class MessageComponent implements OnInit{
+export class MessageComponent implements OnInit, AfterViewChecked{
 
   @ViewChild('containerBody') private containerBody!: ElementRef;
  
@@ -44,12 +44,14 @@ export class MessageComponent implements OnInit{
   
   userService = inject(UserService);
   channelService = inject(ChannelService);
+  dashboardResponsive = inject(DashboardResponsiveService);
   mainLayoutContentComponent = inject(MainLayoutContentComponent);
   allUsers: User[] = [];
   allUsersWithOutCurrentUser: User[] = [];
   authService = inject(AuthService);
   currentUser: User | null = null;
   channel: Channel | null = null;
+  allChannel: Channel[] = [];
   messageUser: User | null = null;
   messageService = inject(MessageService);
   userChannelActivityService = inject(UserChannelActivityService);
@@ -62,9 +64,6 @@ export class MessageComponent implements OnInit{
   route = inject(ActivatedRoute);
   router = inject(Router);
 
-  constructor(public dashboardResponsive: DashboardResponsiveService) {
-   
-  }
 
   ngOnInit(): void {
     this.subscriptions.add(
@@ -88,6 +87,12 @@ export class MessageComponent implements OnInit{
     this.showHeader = 'new';
     this.messageUser = null;
     this.messageUser = null;
+  }
+
+  ngAfterViewChecked(): void {
+    if (this.containerBody ) {
+      this.containerBody.nativeElement.scrollTop = this.containerBody.nativeElement.scrollHeight;
+    }
   }
 
   loadUser(userId:string) {

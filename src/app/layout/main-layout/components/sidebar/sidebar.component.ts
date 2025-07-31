@@ -230,7 +230,7 @@ export class SidebarComponent implements OnInit, OnDestroy {
   subAllChannels() {
     if(!this.currentUser) return;
     this.subscriptions.add(
-      this.channelService.getChannelsOrderByCreatedAt(this.currentUser.id, (data) => {
+      this.channelService.getChannels((data) => {
         this.channels = [...data];
         this.subAllChannelMessages()
         this.subAllPrivateMessages()

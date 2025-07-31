@@ -11,7 +11,7 @@ import { User } from '../../models/user.interface';
 import { Subscription } from 'rxjs';
 import { forkJoin } from 'rxjs';
 import { orderBy, where } from 'firebase/firestore';
-import { ChannelData } from '../../models/channel.interface';
+import { Channel, ChannelData } from '../../models/channel.interface';
 
 @Injectable({
   providedIn: 'root'
@@ -171,5 +171,4 @@ setSelectedUser(user: User) {
   u.id !== this.currentUser?.id &&
   !this.allSelectedUsers.some(selected => selected.id === u.id)
 );
-}
 }
