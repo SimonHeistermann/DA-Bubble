@@ -33,9 +33,7 @@ export class LoginComponent implements OnInit, OnDestroy {
   showIntro = false;
   loginForm!: FormGroup;
   loading = false;
-  showPassword = false;
   guestLoading = false;
-  showGuestInfo = false;
   private destroy$ = new Subject<void>();
   private redirectTimeoutId?: number;
 
@@ -151,7 +149,6 @@ export class LoginComponent implements OnInit, OnDestroy {
       takeUntil(this.destroy$)
     ).subscribe({
       next: (guestUser) => {
-        console.log('Guest user logged in:', guestUser);
         this.handleGuestLoginSuccess();
       },
       error: (error) => this.handleGuestLoginError(error)
@@ -287,22 +284,8 @@ export class LoginComponent implements OnInit, OnDestroy {
 
   // ========== UI INTERACTION METHODS ==========
 
-  togglePasswordVisibility(): void {
-    this.showPassword = !this.showPassword;
-  }
-
-  toggleGuestInfo(): void {
-    this.showGuestInfo = !this.showGuestInfo;
-  }
-
   hideAllNotifications(): void {
     this.notificationService.clearAll();
-  }
-
-  onEscapeKey(): void {
-    if (this.showGuestInfo) {
-      this.showGuestInfo = false;
-    }
   }
 
   // ========== INTRO ANIMATION ==========
@@ -328,7 +311,6 @@ export class LoginComponent implements OnInit, OnDestroy {
       takeUntil(this.destroy$)
     ).subscribe(user => {
       if (user) {
-        console.log('User authenticated, redirecting to dashboard');
         this.router.navigate(['/dashboard']);
       }
     });

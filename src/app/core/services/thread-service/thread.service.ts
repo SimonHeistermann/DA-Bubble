@@ -172,5 +172,3 @@ setSelectedUser(user: User) {
   !this.allSelectedUsers.some(selected => selected.id === u.id)
 );
 }
-  
-}
