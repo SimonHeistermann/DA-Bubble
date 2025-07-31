@@ -130,13 +130,6 @@ export class AddChannelUserComponent implements OnDestroy {
       // let channelData = ;
       this.subscriptions.add( 
         this.channelService.updateChannel(this.currentChannel?.id, channelData).subscribe({
-          next: () => {
-            console.log('Channel members updated');
-            
-          },
-          error: (e)=> {
-
-          },
           complete: () => {
             this.closeOverlay();
           }
@@ -164,10 +157,7 @@ export class AddChannelUserComponent implements OnDestroy {
   }
 
   openAddMemberOverlay() {
-    console.log('openAddMemberOverlay');
-    
     if (!this.addMemberRef) return;
-    
     let positions = this.overlayService.defaultPositions;
     positions[0] = { originX: 'end', originY: 'bottom', overlayX: 'end', overlayY: 'top' };
 
