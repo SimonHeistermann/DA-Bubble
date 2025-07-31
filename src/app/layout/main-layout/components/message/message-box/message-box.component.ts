@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, ElementRef, EventEmitter, inject, Input, NgZone, OnDestroy, OnInit, Output, QueryList, SimpleChanges, TemplateRef, ViewChild, ViewChildren, ViewContainerRef } from '@angular/core';
+import { Component, ElementRef, EventEmitter, inject, Input, OnDestroy, Output, QueryList, SimpleChanges, TemplateRef, ViewChild, ViewChildren, ViewContainerRef } from '@angular/core';
 import { EmojiComponent } from '../../shared/emoji/emoji.component';
 import { EmojiPickerComponent } from '../../shared/emoji-picker/emoji-picker.component';
 import { Channel } from '../../../../../core/models/channel.interface';
@@ -24,7 +24,7 @@ import { ThreadService } from '../../../../../core/services/thread-service/threa
   templateUrl: './message-box.component.html',
   styleUrl: './message-box.component.scss'
 })
-export class MessageBoxComponent implements OnInit, OnDestroy, AfterViewInit{
+export class MessageBoxComponent implements OnDestroy{
   @Input() channel: Channel | null = null;
   @Input() messageUser: User | null = null;
   @Input() currentUser: User | null = null;
@@ -65,14 +65,7 @@ export class MessageBoxComponent implements OnInit, OnDestroy, AfterViewInit{
   lastLoadedId: string | null = null;
   selectedUser: User | null = null;
   editingIndex = -1;
-  
-  ngOnInit(): void {
-    
-  }
 
-  ngAfterViewInit(): void {
-    
-  }
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['channel'] && changes['channel'].currentValue) {
@@ -102,14 +95,6 @@ export class MessageBoxComponent implements OnInit, OnDestroy, AfterViewInit{
     return !this.dateService.isSameDay(currentDate, previousDate);
   }
 
-/*************  ✨ Windsurf Command ⭐  *************/
-  /**
-   * Takes a MessageReactions object and returns an array of reaction keys.
-   *
-   * If the MessageReactions object is undefined, an empty array is returned.
-   * Otherwise, the Object.keys() method is used to get an array of the object's own property names.
-   * @param mr the MessageReactions object to convert
-   */
   convertReaction(mr: MessageReactions | undefined) {
     if (!mr) return [];
     const mrKeys= Object.keys(mr);

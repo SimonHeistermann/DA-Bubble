@@ -4,7 +4,7 @@
       [@toggleMarginLeft20]="showSelf ? 'open' : 'closed'"
       >
 
-    <section class="thread-container" [class.full-width]="isTablet || smallScreen && (dashboardResponsive.openSidebar$ | async)">
+    <section class="thread-container" #threadContainer [class.full-width]="isTablet || smallScreen && (dashboardResponsive.openSidebar$ | async)">
         <div class="thread-header">
             <div class="title">
                 <span>Thread</span>

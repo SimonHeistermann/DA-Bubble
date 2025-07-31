@@ -20,8 +20,6 @@ export class ToggleComponent {
   @Input() allChannelUsers: User[] = [];
   @Input() routes = routes;
   @ViewChild(ActualProfileComponent) actualProfileComp!: ActualProfileComponent;
-  
-  // @Output() closeOverlayEmitter = new EventEmitter<void>();
 
   currentUser: User | null = null;
 

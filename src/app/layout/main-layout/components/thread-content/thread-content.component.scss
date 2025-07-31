@@ -16,7 +16,7 @@
     @include displayFlex($fd: column, $ai: center, $jc: flex-start);
     border-radius: 30px;
     background-color: #FFFFFF;
-    height: 824px !important;
+    flex: 1;
     overflow-y: scroll !important;
 }
     ::-webkit-scrollbar {
