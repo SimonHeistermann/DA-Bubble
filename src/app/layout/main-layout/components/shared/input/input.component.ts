@@ -1,16 +1,18 @@
-import { AfterViewInit, Component, ElementRef, EventEmitter, inject, Input, Output, TemplateRef, ViewChild, ViewContainerRef } from '@angular/core';
+import { Component, ElementRef, EventEmitter, inject, Input, Output, TemplateRef, ViewChild, ViewContainerRef } from '@angular/core';
 import { AutoResizeDirective } from '../../../../../core/directives/auto-resize.directive';
 import { FormsModule } from '@angular/forms';
 import { ConnectedPosition, OverlayRef } from '@angular/cdk/overlay';
 import { OverlayService } from '../../../../../core/services/overlay.service';
 import { EmojiPickerComponent } from '../emoji-picker/emoji-picker.component';
 import { User } from '../../../../../core/models/user.interface';
+import { Channel } from '../../../../../core/models/channel.interface';
 import { UserListComponent } from '../user-list/user-list.component';
 import { CommonModule } from '@angular/common';
+import { ChannelListComponent } from "../channel-list/channel-list.component";
 
 @Component({
   selector: 'app-input',
-  imports: [AutoResizeDirective, FormsModule, EmojiPickerComponent, UserListComponent, CommonModule],
+  imports: [AutoResizeDirective, FormsModule, EmojiPickerComponent, UserListComponent, CommonModule, ChannelListComponent],
   standalone: true,
   templateUrl: './input.component.html',
   styleUrl: './input.component.scss'
@@ -19,10 +21,12 @@ export class InputComponent{
   @Input() editingMode = false;
   inputMessage:string = '';
   @Input() placeHolder:string = '';
-  allChannelUser: User[] = [];
+  fullChannelList: Channel[] | null = null;
   fullUserList: User[] = [];
   isTextareaFocused = false;
   originalMessage = '';
+
+  @Input() allChannelUser: User[] = [];
 
   @ViewChild('emojiPickerTemplate') emojiPickerTemplate!: TemplateRef<any>;
   @ViewChild('emojiPickerTrigger') emojiPickerTrigger!: ElementRef;
@@ -36,6 +40,7 @@ export class InputComponent{
   viewContainerRef = inject(ViewContainerRef);
 
   showUserListOverlay = false;
+  showChannelListOverlay = false;
   mentionActive = false;
   mentionStartIndex: number | null = null;  
 
@@ -44,10 +49,11 @@ export class InputComponent{
     this.originalMessage = msg || '';
   }
 
-  @Input('allChannelUser') set allChannelUserInput(users: User[]) {
+  @Input() set allChannelUserInput(users: User[]) {
     this.allChannelUser = users;
     this.fullUserList = [...users];
   }
+
 
   @Output() sendMessageEmitter = new EventEmitter<string>();
   sendMessage() {
@@ -98,6 +104,11 @@ export class InputComponent{
       this.mentionStartIndex = cursorPos - 1;
       this.showUserListOverlay = true;
     }
+     if (!this.mentionActive && text[cursorPos - 1] === '#') {
+      this.mentionActive = true;
+      this.mentionStartIndex = cursorPos - 1;
+      this.showChannelListOverlay = true;
+    }
   }
 
   filterUserList(mentionText: string){
@@ -106,7 +117,21 @@ export class InputComponent{
     );
   }
 
+
   onTextareaKeyDown(event: KeyboardEvent) {
+    
+    if (event.key === '@') {
+      event.preventDefault();
+      this.showUserList();
+      return;
+    }
+
+     if (event.key === '#') {
+      event.preventDefault();
+      this.showChannelList();
+      return;
+    }
+
     if (event.key === 'Enter' && !event.shiftKey) {
       event.preventDefault();
       this.sendMessage();
@@ -124,6 +149,7 @@ export class InputComponent{
     this.mentionActive = false;
     this.mentionStartIndex = null;
     this.showUserListOverlay = false;
+    this.showChannelListOverlay = false;
     this.allChannelUser = [...this.fullUserList];
   }
 
@@ -158,6 +184,20 @@ export class InputComponent{
     this.showUserListOverlay = true;
   }
 
+  showChannelList(){
+    const textarea = this.textareaRef.nativeElement;
+    const cursorPos = textarea.selectionStart;
+    const text = this.inputMessage;
+    this.inputMessage = text.slice(0, cursorPos) + '#' + text.slice(cursorPos);
+    setTimeout(() => {
+      textarea.focus();
+      textarea.setSelectionRange(cursorPos + 1, cursorPos + 1);
+    });
+    this.mentionActive = true;
+    this.mentionStartIndex = cursorPos;
+    this.showChannelListOverlay = true;
+  }
+
   onClickUser(u: User) {
     if (this.mentionStartIndex === null) return;
     const textarea = this.textareaRef.nativeElement;
@@ -177,12 +217,35 @@ export class InputComponent{
     this.cancelMention(); 
   }
 
+  onclickChannel(c: Channel) {
+    if (this.mentionStartIndex === null) return;
+    const textarea = this.textareaRef.nativeElement;
+    const cursorPos = textarea.selectionStart;
+    const beforeMention = this.inputMessage.slice(0, this.mentionStartIndex);
+    const afterMention = this.inputMessage.slice(cursorPos);
+    const mentionReplacement = `#${c.name} `;
+
+    this.inputMessage = beforeMention + mentionReplacement + afterMention;
+
+    setTimeout(() => {
+      const newCursorPos = (beforeMention + mentionReplacement).length;
+      textarea.setSelectionRange(newCursorPos, newCursorPos);
+      textarea.focus();
+    });
+
+    this.cancelMention(); 
+  }
+
   closeUserListOverlay(){
     this.showUserListOverlay = false;
   }
 
   closeAtUserListOverlay(){
      this.atUserListOverlayRef?.dispose();
+  }
+
+  closeChannelListOverlay(){
+    this.showChannelListOverlay = false;
   }
 
   onSelectedEmoji(emojiStr: string){
