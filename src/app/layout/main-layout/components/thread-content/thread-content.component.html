@@ -164,9 +164,10 @@
     </section>
 
       <div class="container-input">
-                <app-input (sendMessageEmitter)="sendMessage($event)"
+                <app-input-cont #inputCont (sendMessageEmitter)="sendMessage($event)"
                     placeHolder="{{ threadService.mainUser?.displayName }} "
-                    [allChannelUser]="this.threadService.allUsersWithOutCurrentUser"></app-input>
+                    [allChannelUser]="this.threadService.allUsersWithOutCurrentUser">
+                </app-input-cont>
             </div>
 
 </main>

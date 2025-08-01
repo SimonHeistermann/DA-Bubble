@@ -3,7 +3,6 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { toggleMarginLeft20Animation } from '../../animations/expand-collapse.animation';
 import { ThreadService } from '../../../../core/services/thread-service/thread.service';
-import { InputComponent } from '../shared/input/input.component';
 import { Message, ThreadMessage, ThreadReactions } from '../../../../core/models/message.interface';
 import { User } from '../../../../core/models/user.interface';
 import { FirebaseService } from '../../../../core/services/firebase-service/firebase.service';
@@ -22,10 +21,11 @@ import { OverlayService } from '../../../../core/services/overlay.service';
 import { ViewContainerRef } from '@angular/core';
 import { ProfileRefComponent } from "./profile-ref/profile-ref.component";
 import { DashboardResponsiveService } from '../../../../core/services/dashboard-responsive/dashboard-responsive.service';
+import { InputContComponent } from "./input-cont/input-cont.component";
 
 @Component({
   selector: 'app-thread-content',
-  imports: [InputComponent, CommonModule, FormsModule, EmojiPickerComponent, ProfileRefComponent],
+  imports: [CommonModule, FormsModule, EmojiPickerComponent, ProfileRefComponent, InputContComponent],
   templateUrl: './thread-content.component.html',
   styleUrl: './thread-content.component.scss',
   animations: [toggleMarginLeft20Animation]
@@ -71,6 +71,8 @@ export class ThreadContentComponent implements AfterViewChecked {
   overlayService = inject(OverlayService);
   viewContainerRef = inject(ViewContainerRef);
   dashboardResponsive = inject(DashboardResponsiveService);
+
+  @ViewChild('inputCont') inputCont!: InputContComponent;
   @ViewChild('containerBody') containerBody!: ElementRef;
   @ViewChild('threadContainer') threadContainer!: ElementRef;
   @ViewChild('emojiPickerTemplate') emojiPickerTemplate !: TemplateRef<any>;
@@ -94,6 +96,7 @@ export class ThreadContentComponent implements AfterViewChecked {
   ngAfterViewChecked(): void {
     if (this.dashboardResponsive.openThread$ && this.threadContainer) {
       this.threadContainer.nativeElement.scrollTop = this.threadContainer.nativeElement.scrollHeight;
+      this.inputCont.setFocus();
     }
   }
 
