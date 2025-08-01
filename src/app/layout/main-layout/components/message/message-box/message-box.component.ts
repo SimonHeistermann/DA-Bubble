@@ -118,8 +118,6 @@ export class MessageBoxComponent implements OnDestroy{
         } else {
           this.firstUnreadMessageId = unreadMessages[unreadMessages.length - 1].id;
         }
-        console.log('firstunreadmessageid:', this.firstUnreadMessageId);
-        
       } else {
         this.firstUnreadMessageId = '';
       }

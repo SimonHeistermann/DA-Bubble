@@ -138,7 +138,6 @@ export class SidebarComponent implements OnInit, OnDestroy {
 
       setTimeout(() => {  
         const el = this.userItems.get(index)?.nativeElement;
-        console.log(el);
         el?.scrollIntoView({ behavior: 'smooth', block: 'center' });
         });
     })

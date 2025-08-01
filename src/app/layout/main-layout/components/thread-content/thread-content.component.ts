@@ -209,9 +209,7 @@ export class ThreadContentComponent implements AfterViewChecked {
     
     if (currentMessage.id) {
       this.dataService.updateDocument('threadmessage', currentMessage.id,
-        { reactions: currentMessage.reactions }).then(() => {
-          console.log(`Reaction updated successfully`);
-        });
+        { reactions: currentMessage.reactions })
     } else {
       console.error('currentMessage.id is undefined, cannot update document.');
     }
@@ -250,9 +248,7 @@ export class ThreadContentComponent implements AfterViewChecked {
     const messageId = this.threadService.currentThreadMessages[index].id;
     if (typeof messageId === 'string') {
       this.dataService.updateDocument('threadmessage', messageId,
-        { content: content, editedAt: Timestamp.now() }).then(() => {
-          console.log(`Message updated successfully`);
-      });
+        { content: content, editedAt: Timestamp.now() })
     } else {
       console.error('Message ID is undefined, cannot update document.');
     }

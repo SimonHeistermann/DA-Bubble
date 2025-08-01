@@ -84,8 +84,6 @@ export class EditChannelComponent implements OnChanges, OnDestroy {
     const currentChannel = this.currentChannel;
     if (currentChannel?.id) {
       let {id, ...channelData} = currentChannel;
-      console.log(currentChannel.name);
-      
       this.subscriptions.add( 
         this.channelService.updateChannel(currentChannel.id, channelData).subscribe()
       );

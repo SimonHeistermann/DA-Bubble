@@ -155,8 +155,6 @@ export class MainLayoutContentComponent implements AfterViewInit, OnInit {
 
   handleThreadMessage(message: any) {
       this.selectedMessage = message;
-      console.log(this.selectedMessage);
-      
     }
 }
 
