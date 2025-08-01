@@ -1,4 +1,4 @@
-<div class="input-container scrollbar__none" [class.focused]="isTextareaFocused" #userListTrigger [ngStyle]="{'margin': editingMode ? '0' : '20px', 'width': editingMode ? '100%' : 'calc(100% - 40px)'}">
+<div class="input-container scrollbar__none" #userListTrigger [ngStyle]="{'margin': editingMode ? '0' : '20px', 'width': editingMode ? '100%' : 'calc(100% - 40px)'}">
     <div class="user-list" *ngIf="showUserListOverlay" [style.left]="editingMode ? '50%' : '20px'" [style.transform]="editingMode ? 'translateX(-50%)' : 'none'">
          <app-user-list (closeOverlayEmitter)="closeAtUserListOverlay()" (clickedUser)="onClickUser($event)"  [dataSource]="allChannelUser" [maxHeight]="editingMode ? '25vh' : '50vh'" ></app-user-list>
     </div>
@@ -7,11 +7,9 @@
     </div>
     <textarea 
         #textarea
-         autoResize
+        autoResize
         class="scrollbar__none" name="message" id="message" 
         placeholder="Nachricht an {{placeHolder}}"  
-        (focus)="isTextareaFocused = true" 
-        (blur)="isTextareaFocused = false" 
         [(ngModel)]="inputMessage" 
         (input)="typing()"
         (keydown)="onTextareaKeyDown($event)"
