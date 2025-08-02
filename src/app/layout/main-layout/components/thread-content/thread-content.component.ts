@@ -78,7 +78,7 @@ export class ThreadContentComponent implements AfterViewChecked {
   @ViewChild('emojiPickerTemplate') emojiPickerTemplate !: TemplateRef<any>;
 
 
-  ngOnInit() : void {
+  ngOnInit(): void {
     this.threadService.message$.subscribe(msg => {
       this.selectedMessage = msg;
     });
@@ -88,10 +88,10 @@ export class ThreadContentComponent implements AfterViewChecked {
     this.dashboardResponsive.isTablet$.subscribe(isTablet => {
       this.isTablet = isTablet;
     })
-     this.dashboardResponsive.isMobile$.subscribe(isMobile => {
+    this.dashboardResponsive.isMobile$.subscribe(isMobile => {
       this.isMobile = isMobile;
     })
-  } 
+  }
 
   ngAfterViewChecked(): void {
     if (this.dashboardResponsive.openThread$ && this.threadContainer) {
@@ -100,12 +100,12 @@ export class ThreadContentComponent implements AfterViewChecked {
     }
   }
 
-  getReactionsArray(){
+  getReactionsArray() {
     const reaction = this.selectedMessage?.reactions ?? {};
     return Object.entries(reaction).map(([emoji, data]) => ({
-    emoji,
-    users: data.users
-  }));
+      emoji,
+      users: data.users
+    }));
   }
 
   formatDate(rawDate: Timestamp | Timestamp) {
@@ -115,16 +115,16 @@ export class ThreadContentComponent implements AfterViewChecked {
   }
 
   getRows(text: string): number {
-  return Math.max(Math.ceil(text.length / 35));
+    return Math.max(Math.ceil(text.length / 35));
   }
 
   getCols(text: string): number {
-  return Math.max(Math.ceil(text.length / 20));
+    return Math.max(Math.ceil(text.length / 20));
   }
 
   showProfile(user: User) {
-   this.canShowProfile = true;
-   this.profileRefUser = user;
+    this.canShowProfile = true;
+    this.profileRefUser = user;
   }
 
   hideThreadContainer() {
@@ -171,7 +171,7 @@ export class ThreadContentComponent implements AfterViewChecked {
   shouldShowDateDivider(index: number) {
     if (index === 0) return true;
 
-    const current =  this.threadService.currentThreadMessages[index];
+    const current = this.threadService.currentThreadMessages[index];
     const previous = this.threadService.currentThreadMessages[index - 1];
     if (!current.createdAt || !previous.createdAt) return false;
 
@@ -193,20 +193,20 @@ export class ThreadContentComponent implements AfterViewChecked {
     }
 
     const existingReaction = currentMessage.reactions.find(reaction => reaction.emojiStr === emojiStr);
-    if (existingReaction){
+    if (existingReaction) {
       if (!existingReaction.user.includes(currentUser)) {
         existingReaction.user.push(currentUser);
       } else {
         existingReaction.user.splice(existingReaction.user.indexOf(currentUser), 1);
-        if(existingReaction.user.length == 0) {
+        if (existingReaction.user.length == 0) {
           currentMessage.reactions.splice(currentMessage.reactions.indexOf(existingReaction), 1);
         }
       }
     } else {
       currentMessage.reactions.push({ emojiStr, user: [currentUser] });
-      
+
     }
-    
+
     if (currentMessage.id) {
       this.dataService.updateDocument('threadmessage', currentMessage.id,
         { reactions: currentMessage.reactions })
@@ -228,7 +228,7 @@ export class ThreadContentComponent implements AfterViewChecked {
     } else {
       this.editingMode = false;
     }
-    
+
   }
 
   breakEditing() {
@@ -240,7 +240,7 @@ export class ThreadContentComponent implements AfterViewChecked {
     this.edittedMessage(content, index);
     this.editingIndex = null;
     this.editingMode = false;
-    
+
   }
   edittedMessage(content: string, index: number) {
     this.threadService.currentThreadMessages[index].content = content;
