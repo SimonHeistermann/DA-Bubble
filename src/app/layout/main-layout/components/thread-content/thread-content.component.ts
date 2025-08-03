@@ -158,12 +158,11 @@ export class ThreadContentComponent implements AfterViewChecked {
 
   showEmojiPicker(index: number) {
     this.emojiPickerIndex = index;
-
     this.emojiPickerOverlayRef = this.overlayService.openTemplateOverlay(
       this.containerBody,
       this.emojiPickerTemplate,
       this.viewContainerRef
-    );
+     );
 
     this.emojiPickerOverlayRef.backdropClick().subscribe(() => this.emojiPickerOverlayRef.dispose());
   }

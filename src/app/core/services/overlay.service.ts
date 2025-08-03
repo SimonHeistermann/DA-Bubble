@@ -24,7 +24,8 @@ export class OverlayService {
     trigger: ElementRef,
     template: TemplateRef<any>,
     viewContainerRef: ViewContainerRef,
-    positions?: FlexibleConnectedPositionStrategy['positions']
+    positions?: FlexibleConnectedPositionStrategy['positions'],
+    context: any = {}
   ): OverlayRef {
     const positionStrategy = this.positionBuilder
       .flexibleConnectedTo(trigger)

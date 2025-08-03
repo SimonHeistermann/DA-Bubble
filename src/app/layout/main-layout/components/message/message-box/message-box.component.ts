@@ -361,9 +361,10 @@ export class MessageBoxComponent implements OnDestroy{
   }
 
   showThreadContainer(index: number){
+    debugger;
     this.threadService.show(); 
     this.threadService.setMessage(this.messages[index]);
-    this.userChannelActivityService.clear();
+    // this.userChannelActivityService.clear();
     this.userChannelActivityService.clearOldFocus();
   }
 
