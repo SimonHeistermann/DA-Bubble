@@ -24,10 +24,10 @@ export class UserService {
   }
 
 
-  private userClickSubject = new Subject<{ index: number | 'currentUser', user: any }>();
+  private userClickSubject = new Subject<{ index: number, user: any }>();
   userClick$ = this.userClickSubject.asObservable();
 
-  triggerUserClick(index: number | 'currentUser', user: any) {
+  triggerUserClick(index: number, user: any) {
     this.userClickSubject.next({ index, user });
   }
 

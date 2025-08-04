@@ -154,8 +154,8 @@
                     </div>
                     <div class="users" [@toggleMarginTop25]="openMessage ? 'open' : 'closed'">
                         <ul>
-                            <li class="current-user pointer" [class.selected]="'currentUser' == currentUserIndex"
-                                (click)="clickUserName('currentUser' , null)">
+                            <li class="current-user pointer" [class.selected]="currentUserIndex === 'currentUser'"
+                                (click)="clickUserName('currentUser' , null)" #currentUserItem>
                                 <div class="li-content">
                                     <div class="li-content-left">
                                         <div class="avatar-div">

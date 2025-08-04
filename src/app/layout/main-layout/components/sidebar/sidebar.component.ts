@@ -32,6 +32,7 @@ import { DashboardResponsiveService } from '../../../../core/services/dashboard-
 export class SidebarComponent implements OnInit, OnDestroy {
   @ViewChildren('channelItem') channelItems!: QueryList<ElementRef>;
   @ViewChildren('userItem') userItems!: QueryList<ElementRef>;
+  @ViewChildren('currentUserItem') currentUserItem!: QueryList<ElementRef>;
   @ViewChild('devspace') devspaceItems!: ElementRef;
   @ViewChild('input') input!: ElementRef;
 
@@ -54,6 +55,7 @@ export class SidebarComponent implements OnInit, OnDestroy {
   inputContent: string = ''
   channels: Channel[] = [];
   allUsers: User[] = [];
+  userIncludeOperator: User[] = [];
   userChannelActivities: UserReadActivity[] = [];
   currentUser: User | null = null;
   imgLoadStatus: Record<string, boolean> = {};
@@ -87,6 +89,7 @@ export class SidebarComponent implements OnInit, OnDestroy {
   newMessageMap: Record<string, { unreadCount: number; firstUnreadMessageId?: string }> = { '': { unreadCount: 0, firstUnreadMessageId: '' } };
   router = inject(Router);
 
+
   ngOnInit(): void {
     this.subCurrentUser();
     this.subChannelMessage();
@@ -99,15 +102,21 @@ export class SidebarComponent implements OnInit, OnDestroy {
     })
 
     this.userService.userClick$.subscribe(({ index, user }) => {
-      const selectUserIndex = this.allUsers.findIndex(u => u.id == user.id);
       this.currentChannelIndex = -1;
-      this.currentUserIndex = selectUserIndex;
-      const userElement = this.userItems.get(this.currentUserIndex)?.nativeElement;
-      if (userElement) {
-        userElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      const selectUserIndex = this.userIncludeOperator.findIndex(u => u.id == user.id);
+      const operatorIndex = index; 
+      if (operatorIndex === selectUserIndex) {
+        this.currentUserIndex = 'currentUser';
+        this.currentUserItem.first?.nativeElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      } else {
+        this.currentUserIndex = selectUserIndex;
+        const currentUserElement = this.userItems.get(this.currentUserIndex)?.nativeElement;
+        if (currentUserElement) {
+          currentUserElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
       }
     })
-    
+
     this.dashboardResponsive.isTablet$.subscribe(isTablet => {
       this.isTablet = isTablet;
     })
@@ -146,7 +155,6 @@ export class SidebarComponent implements OnInit, OnDestroy {
       this.currentChannelIndex = -1;
       this.currentUserIndex = index;
       this.cdRef.detectChanges();
-
       setTimeout(() => {
         const el = this.userItems.get(index)?.nativeElement;
         el?.scrollIntoView({ behavior: 'smooth', block: 'center' });
@@ -221,10 +229,8 @@ export class SidebarComponent implements OnInit, OnDestroy {
     this.subscriptions.add(
       this.userService.currentUser$.subscribe(user => {
         this.currentUser = user;
-
         this.subAllUsers();
         this.subAllChannels();
-
       })
     );
   }
@@ -233,6 +239,7 @@ export class SidebarComponent implements OnInit, OnDestroy {
     this.subscriptions.add(
       this.userService.allUsers$.subscribe(users => {
         this.allUsers = users;
+        this.userIncludeOperator = users;
         this.allUsers = this.allUsers.filter(u => u.id !== this.currentUser?.id);
         this.subUserChannelActivites();
       }));
