@@ -21,6 +21,7 @@ app-main-header {
     display: flex;
     flex-direction: row;
     overflow: hidden;
+    flex: 1;
 
     .message {
         width: 100%;

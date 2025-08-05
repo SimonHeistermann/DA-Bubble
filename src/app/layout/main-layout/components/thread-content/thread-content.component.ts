@@ -100,7 +100,7 @@ export class ThreadContentComponent implements AfterViewChecked {
     }
   }
 
-  getReactionsArray() {
+  getReactionsArray() { 
     const reaction = this.selectedMessage?.reactions ?? {};
     return Object.entries(reaction).map(([emoji, data]) => ({
       emoji,
@@ -156,7 +156,7 @@ export class ThreadContentComponent implements AfterViewChecked {
     }
   }
 
-  showEmojiPicker(index: number) {
+  showEmojiPicker(index: number) { 
     this.emojiPickerIndex = index;
     this.emojiPickerOverlayRef = this.overlayService.openTemplateOverlay(
       this.containerBody,

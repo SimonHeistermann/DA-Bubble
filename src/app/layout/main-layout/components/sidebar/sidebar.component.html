@@ -1,4 +1,4 @@
-<section [class.full-width]="isTablet" [class.full-height]="isTablet"
+<section [class.full-width]="isTablet" 
     *ngIf="(smallScreen && !threadService.threadOpen) || !smallScreen || (isTablet && (dashboardResponsive.openSidebar$ | async))"
     class="devspace" [@toggleMarginRight20]="showSelf ? 'open' : 'closed'">
 

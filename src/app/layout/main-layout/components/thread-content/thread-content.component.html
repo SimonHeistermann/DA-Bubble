@@ -1,10 +1,8 @@
-<main *ngIf="smallScreen || (!smallScreen && threadService.threadOpen)" 
-      [class.full-width]="isTablet"
-      class="main-container" 
-      [@toggleMarginLeft20]="showSelf ? 'open' : 'closed'"
-      >
+<main *ngIf="smallScreen || (!smallScreen && threadService.threadOpen)" [class.full-width]="isTablet"
+    class="main-container" [@toggleMarginLeft20]="showSelf ? 'open' : 'closed'">
 
-    <section class="thread-container" #threadContainer [class.full-width]="isTablet || smallScreen && (dashboardResponsive.openSidebar$ | async)">
+    <section class="thread-container" #threadContainer
+        [class.full-width]="isTablet || smallScreen && (dashboardResponsive.openSidebar$ | async)">
         <div class="thread-header">
             <div class="title">
                 <span>Thread</span>
@@ -21,7 +19,8 @@
                 <img src="{{ threadService.mainUser?.photoURL }}">
                 <div class="thread-details">
                     <div class="thread-content-header">
-                        <span (click)="showProfile(threadService.mainUser!)">{{ threadService.mainUser?.displayName }}</span>
+                        <span (click)="showProfile(threadService.mainUser!)">{{ threadService.mainUser?.displayName
+                            }}</span>
                         <p>{{ threadService.formattedTime }}</p>
                     </div>
                     <div class="thread-message">
@@ -48,22 +47,23 @@
 
             <div class="scrollbar__none container-body" #containerBody>
                 <ng-container *ngFor="let message of threadService.currentThreadMessages; let i = index">
-                  
-                        @if (message.createdAt) {
-                             @if (shouldShowDateDivider(i)) {
-                            <div class="data-divider">
-                                <div class="divider-line"></div>
-                                <div class="data">{{ dateService.getGermanFullDate(message.createdAt) }}</div>
-                            </div>
-                        }
+
+                    @if (message.createdAt) {
+                    @if (shouldShowDateDivider(i)) {
+                    <div class="data-divider">
+                        <div class="divider-line"></div>
+                        <div class="data">{{ dateService.getGermanFullDate(message.createdAt) }}</div>
+                    </div>
                     }
-                    
+                    }
+
                     <div *ngIf="threadService.threadUsers[i] && (threadService.threadUsers[i].id != threadService.currentUser?.id)"
                         class="thread-content">
                         <img src="{{ threadService.threadUsers[i].photoURL }}">
                         <div class="thread-details">
                             <div class="thread-content-header">
-                                <span (click)="showProfile(threadService.threadUsers[i])">{{ threadService.threadUsers[i].displayName }}</span>
+                                <span (click)="showProfile(threadService.threadUsers[i])">{{
+                                    threadService.threadUsers[i].displayName }}</span>
                                 <p>{{ this.dateService.getHoursAndMinutes(message.editedAt!) }}</p>
                             </div>
 
@@ -77,17 +77,18 @@
                                     <span
                                         *ngIf="reaction.emojiStr != 'thumbs-up' && reaction.emojiStr != 'check-mark'">{{
                                         reaction.emojiStr }}</span>
-                                        <p> {{ reaction.user.length}} </p>
+                                    <p> {{ reaction.user.length}} </p>
                                     <div class="reaction-hover">
                                         <img *ngIf="reaction.emojiStr == 'check-mark'" src="images/icons/emojis/1.png">
                                         <img *ngIf="reaction.emojiStr == 'thumbs-up'" src="images/icons/emojis/3.png">
                                         <span
                                             *ngIf="reaction.emojiStr != 'thumbs-up' && reaction.emojiStr != 'check-mark'">
                                             {{ reaction.emojiStr }}</span>
-                                         <div *ngIf="reaction.user.length > 1; else singleUser"><p *ngFor="let eachUser of reaction.user"> {{ eachUser }} </p>  
-                                           </div>
-                                             <ng-template #singleUser>{{ reaction.user }}</ng-template>
-                                             
+                                        <div *ngIf="reaction.user.length > 1; else singleUser">
+                                            <p *ngFor="let eachUser of reaction.user"> {{ eachUser }} </p>
+                                        </div>
+                                        <ng-template #singleUser>{{ reaction.user }}</ng-template>
+
                                         <p>hat reagiert</p>
                                     </div>
                                 </div>
@@ -100,29 +101,30 @@
                         </div>
                     </div>
 
-
+                    <ng-template #emojiPickerTemplate>
+                        <app-emoji-picker (selectedEojiEmitter)="onSelectedEmoji($event)"
+                            (closeOverlayEmitter)="closeEmojiPickerOverlay()"></app-emoji-picker>
+                    </ng-template>
                     <div *ngIf="threadService.threadUsers[i] && (threadService.threadUsers[i].id == threadService.currentUser?.id)"
                         class="crnt-user-content">
-                        <ng-template #emojiPickerTemplate>
-                            <app-emoji-picker (selectedEojiEmitter)="onSelectedEmoji($event)"
-                                (closeOverlayEmitter)="closeEmojiPickerOverlay()"></app-emoji-picker>
-                        </ng-template>
+
                         <img src="{{ threadService.threadUsers[i].photoURL }}">
                         <div (mouseenter)="hideEditBar = false" class="thread-details">
                             <div class="crnt-usr-thread-header">
-                                <span (click)="showProfile(threadService.threadUsers[i])">{{ threadService.threadUsers[i].displayName }}</span>
+                                <span (click)="showProfile(threadService.threadUsers[i])">{{
+                                    threadService.threadUsers[i].displayName }}</span>
                                 <p>{{ this.dateService.getHoursAndMinutes(message.editedAt!) }}</p>
                             </div>
 
                             <div class="crnt-usr-thread">
                                 <div class="thread-editor" *ngIf="editingIndex === i && editingMode">
-                                <textarea [cols]="getCols(message.content)" [rows]="getRows(message.content)" #textarea
-                                [(ngModel)]="message.content"
-                                placeholder="{{ message.content }}"></textarea>
-                                <div class="btns-container">
-                                    <button (click)="breakEditing()">Abbrechen</button>
-                                    <button (click)="saveEditing(i, message.content)">Speichern</button>
-                                </div>
+                                    <textarea [cols]="getCols(message.content)" [rows]="getRows(message.content)"
+                                        #textarea [(ngModel)]="message.content"
+                                        placeholder="{{ message.content }}"></textarea>
+                                    <div class="btns-container">
+                                        <button (click)="breakEditing()">Abbrechen</button>
+                                        <button (click)="saveEditing(i, message.content)">Speichern</button>
+                                    </div>
                                 </div>
                                 <span *ngIf="editingIndex !== i || !editingMode">{{ message.content }}</span>
                             </div>
@@ -136,12 +138,13 @@
                                     <div class="reaction-hover">
                                         <img *ngIf="reaction.emojiStr == 'check-mark'" src="images/icons/emojis/1.png">
                                         <img *ngIf="reaction.emojiStr == 'thumbs-up'" src="images/icons/emojis/3.png">
-                                        <span *ngIf="reaction.emojiStr != 'thumbs-up' && reaction.emojiStr != 'check-mark'">
+                                        <span
+                                            *ngIf="reaction.emojiStr != 'thumbs-up' && reaction.emojiStr != 'check-mark'">
                                             {{ reaction.emojiStr }}</span>
-                                           <div *ngIf="reaction.user.length > 1; else singleUser">
-                                            <p *ngFor="let eachUser of reaction.user"> {{ eachUser }} </p>  
-                                           </div>
-                                           <ng-template #singleUser>{{ reaction.user }}</ng-template>
+                                        <div *ngIf="reaction.user.length > 1; else singleUser">
+                                            <p *ngFor="let eachUser of reaction.user"> {{ eachUser }} </p>
+                                        </div>
+                                        <ng-template #singleUser>{{ reaction.user }}</ng-template>
                                         <p>hat reagiert</p>
                                     </div>
                                 </div>
@@ -165,14 +168,14 @@
         </div>
     </section>
 
-      <div class="container-input">
-                <app-input-cont #inputCont (sendMessageEmitter)="sendMessage($event)"
-                    placeHolder="{{ threadService.mainUser?.displayName }} "
-                    [allChannelUser]="this.threadService.allUsersWithOutCurrentUser">
-                </app-input-cont>
-            </div>
+    <div class="container-input">
+        <app-input-cont #inputCont (sendMessageEmitter)="sendMessage($event)"
+            placeHolder="{{ threadService.mainUser?.displayName }} "
+            [allChannelUser]="this.threadService.allUsersWithOutCurrentUser">
+        </app-input-cont>
+    </div>
 
 </main>
 
-            <app-profile-ref [showOverlay]="canShowProfile" (closeOverlayEmitter)="canShowProfile = false; 
+<app-profile-ref [showOverlay]="canShowProfile" (closeOverlayEmitter)="canShowProfile = false; 
             currentUserIndex = -1" [currentUser]="profileRefUser"></app-profile-ref>

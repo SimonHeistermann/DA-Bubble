@@ -197,7 +197,7 @@
 
 @media (max-width: 575px) {
     .main-container {
-        justify-content: space-between;
+        justify-content: center;
     }
     .profile-container {
         >span {
@@ -211,7 +211,6 @@
 
 @media (max-width : 342px) {
     .main-container {
-        justify-content: center;
         gap: 0px;
     }
 }
