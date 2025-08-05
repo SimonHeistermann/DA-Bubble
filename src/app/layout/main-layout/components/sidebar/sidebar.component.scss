@@ -167,11 +167,13 @@
                     }
                 }
             }
-          
+
             .add-btn {
                 &:hover {
                     content: url('/angular-projects/dabubble/images/icons/add_hover.png');
-                }}}
+                }
+            }
+        }
 
 
         .channel-names {
@@ -205,12 +207,15 @@
                         }
 
                     }
+
                     &:hover {
                         color: var(--purple-3);
+
                         .add-btn-circle {
                             background-image: url('/angular-projects/dabubble/images/icons/add_circle_hover.png') !important;
                         }
                     }
+
                     &:active,
                     &.active {
                         .add-btn-circle {
@@ -390,5 +395,11 @@
                 }
             }
         }
+    }
+}
+
+@media (max-width: 1020px) {
+    .devspace {
+        margin-right: auto !important;
     }
 }

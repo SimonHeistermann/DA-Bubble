@@ -48,7 +48,8 @@
 
             <div class="scrollbar__none container-body" #containerBody>
                 <ng-container *ngFor="let message of threadService.currentThreadMessages; let i = index">
-                    @if (message.createdAt) {
+                  
+                        @if (message.createdAt) {
                              @if (shouldShowDateDivider(i)) {
                             <div class="data-divider">
                                 <div class="divider-line"></div>
@@ -56,8 +57,7 @@
                             </div>
                         }
                     }
-                
-
+                    
                     <div *ngIf="threadService.threadUsers[i] && (threadService.threadUsers[i].id != threadService.currentUser?.id)"
                         class="thread-content">
                         <img src="{{ threadService.threadUsers[i].photoURL }}">
@@ -99,6 +99,7 @@
                             <img (click)="showEmojiPicker(i)" src="images/icons/add_reaction_thread.png">
                         </div>
                     </div>
+
 
                     <div *ngIf="threadService.threadUsers[i] && (threadService.threadUsers[i].id == threadService.currentUser?.id)"
                         class="crnt-user-content">
@@ -158,6 +159,7 @@
                         </div>
 
                     </div>
+
                 </ng-container>
             </div>
         </div>
