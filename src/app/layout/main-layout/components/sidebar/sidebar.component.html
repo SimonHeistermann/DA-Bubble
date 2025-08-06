@@ -1,4 +1,4 @@
-<section [class.full-width]="isTablet" [class.full-height]="isTablet"
+<section [class.full-width]="isTablet" 
     *ngIf="(smallScreen && !threadService.threadOpen) || !smallScreen || (isTablet && (dashboardResponsive.openSidebar$ | async))"
     class="devspace" [@toggleMarginRight20]="showSelf ? 'open' : 'closed'">
 
@@ -108,7 +108,7 @@
                         </div>
                         <img class="add-btn" src="images/icons/add.png" (click)="clickAddChannel()">
                     </div>
-                    <div class="channel-names" [@toggleMarginTop25]="openChannel ? 'open' : 'closed'">
+                    <div class="channel-names" [@toggleMarginTop25]="openChannel ? 'open' : 'closed'" #channelList>
                         <ul>
                             @for(channel of channels; let index = $index; track channel.id) {
                             <li class="channel-li pointer" [class.selected]="index === currentChannelIndex"
@@ -154,8 +154,8 @@
                     </div>
                     <div class="users" [@toggleMarginTop25]="openMessage ? 'open' : 'closed'">
                         <ul>
-                            <li class="current-user pointer" [class.selected]="'currentUser' == currentUserIndex"
-                                (click)="clickUserName('currentUser' , null)">
+                            <li class="current-user pointer" [class.selected]="currentUserIndex === 'currentUser'"
+                                (click)="clickUserName('currentUser' , null)" #currentUserItem>
                                 <div class="li-content">
                                     <div class="li-content-left">
                                         <div class="avatar-div">
@@ -176,7 +176,6 @@
 
                             @for (user of allUsers; let index = $index; track $index) {
                             <li [class.selected]="index === currentUserIndex" #userItem>
-
                                 <div class="li-content pointer" (click)="clickUserName(index, user)">
 
                                     <div class="li-content-left">
@@ -186,7 +185,7 @@
                                             @if(!user?.isActive) {
                                             <span class="active-status offline"></span>
                                             } @else {
-                                          <span class="active-status"></span>
+                                            <span class="active-status"></span>
                                             }
 
                                         </div>

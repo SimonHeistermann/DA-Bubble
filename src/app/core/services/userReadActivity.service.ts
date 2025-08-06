@@ -1,7 +1,7 @@
 import {inject, Injectable } from "@angular/core";
 import { where } from "firebase/firestore";
 import { DataService } from "./data-service/data.service";
-import { catchError, from, Observable, switchMap, of, pipe, map } from "rxjs";
+import { catchError, from, Observable, switchMap, of, map, Subject } from "rxjs";
 import { UserReadActivity, UserReadActivityData } from "../models/userReadActivity.interface";
 
 @Injectable({
@@ -9,7 +9,31 @@ import { UserReadActivity, UserReadActivityData } from "../models/userReadActivi
 })
 export class UserChannelActivityService{
     private readonly COL_NAME = 'userReadActivities';
+    private focusCallBack: (() => void) | null = null;
+
+    private _clearFocus = new Subject<void>();
+    clearOldFocus$ = this._clearFocus.asObservable();
+
     dataService = inject(DataService);
+
+    registerFocusHandler(callback: () => void) : void {
+        this.focusCallBack = callback;
+    }
+
+    focus(): void {
+        if (this.focusCallBack){
+            this.focusCallBack()
+        }
+    }
+
+    clear(): void {
+        this.focusCallBack = null;
+    }
+
+    clearOldFocus(): void {
+        this._clearFocus.next();
+    }
+
 
     markMessageAsReadByCurrentUser(currentUserId: string, activityID: string) {
         this.getUserReadActivityByIDsOnce(currentUserId, activityID, (data: UserReadActivity[]) => {
@@ -21,6 +45,7 @@ export class UserChannelActivityService{
             this.markAsSeenForNewActivity({userID: currentUserId, activityID: activityID});
         }
         })
+        this.focus();
     }
     
 

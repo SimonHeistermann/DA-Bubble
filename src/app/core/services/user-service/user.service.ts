@@ -1,5 +1,5 @@
 import { Injectable } from '@angular/core';
-import { Observable, BehaviorSubject, from, of } from 'rxjs';
+import { Observable, BehaviorSubject, from, of, Subject } from 'rxjs';
 import { map, catchError } from 'rxjs/operators';
 import { Unsubscribe, Timestamp } from 'firebase/firestore';
 import { FirebaseService } from './../firebase-service/firebase.service';
@@ -23,6 +23,14 @@ export class UserService {
     this.initializeAllUsersListener();
   }
 
+
+  private userClickSubject = new Subject<{ index: number, user: any }>();
+  userClick$ = this.userClickSubject.asObservable();
+
+  triggerUserClick(index: number, user: any) {
+    this.userClickSubject.next({ index, user });
+  }
+
   /**
    * Listener für alle Benutzer initialisieren
    */
@@ -32,8 +40,8 @@ export class UserService {
       (users: User[]) => {
         this.allUsersSubject.next(users);
         const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000);
-        const onlineUsers = users.filter(user => 
-          user.isActive && 
+        const onlineUsers = users.filter(user =>
+          user.isActive &&
           user.lastSeen.toDate() > fiveMinutesAgo
         );
         this.onlineUsersSubject.next(onlineUsers);
@@ -131,7 +139,7 @@ export class UserService {
     }
     const lowerSearchTerm = searchTerm.toLowerCase();
     return this.allUsers$.pipe(
-      map(users => users.filter(user => 
+      map(users => users.filter(user =>
         user.displayName.toLowerCase().includes(lowerSearchTerm) ||
         user.profile.firstName.toLowerCase().includes(lowerSearchTerm) ||
         user.profile.lastName.toLowerCase().includes(lowerSearchTerm) ||
@@ -285,7 +293,7 @@ export class UserService {
   getUserStatus(user: User): 'online' | 'offline' | 'away' {
     const oneMinuteAgo = new Date(Date.now() - 1 * 60 * 1000);
     const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000);
-    
+
     if (user.isActive && user.lastSeen.toDate() > oneMinuteAgo) {
       return 'online';
     } else if (user.isActive && user.lastSeen.toDate() > fiveMinutesAgo) {
@@ -308,7 +316,7 @@ export class UserService {
   getUserInitials(user: User): string {
     const firstName = user.profile.firstName || user.displayName.split(' ')[0] || '';
     const lastName = user.profile.lastName || user.displayName.split(' ')[1] || '';
-    
+
     return `${firstName.charAt(0)}${lastName.charAt(0)}`.toUpperCase();
   }
 
@@ -391,5 +399,5 @@ export class UserService {
         return of(false);
       })
     );
-  } 
+  }
 }

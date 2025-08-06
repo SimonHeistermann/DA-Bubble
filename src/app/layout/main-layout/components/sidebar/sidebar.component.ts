@@ -1,4 +1,4 @@
-import {  ChangeDetectorRef, Component, ElementRef, EventEmitter, inject, Input, OnDestroy, OnInit, Output, QueryList, ViewChild, ViewChildren } from '@angular/core';
+import { ChangeDetectorRef, Component, ElementRef, EventEmitter, inject, Input, OnDestroy, OnInit, Output, QueryList, ViewChild, ViewChildren } from '@angular/core';
 import { FormsModule } from '@angular/forms';
 import { Subscription } from 'rxjs';
 import { ChannelService } from '../../../../core/services/channel.service';
@@ -32,6 +32,7 @@ import { DashboardResponsiveService } from '../../../../core/services/dashboard-
 export class SidebarComponent implements OnInit, OnDestroy {
   @ViewChildren('channelItem') channelItems!: QueryList<ElementRef>;
   @ViewChildren('userItem') userItems!: QueryList<ElementRef>;
+  @ViewChildren('currentUserItem') currentUserItem!: QueryList<ElementRef>;
   @ViewChild('devspace') devspaceItems!: ElementRef;
   @ViewChild('input') input!: ElementRef;
 
@@ -49,16 +50,17 @@ export class SidebarComponent implements OnInit, OnDestroy {
   dateService = inject(DateService);
   dashboardResponsive = inject(DashboardResponsiveService);
   mainLayoutContentComponent = inject(MainLayoutContentComponent);
-  
+
 
   inputContent: string = ''
   channels: Channel[] = [];
   allUsers: User[] = [];
+  userIncludeOperator: User[] = [];
   userChannelActivities: UserReadActivity[] = [];
   currentUser: User | null = null;
   imgLoadStatus: Record<string, boolean> = {};
 
-  allChannel: Channel[]  = [];
+  allChannel: Channel[] = [];
   allChannelMessages: Message[] = [];
   allPrivateMessages: Message[] = [];
   filteredUsers: User[] = [];
@@ -83,9 +85,10 @@ export class SidebarComponent implements OnInit, OnDestroy {
 
   public currentChannelIndex: number = 0;
   public currentUserIndex: number | 'currentUser' = -1;
-  
-  newMessageMap: Record<string,{ unreadCount: number; firstUnreadMessageId?: string }> = {'': {unreadCount:0, firstUnreadMessageId: ''}};
+
+  newMessageMap: Record<string, { unreadCount: number; firstUnreadMessageId?: string }> = { '': { unreadCount: 0, firstUnreadMessageId: '' } };
   router = inject(Router);
+
 
   ngOnInit(): void {
     this.subCurrentUser();
@@ -97,11 +100,28 @@ export class SidebarComponent implements OnInit, OnDestroy {
       this.inputContent = '';
       this.cdRef.detectChanges();
     })
+
+    this.userService.userClick$.subscribe(({ index, user }) => {
+      this.currentChannelIndex = -1;
+      const selectUserIndex = this.userIncludeOperator.findIndex(u => u.id == user.id);
+      const operatorIndex = index; 
+      if (operatorIndex === selectUserIndex) {
+        this.currentUserIndex = 'currentUser';
+        this.currentUserItem.first?.nativeElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      } else {
+        this.currentUserIndex = selectUserIndex;
+        const currentUserElement = this.userItems.get(this.currentUserIndex)?.nativeElement;
+        if (currentUserElement) {
+          currentUserElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        }
+      }
+    })
+
     this.dashboardResponsive.isTablet$.subscribe(isTablet => {
-        this.isTablet = isTablet;
+      this.isTablet = isTablet;
     })
     this.dashboardResponsive.isMobile$.subscribe(isMobile => {
-        this.isMobile = isMobile;
+      this.isMobile = isMobile;
     })
     this.dashboardResponsive.searchBreakpoint$.subscribe(searchBreakpoint => {
       this.searchBreakpoint = searchBreakpoint;
@@ -135,55 +155,54 @@ export class SidebarComponent implements OnInit, OnDestroy {
       this.currentChannelIndex = -1;
       this.currentUserIndex = index;
       this.cdRef.detectChanges();
-
-      setTimeout(() => {  
+      setTimeout(() => {
         const el = this.userItems.get(index)?.nativeElement;
         el?.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        });
+      });
     })
   }
 
   subUserChannelActivites() {
     this.subscriptions.add(
       this.userChannelActivityService.getUserReadActivities((data: any) => {
-         this.userChannelActivities = [...data];
-         this.subMessagesInAllChannel();
-         this.subMessagesInAllPrivate();
-      }) 
+        this.userChannelActivities = [...data];
+        this.subMessagesInAllChannel();
+        this.subMessagesInAllPrivate();
+      })
     );
   }
 
   buildNewMessageMap(messages: Message[], activityID: string) {
     const activity = this.userChannelActivities.find(act => act.activityID === activityID && act.userID === this.currentUser?.id);
-    if(activity?.updatedAt) {
-        const unreadMessages = messages.filter(
-          msg =>
-            msg.createdAt &&
-            msg.createdAt.toMillis() > activity.updatedAt.toMillis() &&
-            msg.authorID !== this.currentUser?.id
-        );
-        this.newMessageMap[activityID] = {unreadCount: unreadMessages.length, firstUnreadMessageId: unreadMessages.length > 0 ? unreadMessages[0].id : undefined};
-        
+    if (activity?.updatedAt) {
+      const unreadMessages = messages.filter(
+        msg =>
+          msg.createdAt &&
+          msg.createdAt.toMillis() > activity.updatedAt.toMillis() &&
+          msg.authorID !== this.currentUser?.id
+      );
+      this.newMessageMap[activityID] = { unreadCount: unreadMessages.length, firstUnreadMessageId: unreadMessages.length > 0 ? unreadMessages[0].id : undefined };
+
     } else {
-        this.newMessageMap[activityID] = {unreadCount: messages.length, firstUnreadMessageId: messages.length > 0 ? messages[0].id : undefined};
+      this.newMessageMap[activityID] = { unreadCount: messages.length, firstUnreadMessageId: messages.length > 0 ? messages[0].id : undefined };
     }
   }
 
   subMessagesInAllPrivate() {
 
     let currentUserID = '';
-    if(this.currentUser != null) {
-       currentUserID = this.currentUser.id;
+    if (this.currentUser != null) {
+      currentUserID = this.currentUser.id;
     }
-    
+
     for (let index = 0; index < this.allUsers.length; index++) {
       const user = this.allUsers[index];
       const userID = user.id;
       this.subscriptions.add(
         this.messageService.getPrivateMessageOrderByCreatedAt(this.messageService.buildConversationID(currentUserID, userID), (data) => {
           this.buildNewMessageMap(data, userID);
-      }));
-      
+        }));
+
     }
   }
 
@@ -194,7 +213,7 @@ export class SidebarComponent implements OnInit, OnDestroy {
 
       this.subscriptions.add(
         this.messageService.getChannelMessageOrderByCreatedAt(channel.id, (messages) => {
-          if(this.currentUser !== null) {
+          if (this.currentUser !== null) {
             this.buildNewMessageMap(messages, channelID);
           }
         })
@@ -202,7 +221,7 @@ export class SidebarComponent implements OnInit, OnDestroy {
     }
   }
 
-  subCurrentUser(){
+  subCurrentUser() {
     const authUser = this.authService.currentUser;
     if (authUser) {
       this.userService.loadCurrentUser(authUser.uid);
@@ -210,10 +229,8 @@ export class SidebarComponent implements OnInit, OnDestroy {
     this.subscriptions.add(
       this.userService.currentUser$.subscribe(user => {
         this.currentUser = user;
-        
         this.subAllUsers();
         this.subAllChannels();
-        
       })
     );
   }
@@ -222,13 +239,14 @@ export class SidebarComponent implements OnInit, OnDestroy {
     this.subscriptions.add(
       this.userService.allUsers$.subscribe(users => {
         this.allUsers = users;
+        this.userIncludeOperator = users;
         this.allUsers = this.allUsers.filter(u => u.id !== this.currentUser?.id);
         this.subUserChannelActivites();
       }));
   }
 
   subAllChannels() {
-    if(!this.currentUser) return;
+    if (!this.currentUser) return;
     this.subscriptions.add(
       this.channelService.getChannels((data) => {
         this.channels = [...data];
@@ -243,7 +261,7 @@ export class SidebarComponent implements OnInit, OnDestroy {
 
 
   subAllChannelMessages() {
-    if(!this.currentUser) return;
+    if (!this.currentUser) return;
     this.allChannelMessages = [];
     for (let index = 0; index < this.channels.length; index++) {
       let c = this.channels[index]
@@ -256,7 +274,7 @@ export class SidebarComponent implements OnInit, OnDestroy {
   }
 
   subAllPrivateMessages() {
-    if(!this.currentUser) return;
+    if (!this.currentUser) return;
     this.allPrivateMessages = [];
     for (let index = 0; index < this.allUsers.length; index++) {
       const user = this.allUsers[index];
@@ -264,21 +282,21 @@ export class SidebarComponent implements OnInit, OnDestroy {
       this.subscriptions.add(
         this.messageService.getPrivateMessageOrderByCreatedAt(this.messageService.buildConversationID(this.currentUser.id, userID), (data) => {
           this.allPrivateMessages = this.allPrivateMessages.concat([...data])
-      }));
-      
+        }));
+
     }
   }
 
   clickDevspace() {
     this.dashboardResponsive.setOpenMain(true);
-     this.router.navigate(['/dashboard', 'search']);
+    this.router.navigate(['/dashboard', 'search']);
   }
 
-  clickChannelHead(){
+  clickChannelHead() {
     this.openChannel = !this.openChannel;
   }
 
-  clickMessageHead(){
+  clickMessageHead() {
     this.openMessage = !this.openMessage;
   }
 
@@ -293,7 +311,7 @@ export class SidebarComponent implements OnInit, OnDestroy {
     this.currentChannelIndex = index;
     this.currentUserIndex = -1;
     if (this.currentUser) {
-       this.userChannelActivityService.markMessageAsReadByCurrentUser(this.currentUser?.id, channel.id);
+      this.userChannelActivityService.markMessageAsReadByCurrentUser(this.currentUser?.id, channel.id);
     }
     this.router.navigate(['/dashboard', 'channels', channel.id]);
   }
@@ -303,7 +321,7 @@ export class SidebarComponent implements OnInit, OnDestroy {
     this.currentChannelIndex = -1;
     this.currentUserIndex = index;
     let id;
-    if(user && this.currentUser) {
+    if (user && this.currentUser) {
       id = user.id;
       this.userChannelActivityService.markMessageAsReadByCurrentUser(this.currentUser?.id, user.id);
     } else {
@@ -318,7 +336,7 @@ export class SidebarComponent implements OnInit, OnDestroy {
     if (user) {
       return user.displayName;
     } else {
-      if(id == this.currentUser?.id) {
+      if (id == this.currentUser?.id) {
         return this.currentUser.displayName;
       } else {
         return '';
@@ -331,7 +349,7 @@ export class SidebarComponent implements OnInit, OnDestroy {
     if (user) {
       return user.photoURL;
     } else {
-      if(id == this.currentUser?.id) {
+      if (id == this.currentUser?.id) {
         return this.currentUser.photoURL;
       } else {
         return '';
@@ -348,12 +366,12 @@ export class SidebarComponent implements OnInit, OnDestroy {
     this.subscriptions.unsubscribe();
   }
 
-  clickUser(user: User){ 
+  clickUser(user: User) {
     this.clearFilter();
     this.communicator.sendUserMessage(user);
-    if(user && this.currentUser) {
+    if (user && this.currentUser) {
       this.userChannelActivityService.markMessageAsReadByCurrentUser(this.currentUser?.id, user.id);
-    } 
+    }
     this.dashboardResponsive.setOpenMain(true);
     this.router.navigate(['/dashboard', 'users', user.id]);
   }
@@ -361,16 +379,16 @@ export class SidebarComponent implements OnInit, OnDestroy {
   clickChannel(channel: Channel) {
     this.clearFilter();
     this.communicator.sendChannelMessage(channel);
-    
+
     if (this.currentUser) {
-       this.userChannelActivityService.markMessageAsReadByCurrentUser(this.currentUser?.id, channel.id);
+      this.userChannelActivityService.markMessageAsReadByCurrentUser(this.currentUser?.id, channel.id);
     }
     this.dashboardResponsive.setOpenMain(true);
     this.router.navigate(['/dashboard', 'channels', channel.id]);
   }
 
 
-   clearFilter() {
+  clearFilter() {
     this.filteredChannelMessages = [];
     this.filteredPrivateMessages = [];
     this.filteredUsers = [];
@@ -398,14 +416,14 @@ export class SidebarComponent implements OnInit, OnDestroy {
     this.filteredUsers = [];
     this.filteredChannelMessages = [];
     this.filteredPrivateMessages = [];
-     if (value == '#') {
+    if (value == '#') {
       this.filteredChannels = this.channels;
     } else {
-    const search = value.slice(1).toLowerCase(); // remove '#'
-    this.filteredChannels = this.channels?.filter(channel =>
-      channel.name.toLowerCase().includes(search)
-    ) || [];
-  }
+      const search = value.slice(1).toLowerCase(); // remove '#'
+      this.filteredChannels = this.channels?.filter(channel =>
+        channel.name.toLowerCase().includes(search)
+      ) || [];
+    }
   }
 
   filterByAll(value: string) {
@@ -433,7 +451,7 @@ export class SidebarComponent implements OnInit, OnDestroy {
   }
 
   filterChannelMessage(value: string) {
-     this.filteredChannelMessages = this.allChannelMessages?.filter(message =>
+    this.filteredChannelMessages = this.allChannelMessages?.filter(message =>
       message.content.toLowerCase().includes(value)
     ) || [];
   }
@@ -446,14 +464,14 @@ export class SidebarComponent implements OnInit, OnDestroy {
       this.showList = false;
       return;
     }
-    
+
     this.showList = true;
     if (value.startsWith('@')) {
       this.filterUsers(value);
     } else if (value.startsWith('#')) {
       this.filterChannel(value);
     } else {
-            this.filterByAll(value);
+      this.filterByAll(value);
     }
   }
 

@@ -65,7 +65,7 @@ export class GuestLoginService {
     const guest = this.currentGuestSubject.value;
     this.currentGuestSubject.next(null);
     if (!guest) return of(void 0);
-    
+
     return this.performCompleteGuestCleanup(guest).pipe(
       switchMap(() => this.userService.deleteUser(guest.uid)),
       tap(() => localStorage.removeItem(this.GUEST_STORAGE_KEY)),
@@ -211,28 +211,28 @@ export class GuestLoginService {
     const updateOperations = channels
       .filter(channel => channel.userIDs.includes(guest.uid))
       .map(channel => this.updateChannelWithoutGuest(channel, guest.uid));
-    
-    return updateOperations.length > 0 
+
+    return updateOperations.length > 0
       ? forkJoin(updateOperations).pipe(map(() => void 0))
       : of(void 0);
   }
 
   private deleteGuestConversations(conversations: any[]): Observable<void> {
-    const deleteOperations = conversations.map(conv => 
+    const deleteOperations = conversations.map(conv =>
       this.conversationService.deleteConversation(conv.coversationID)
     );
-    
-    return deleteOperations.length > 0 
+
+    return deleteOperations.length > 0
       ? forkJoin(deleteOperations).pipe(map(() => void 0))
       : of(void 0);
   }
 
   private processGuestThreadMessages(threadMessages: ThreadMessage[]): Observable<void> {
-    const processOperations = threadMessages.map(threadMsg => 
+    const processOperations = threadMessages.map(threadMsg =>
       this.deleteThreadMessageAndUpdateCount(threadMsg)
     );
-    
-    return processOperations.length > 0 
+
+    return processOperations.length > 0
       ? forkJoin(processOperations).pipe(map(() => void 0))
       : of(void 0);
   }
@@ -249,8 +249,8 @@ export class GuestLoginService {
       switchMap(message => {
         if (!message) return of(void 0);
         const updatedCount = Math.max(0, message.threadCount - 1);
-        return this.messageService.updateMessage(messageId, { 
-          threadCount: updatedCount 
+        return this.messageService.updateMessage(messageId, {
+          threadCount: updatedCount
         });
       }),
       map(() => void 0),
@@ -276,8 +276,8 @@ export class GuestLoginService {
     const updateOperations = messages
       .filter(msg => this.messageHasGuestReactions(msg, guestId))
       .map(msg => this.updateMessageReactions(msg, guestId));
-    
-    return updateOperations.length > 0 
+
+    return updateOperations.length > 0
       ? forkJoin(updateOperations).pipe(map(() => void 0))
       : of(void 0);
   }
@@ -286,21 +286,21 @@ export class GuestLoginService {
     const updateOperations = threadMessages
       .filter(msg => this.threadMessageHasGuestReactions(msg, guestId))
       .map(msg => this.updateThreadMessageReactions(msg, guestId));
-    
-    return updateOperations.length > 0 
+
+    return updateOperations.length > 0
       ? forkJoin(updateOperations).pipe(map(() => void 0))
       : of(void 0);
   }
 
   private messageHasGuestReactions(message: Message, guestId: string): boolean {
     if (!message.reactions) return false;
-    return Object.values(message.reactions).some(reaction => 
+    return Object.values(message.reactions).some(reaction =>
       reaction.users.includes(guestId)
     );
   }
 
   private threadMessageHasGuestReactions(threadMessage: ThreadMessage, guestId: string): boolean {
-    return threadMessage.reactions?.some(reaction => 
+    return threadMessage.reactions?.some(reaction =>
       reaction.user.includes(guestId)
     ) ?? false;
   }
@@ -312,8 +312,8 @@ export class GuestLoginService {
 
   private updateThreadMessageReactions(threadMessage: ThreadMessage, guestId: string): Observable<void> {
     const cleanedReactions = this.removeGuestFromThreadReactions(threadMessage.reactions!, guestId);
-    return this.threadMessageService.updateThreadMessage(threadMessage.id!, { 
-      reactions: cleanedReactions 
+    return this.threadMessageService.updateThreadMessage(threadMessage.id!, {
+      reactions: cleanedReactions
     });
   }
 

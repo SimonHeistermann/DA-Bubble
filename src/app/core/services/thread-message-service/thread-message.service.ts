@@ -16,7 +16,7 @@ import { ThreadMessage } from './../../models/message.interface';
 @Injectable({ providedIn: 'root' })
 export class ThreadMessageService {
   private db = getFirestore();
-  private collectionName = 'threadMessages';
+  private collectionName = 'threadmessage';
 
   getThreadMessagesByAuthor(authorId: string): Observable<ThreadMessage[]> {
     if (!this.isGuestUser(authorId)) {

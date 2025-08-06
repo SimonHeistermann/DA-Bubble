@@ -3,7 +3,6 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { toggleMarginLeft20Animation } from '../../animations/expand-collapse.animation';
 import { ThreadService } from '../../../../core/services/thread-service/thread.service';
-import { InputComponent } from '../shared/input/input.component';
 import { Message, ThreadMessage, ThreadReactions } from '../../../../core/models/message.interface';
 import { User } from '../../../../core/models/user.interface';
 import { FirebaseService } from '../../../../core/services/firebase-service/firebase.service';
@@ -22,10 +21,11 @@ import { OverlayService } from '../../../../core/services/overlay.service';
 import { ViewContainerRef } from '@angular/core';
 import { ProfileRefComponent } from "./profile-ref/profile-ref.component";
 import { DashboardResponsiveService } from '../../../../core/services/dashboard-responsive/dashboard-responsive.service';
+import { InputContComponent } from "./input-cont/input-cont.component";
 
 @Component({
   selector: 'app-thread-content',
-  imports: [InputComponent, CommonModule, FormsModule, EmojiPickerComponent, ProfileRefComponent],
+  imports: [CommonModule, FormsModule, EmojiPickerComponent, ProfileRefComponent, InputContComponent],
   templateUrl: './thread-content.component.html',
   styleUrl: './thread-content.component.scss',
   animations: [toggleMarginLeft20Animation]
@@ -71,12 +71,14 @@ export class ThreadContentComponent implements AfterViewChecked {
   overlayService = inject(OverlayService);
   viewContainerRef = inject(ViewContainerRef);
   dashboardResponsive = inject(DashboardResponsiveService);
+
+  @ViewChild('inputCont') inputCont!: InputContComponent;
   @ViewChild('containerBody') containerBody!: ElementRef;
   @ViewChild('threadContainer') threadContainer!: ElementRef;
   @ViewChild('emojiPickerTemplate') emojiPickerTemplate !: TemplateRef<any>;
 
 
-  ngOnInit() : void {
+  ngOnInit(): void {
     this.threadService.message$.subscribe(msg => {
       this.selectedMessage = msg;
     });
@@ -86,23 +88,24 @@ export class ThreadContentComponent implements AfterViewChecked {
     this.dashboardResponsive.isTablet$.subscribe(isTablet => {
       this.isTablet = isTablet;
     })
-     this.dashboardResponsive.isMobile$.subscribe(isMobile => {
+    this.dashboardResponsive.isMobile$.subscribe(isMobile => {
       this.isMobile = isMobile;
     })
-  } 
+  }
 
   ngAfterViewChecked(): void {
     if (this.dashboardResponsive.openThread$ && this.threadContainer) {
       this.threadContainer.nativeElement.scrollTop = this.threadContainer.nativeElement.scrollHeight;
+      this.inputCont.setFocus();
     }
   }
 
-  getReactionsArray(){
+  getReactionsArray() { 
     const reaction = this.selectedMessage?.reactions ?? {};
     return Object.entries(reaction).map(([emoji, data]) => ({
-    emoji,
-    users: data.users
-  }));
+      emoji,
+      users: data.users
+    }));
   }
 
   formatDate(rawDate: Timestamp | Timestamp) {
@@ -112,16 +115,16 @@ export class ThreadContentComponent implements AfterViewChecked {
   }
 
   getRows(text: string): number {
-  return Math.max(Math.ceil(text.length / 35));
+    return Math.max(Math.ceil(text.length / 35));
   }
 
   getCols(text: string): number {
-  return Math.max(Math.ceil(text.length / 20));
+    return Math.max(Math.ceil(text.length / 20));
   }
 
   showProfile(user: User) {
-   this.canShowProfile = true;
-   this.profileRefUser = user;
+    this.canShowProfile = true;
+    this.profileRefUser = user;
   }
 
   hideThreadContainer() {
@@ -153,14 +156,13 @@ export class ThreadContentComponent implements AfterViewChecked {
     }
   }
 
-  showEmojiPicker(index: number) {
+  showEmojiPicker(index: number) { 
     this.emojiPickerIndex = index;
-
     this.emojiPickerOverlayRef = this.overlayService.openTemplateOverlay(
       this.containerBody,
       this.emojiPickerTemplate,
       this.viewContainerRef
-    );
+     );
 
     this.emojiPickerOverlayRef.backdropClick().subscribe(() => this.emojiPickerOverlayRef.dispose());
   }
@@ -168,7 +170,7 @@ export class ThreadContentComponent implements AfterViewChecked {
   shouldShowDateDivider(index: number) {
     if (index === 0) return true;
 
-    const current =  this.threadService.currentThreadMessages[index];
+    const current = this.threadService.currentThreadMessages[index];
     const previous = this.threadService.currentThreadMessages[index - 1];
     if (!current.createdAt || !previous.createdAt) return false;
 
@@ -190,20 +192,20 @@ export class ThreadContentComponent implements AfterViewChecked {
     }
 
     const existingReaction = currentMessage.reactions.find(reaction => reaction.emojiStr === emojiStr);
-    if (existingReaction){
+    if (existingReaction) {
       if (!existingReaction.user.includes(currentUser)) {
         existingReaction.user.push(currentUser);
       } else {
         existingReaction.user.splice(existingReaction.user.indexOf(currentUser), 1);
-        if(existingReaction.user.length == 0) {
+        if (existingReaction.user.length == 0) {
           currentMessage.reactions.splice(currentMessage.reactions.indexOf(existingReaction), 1);
         }
       }
     } else {
       currentMessage.reactions.push({ emojiStr, user: [currentUser] });
-      
+
     }
-    
+
     if (currentMessage.id) {
       this.dataService.updateDocument('threadmessage', currentMessage.id,
         { reactions: currentMessage.reactions })
@@ -225,7 +227,7 @@ export class ThreadContentComponent implements AfterViewChecked {
     } else {
       this.editingMode = false;
     }
-    
+
   }
 
   breakEditing() {
@@ -237,7 +239,7 @@ export class ThreadContentComponent implements AfterViewChecked {
     this.edittedMessage(content, index);
     this.editingIndex = null;
     this.editingMode = false;
-    
+
   }
   edittedMessage(content: string, index: number) {
     this.threadService.currentThreadMessages[index].content = content;
