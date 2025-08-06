@@ -67,4 +67,3 @@ export const toggleMarginTop25Animation = trigger('toggleMarginTop25', [
     animate('200ms ease-in-out')
   ]),
 ]);
-

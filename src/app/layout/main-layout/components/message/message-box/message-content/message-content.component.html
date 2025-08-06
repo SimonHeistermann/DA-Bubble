@@ -1,6 +1,6 @@
  <div class="message-content-container">
     @if (isEditing && message?.content != null) {
-        <app-input [allChannelUserInput]="allUsersWithOutCurrentUser" (saveEditingEmitter)="onSaveEditing($event)" (breakEditingEmitter)="onBreakEditing()" [editingMode]="true" [originalInputMessage]="message?.content"></app-input>
+        <app-input #inputContainer [allChannelUserInput]="allUsersWithOutCurrentUser" (saveEditingEmitter)="onSaveEditing($event)" (breakEditingEmitter)="onBreakEditing()" [editingMode]="true" [originalInputMessage]="message?.content"></app-input>
     }
     <p>
         {{ message?.content }}

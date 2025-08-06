@@ -3,23 +3,23 @@ import { AutoResizeDirective } from '../../../../../core/directives/auto-resize.
 import { FormsModule } from '@angular/forms';
 import { ConnectedPosition, OverlayRef } from '@angular/cdk/overlay';
 import { OverlayService } from '../../../../../core/services/overlay.service';
-import { EmojiPickerComponent } from '../emoji-picker/emoji-picker.component';
+import { EmojiPickerComponent } from '../../shared/emoji-picker/emoji-picker.component';
 import { User } from '../../../../../core/models/user.interface';
 import { Channel } from '../../../../../core/models/channel.interface';
-import { UserListComponent } from '../user-list/user-list.component';
+import { UserListComponent } from '../../shared/user-list/user-list.component';
 import { CommonModule } from '@angular/common';
-import { ChannelListComponent } from "../channel-list/channel-list.component";
+import { ChannelListComponent } from "../../shared/channel-list/channel-list.component";
 import { UserChannelActivityService } from '../../../../../core/services/userReadActivity.service';
 import { ThreadService } from '../../../../../core/services/thread-service/thread.service';
 
+
 @Component({
-  selector: 'app-input',
+  selector: 'app-input-cont',
   imports: [AutoResizeDirective, FormsModule, EmojiPickerComponent, UserListComponent, CommonModule, ChannelListComponent],
-  standalone: true,
-  templateUrl: './input.component.html',
-  styleUrl: './input.component.scss'
+  templateUrl: './input-cont.component.html',
+  styleUrl: './input-cont.component.scss'
 })
-export class InputComponent implements AfterViewInit {
+export class InputContComponent {
   @Input() editingMode = false;
   @Input() placeHolder: string = '';
   @Input() shouldFocus: boolean = false;
@@ -33,9 +33,8 @@ export class InputComponent implements AfterViewInit {
   @ViewChild('emojiPickerTemplate') emojiPickerTemplate!: TemplateRef<any>;
   @ViewChild('emojiPickerTrigger') emojiPickerTrigger!: ElementRef;
   @ViewChild('atUserListTempalte') atUserListTempalte!: TemplateRef<any>;
-  @ViewChild('userListTrigger') atUserListTrigger!: ElementRef;
+  @ViewChild('inputContainer') inputContainer!: ElementRef;
   @ViewChild('textarea') textareaRef!: ElementRef<HTMLTextAreaElement>;
-  @ViewChild('userListTrigger') userListTrigger!: ElementRef;
 
   emojiPickerOverlayRef!: OverlayRef;
   atUserListOverlayRef!: OverlayRef;
@@ -85,21 +84,15 @@ export class InputComponent implements AfterViewInit {
     }
   }
 
-  ngAfterViewInit(): void {
-    if (!this.threadService.threadOpen) {
+
+  setFocus() {  
+      if (this.threadService.threadOpen) {
       this.textareaRef.nativeElement.focus();
-      this.userListTrigger.nativeElement.classList.add('focused');
+      this.inputContainer.nativeElement.classList.add('focused');
       this.userChannelActivityService.registerFocusHandler(() => {
         this.textareaRef?.nativeElement?.focus();
       });
     }
-  }
-
-  ngOnInit() {
-    this.userChannelActivityService.clearOldFocus$.subscribe(() => {
-      this.userChannelActivityService.clear();
-      this.userListTrigger.nativeElement.classList.remove('focused');
-    });
   }
 
   typing() {

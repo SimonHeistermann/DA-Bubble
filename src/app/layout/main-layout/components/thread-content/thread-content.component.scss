@@ -391,9 +391,14 @@
     }
 }
 
-@media (max-width: 575px) {
+@media (max-width: 1024px) {
     .main-container {
         margin-left: 0px !important;
+    }
+}
+
+@media (max-width: 575px) {
+    .main-container {
         height: calc(100vh - 94px) !important;
     }
 

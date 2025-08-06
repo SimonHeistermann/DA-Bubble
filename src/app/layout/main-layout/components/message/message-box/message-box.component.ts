@@ -1,4 +1,4 @@
-import { Component, ElementRef, EventEmitter, inject, Input, OnDestroy, Output, QueryList, SimpleChanges, TemplateRef, ViewChild, ViewChildren, ViewContainerRef } from '@angular/core';
+import { AfterViewInit, Component, ElementRef, EventEmitter, inject, Input, OnDestroy, Output, QueryList, SimpleChanges, TemplateRef, ViewChild, ViewChildren, ViewContainerRef } from '@angular/core';
 import { EmojiComponent } from '../../shared/emoji/emoji.component';
 import { EmojiPickerComponent } from '../../shared/emoji-picker/emoji-picker.component';
 import { Channel } from '../../../../../core/models/channel.interface';
@@ -19,7 +19,7 @@ import { ThreadService } from '../../../../../core/services/thread-service/threa
 
 @Component({
   selector: 'app-message-box',
-  imports: [EmojiComponent, EmojiPickerComponent, CommonModule, ProfileComponent, MessageContentComponent],
+  imports: [EmojiComponent, EmojiPickerComponent, CommonModule, ProfileComponent, MessageContentComponent ],
   standalone: true,
   templateUrl: './message-box.component.html',
   styleUrl: './message-box.component.scss'
@@ -31,6 +31,7 @@ export class MessageBoxComponent implements OnDestroy{
   @Input() allUsers: User[] = [];
   @Input() allUsersWithOutCurrentUser: User[] = [];
   @Input() firstUnreadMessageId: string = '';
+
   
   @Output() threadMessageEmitter = new EventEmitter<Message>();
 
@@ -51,6 +52,7 @@ export class MessageBoxComponent implements OnDestroy{
   @ViewChildren('emojiTriggerAtLeft') emojiTriggerAtLeftRefs!: QueryList<ElementRef>;
   @ViewChildren('emojiTriggerAtRight') emojiTriggerAtRightRefs!: QueryList<ElementRef>;
   @ViewChildren('messageDiv') messageRefs!: QueryList<ElementRef>;
+
   
   emojiPickerOverlayRef!: OverlayRef;
   overlayService = inject(OverlayService);
@@ -67,6 +69,7 @@ export class MessageBoxComponent implements OnDestroy{
   editingIndex = -1;
 
 
+
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['channel'] && changes['channel'].currentValue) {
       this.channel = changes['channel'].currentValue;
@@ -77,7 +80,7 @@ export class MessageBoxComponent implements OnDestroy{
     if (changes['messageUser'] && changes['messageUser'].currentValue) {
       this.messageUser = changes['messageUser'].currentValue;
        this.isNewInChat = true;
-       this.subPrivateMessages();
+       this.subPrivateMessages(); 
     }
   }
 
@@ -118,6 +121,8 @@ export class MessageBoxComponent implements OnDestroy{
         } else {
           this.firstUnreadMessageId = unreadMessages[unreadMessages.length - 1].id;
         }
+        console.log('firstunreadmessageid:', this.firstUnreadMessageId);
+        
       } else {
         this.firstUnreadMessageId = '';
       }
@@ -358,6 +363,8 @@ export class MessageBoxComponent implements OnDestroy{
   showThreadContainer(index: number){
     this.threadService.show(); 
     this.threadService.setMessage(this.messages[index]);
+    // this.userChannelActivityService.clear();
+    this.userChannelActivityService.clearOldFocus();
   }
 
 }

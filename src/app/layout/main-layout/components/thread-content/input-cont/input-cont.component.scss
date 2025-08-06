@@ -1,0 +1,115 @@
+
+@use './../../../../../../styles.scss' as *;
+
+.input-container {
+    
+    position: relative;
+    width: calc(100% - 40px);
+    margin: 20px;
+    margin-bottom: 20px;
+    margin-top: 0;
+    border: 1px solid #ADB0D9;
+    border-radius: 20px;
+    padding: 10px 10px 5px;
+    background: var(--white);
+
+    .user-list {
+        position: absolute;
+        left: 20px;
+        bottom: 100%;
+        overflow: hidden;
+        border-bottom-right-radius: 0;
+        border-top-right-radius: 20px;
+        border-top-left-radius: 20px;
+        border: 1px solid var(--light-purple);
+        padding: 10px 0;
+        background-color: var(--white);
+        z-index: 999;
+    }
+
+    &.focused {
+        border: 1px solid var(--purple-2);
+    }
+
+
+}
+
+textarea {
+    background-color: transparent;
+    box-sizing: border-box;
+    width: 100%;
+    font-size: 16px;
+    padding: 0 12px;  
+    letter-spacing: normal;         
+    height: auto;          
+    overflow: hidden;
+    resize: none;
+    border: none;
+    color: #686868;
+    height: 20px; 
+    line-height: 20px;
+    
+    max-height: 60px;
+    overflow-y: scroll;
+
+    &:focus {
+        outline: none;
+    }
+}
+
+
+.input-icons {
+    width: 100%;
+    display: flex;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+
+    .input-icons-left {
+        @include displayFlex($g:5px);
+       
+        .emoji {
+            @include imgButton($wh: 40px, $url:'/angular-projects/dabubble/images/icons/emoji.png');
+            &:hover {
+                background-image: url('/angular-projects/dabubble/images/icons/emoji_hover.png');
+            }
+        }
+    
+
+    
+        .at {
+            @include imgButton($wh: 40px, $url:'/angular-projects/dabubble/images/icons/at.png');
+            &:hover {
+                background-image: url('/angular-projects/dabubble/images/icons/at_hover.png');
+            }
+        }
+    
+
+    }
+
+    .send-button {
+        @include imgButton($wh: 23px, $url:'/angular-projects/dabubble/images/icons/send.png');
+        &:hover {
+            background-image: url('/angular-projects/dabubble/images/icons/send_hover.png');
+        }
+    }
+
+    .buttons {
+        @include displayFlex($g:10px);
+        button {
+           padding: 5px 10px;
+           border-radius: 10px;
+        }
+        .break {
+             background-color: var(--white);
+             color: var(--purple-3);
+             border: 1px solid var(--purple-3);
+        }
+        .save {
+            background-color: var(--purple-3);
+            color: var(--white);
+        }
+    }
+
+}
