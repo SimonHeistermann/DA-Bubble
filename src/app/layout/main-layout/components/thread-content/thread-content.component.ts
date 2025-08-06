@@ -1,4 +1,4 @@
-import { AfterViewChecked, Component, ElementRef, Inject, Input, TemplateRef, ViewChild, inject } from '@angular/core';
+import { AfterViewChecked, Component, ElementRef, Inject, Input, QueryList, TemplateRef, ViewChild, inject } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { toggleMarginLeft20Animation } from '../../animations/expand-collapse.animation';
@@ -56,6 +56,7 @@ export class ThreadContentComponent implements AfterViewChecked {
   smallScreen = false;
   isTablet = false;
   isMobile = false;
+  isScrolled = false;
 
 
   emojiPickerOverlayRef!: OverlayRef;
@@ -74,13 +75,14 @@ export class ThreadContentComponent implements AfterViewChecked {
 
   @ViewChild('inputCont') inputCont!: InputContComponent;
   @ViewChild('containerBody') containerBody!: ElementRef;
-  @ViewChild('threadContainer') threadContainer!: ElementRef;
+  @ViewChild('threadContainer') threadContainer!: ElementRef<HTMLElement>;
   @ViewChild('emojiPickerTemplate') emojiPickerTemplate !: TemplateRef<any>;
 
 
   ngOnInit(): void {
     this.threadService.message$.subscribe(msg => {
       this.selectedMessage = msg;
+      this.isScrolled = false;
     });
     this.dashboardResponsive.smallScreen$.subscribe(smallScreen => {
       this.smallScreen = smallScreen;
@@ -91,20 +93,30 @@ export class ThreadContentComponent implements AfterViewChecked {
     this.dashboardResponsive.isMobile$.subscribe(isMobile => {
       this.isMobile = isMobile;
     })
+
+    this.threadService.setComponent(this);
   }
 
   ngAfterViewChecked(): void {
     if (this.dashboardResponsive.openThread$ && this.threadContainer) {
-      this.threadContainer.nativeElement.scrollTop = this.threadContainer.nativeElement.scrollHeight;
       this.inputCont.setFocus();
+    }
+    this.threadContainer.nativeElement.scrollTop = this.threadContainer.nativeElement.scrollHeight;
+  }
+
+   public tryScrollOnce(): void { debugger;
+    if (!this.isScrolled && this.threadContainer.nativeElement) {
+      this.scrollToBottom();
+      this.isScrolled = true;
     }
   }
 
-  clearFocus() {
-    
-  }
 
-  getReactionsArray() { 
+  scrollToBottom() {
+     let element = this.threadContainer.nativeElement;
+    if (element) element.scrollIntoView({ block: 'start' });
+  }
+  getReactionsArray() {
     const reaction = this.selectedMessage?.reactions ?? {};
     return Object.entries(reaction).map(([emoji, data]) => ({
       emoji,
@@ -160,13 +172,13 @@ export class ThreadContentComponent implements AfterViewChecked {
     }
   }
 
-  showEmojiPicker(index: number) { 
+  showEmojiPicker(index: number) {
     this.emojiPickerIndex = index;
     this.emojiPickerOverlayRef = this.overlayService.openTemplateOverlay(
       this.containerBody,
       this.emojiPickerTemplate,
       this.viewContainerRef
-     );
+    );
 
     this.emojiPickerOverlayRef.backdropClick().subscribe(() => this.emojiPickerOverlayRef.dispose());
   }

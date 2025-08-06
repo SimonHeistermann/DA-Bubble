@@ -1,10 +1,10 @@
-import { AfterViewChecked, Component, inject, OnInit,} from '@angular/core';
+import { Component, inject, OnInit, } from '@angular/core';
 import { InputComponent } from '../shared/input/input.component';
 import { CommonModule } from '@angular/common';
-import { Channel} from '../../../../core/models/channel.interface';
+import { Channel } from '../../../../core/models/channel.interface';
 import { Subscription } from 'rxjs';
 import { UserService } from '../../../../core/services/user-service/user.service';
-import { forkJoin} from 'rxjs';
+import { forkJoin } from 'rxjs';
 import { User } from '../../../../core/models/user.interface';
 import {
   ElementRef,
@@ -17,7 +17,7 @@ import { MessageService } from '../../../../core/services/message.service';
 import { ChannelMessageHeaderComponent } from './channel-message-header/channel-message-header.component';
 import { MessageData } from '../../../../core/models/message.interface';
 import { UserChannelActivityService } from '../../../../core/services/userReadActivity.service';
-import { ActivatedRoute, NavigationEnd, Router } from '@angular/router';
+import { ActivatedRoute, Router } from '@angular/router';
 import { ChannelService } from '../../../../core/services/channel.service';
 import { SearchMessageHeaderComponent } from './search-message-header/search-message-header.component';
 import { DashboardResponsiveService } from '../../../../core/services/dashboard-responsive/dashboard-responsive.service';
@@ -33,14 +33,14 @@ import { MainLayoutContentComponent } from '../../main-layout-content/main-layou
   styleUrl: './message.component.scss',
   animations: [],
 })
-export class MessageComponent implements OnInit, AfterViewChecked{
+export class MessageComponent implements OnInit {
 
   @ViewChild('containerBody') private containerBody!: ElementRef;
- 
-  
+  @ViewChild('messageContainer') private messageContainer!: ElementRef;
+
   private subscriptions = new Subscription();
   showHeader: 'direct' | 'channel' | 'new' = 'channel';
-  
+
   userService = inject(UserService);
   channelService = inject(ChannelService);
   dashboardResponsive = inject(DashboardResponsiveService);
@@ -76,32 +76,28 @@ export class MessageComponent implements OnInit, AfterViewChecked{
           this.loadUser(userId);
           this.channel = null;
         } else {
-           this.handleShowSearchField();
-        }}));
+          this.handleShowSearchField();
+        }
+      }));
 
-     this.dashboardResponsive.isTablet$.subscribe(isTablet => { this.isTablet = isTablet;})
-     this.dashboardResponsive.isMobile$.subscribe(isMobile => { this.isMobile = isMobile;})}
+    this.dashboardResponsive.isTablet$.subscribe(isTablet => { this.isTablet = isTablet; });
+    this.dashboardResponsive.isMobile$.subscribe(isMobile => { this.isMobile = isMobile; });
+  }
 
-  handleShowSearchField() { 
+  handleShowSearchField() {
     this.showHeader = 'new';
     this.messageUser = null;
     this.messageUser = null;
   }
 
-  ngAfterViewChecked(): void {
-    if (this.containerBody ) {
-      this.containerBody.nativeElement.scrollTop = this.containerBody.nativeElement.scrollHeight;
-    }
-  }
-
-  loadUser(userId:string) {
+  loadUser(userId: string) {
     this.showHeader = 'direct';
     this.subscriptions.add(
       this.userService.getUserById(userId).subscribe({
         next: (data) => {
-          if(data) {
-             this.messageUser = {...data};
-             this.subCurrentUser();
+          if (data) {
+            this.messageUser = { ...data };
+            this.subCurrentUser();
           }
         }
       })
@@ -113,16 +109,16 @@ export class MessageComponent implements OnInit, AfterViewChecked{
     this.subscriptions.add(
       this.channelService.getChannelById(channelId).subscribe({
         next: (data) => {
-          if(data) {
-             this.channel = {...data};
-             this.subCurrentUser();
+          if (data) {
+            this.channel = { ...data };
+            this.subCurrentUser();
           }
         }
       })
     );
   }
 
-  subCurrentUser(){
+  subCurrentUser() {
     const authUser = this.authService.currentUser;
     if (authUser) {
       this.userService.loadCurrentUser(authUser.uid);
@@ -136,17 +132,17 @@ export class MessageComponent implements OnInit, AfterViewChecked{
   }
 
   subChannelUsers() {
-    if(!this.channel) return;
+    if (!this.channel) return;
     const userIDs = this.channel.userIDs ?? [];
-    if(this.channel.userIDs?.length === 0) return;
+    if (this.channel.userIDs?.length === 0) return;
 
     this.subscriptions.add(
       forkJoin(userIDs.map(uid => this.userService.getUserById(uid)))
-      .subscribe( users => {
-        this.allUsers = [];
-        this.allUsers = users.filter((u): u is User => u !== null);
-        this.allUsersWithOutCurrentUser = this.allUsers.filter(u => u.id !== this.currentUser?.id);
-     })
+        .subscribe(users => {
+          this.allUsers = [];
+          this.allUsers = users.filter((u): u is User => u !== null);
+          this.allUsersWithOutCurrentUser = this.allUsers.filter(u => u.id !== this.currentUser?.id);
+        })
     )
   }
 
@@ -167,7 +163,7 @@ export class MessageComponent implements OnInit, AfterViewChecked{
   }
 
   buildPrivateMessageData(msg: string): MessageData {
-   
+
     return {
       authorID: this.currentUser?.id || '',
       authorName: this.currentUser?.displayName || '',
@@ -182,15 +178,15 @@ export class MessageComponent implements OnInit, AfterViewChecked{
 
 
   onSendMessage(msg: string) {
-    if ((this.currentUser && this.channel) || (this.currentUser && this.messageUser))  {
-      let messsageData ;
-      if(this.messageUser) {
+    if ((this.currentUser && this.channel) || (this.currentUser && this.messageUser)) {
+      let messsageData;
+      if (this.messageUser) {
         messsageData = this.buildPrivateMessageData(msg);
       } else {
         messsageData = this.buildChannelMessageData(msg);
       }
-      
-      this.subscriptions.add( this.messageService.addOneMessage(messsageData).subscribe(
+
+      this.subscriptions.add(this.messageService.addOneMessage(messsageData).subscribe(
         {
           next: (id: string) => {
             if (this.currentUser && this.channel)
