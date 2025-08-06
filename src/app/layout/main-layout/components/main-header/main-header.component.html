@@ -11,7 +11,7 @@
 
 
     <div class="search-field-container">
-        <input type="text" class="search-field" placeholder="Devspace durchsuchen" [(ngModel)]="inputContent" (input)="inputText()">
+        <input type="text" class="search-field" placeholder="Devspace durchsuchen" [(ngModel)]="inputContent" (input)="inputText()" (focus)="activateSearch()">
         <div class="search-result scrollbar__none" *ngIf="showList">
             <div class="search-result-user" *ngIf="filteredUsers.length > 0">
                 <h3>User</h3>

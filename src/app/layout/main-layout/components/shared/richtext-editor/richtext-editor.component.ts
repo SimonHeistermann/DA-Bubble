@@ -1,4 +1,4 @@
-  import {Component, ElementRef, ViewChild, Input, AfterViewInit, ChangeDetectionStrategy, Output, EventEmitter, ViewEncapsulation} from '@angular/core';
+  import {Component, ElementRef, ViewChild, ChangeDetectionStrategy, Output, EventEmitter, ViewEncapsulation, inject} from '@angular/core';
 import { User } from '../../../../../core/models/user.interface';
 
 
@@ -20,10 +20,10 @@ import { User } from '../../../../../core/models/user.interface';
     @Output() tagIDsChanges = new EventEmitter<Array<string>>();
 
     ngAfterViewInit() {
+      this.editorRef.nativeElement.focus();
       const el = this.editorRef.nativeElement;
       this.focusEditorAndMoveCaretToEnd();
       this.editorReady.emit(el);
-
     }
 
     clearContent(): void {

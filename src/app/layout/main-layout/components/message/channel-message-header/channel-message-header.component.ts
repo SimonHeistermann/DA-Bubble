@@ -147,9 +147,10 @@ export class ChannelMessageHeaderComponent implements AfterViewInit, OnInit {
     this.activeUserListButton = false;
   }
 
-  openAddChannelUserOverlay() {
+  openAddChannelUserOverlay() { 
     this.showAddChannelUserOverlay = true;
     this.activeAddChannelUserButton = true;
+    this.threadService.hide();
   }
 
   closeAddChannelUserOverlay() {

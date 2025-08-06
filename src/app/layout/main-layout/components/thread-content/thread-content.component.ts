@@ -100,6 +100,10 @@ export class ThreadContentComponent implements AfterViewChecked {
     }
   }
 
+  clearFocus() {
+    
+  }
+
   getReactionsArray() { 
     const reaction = this.selectedMessage?.reactions ?? {};
     return Object.entries(reaction).map(([emoji, data]) => ({

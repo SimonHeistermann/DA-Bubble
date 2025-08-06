@@ -14,6 +14,7 @@ export class UserChannelActivityService{
     private _clearFocus = new Subject<void>();
     clearOldFocus$ = this._clearFocus.asObservable();
 
+
     dataService = inject(DataService);
 
     registerFocusHandler(callback: () => void) : void {

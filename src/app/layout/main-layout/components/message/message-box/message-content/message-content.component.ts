@@ -1,4 +1,4 @@
-import { Component, EventEmitter, Input, input, OnChanges, Output, SimpleChanges } from '@angular/core';
+import { Component, EventEmitter, Input, OnChanges, Output, SimpleChanges } from '@angular/core';
 import { Message } from '../../../../../../core/models/message.interface';
 import { InputComponent } from '../../../shared/input/input.component';
 import { User } from '../../../../../../core/models/user.interface';

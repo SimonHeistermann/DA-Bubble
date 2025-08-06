@@ -85,8 +85,8 @@ export class InputContComponent {
   }
 
 
-  setFocus() {  
-      if (this.threadService.threadOpen) {
+  setFocus() {
+    if (this.threadService.threadOpen) {
       this.textareaRef.nativeElement.focus();
       this.inputContainer.nativeElement.classList.add('focused');
       this.userChannelActivityService.registerFocusHandler(() => {
