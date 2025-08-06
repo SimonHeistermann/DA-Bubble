@@ -54,7 +54,6 @@ export class UserChannelActivityService{
             this.dataService.updateDocument(this.COL_NAME, id, data)
         ).pipe(
             catchError(e => {
-                console.log('Error when updading userChannelActivity:', e);
                 throw e;
             })
         );
@@ -65,7 +64,6 @@ export class UserChannelActivityService{
             this.dataService.addDocument(this.COL_NAME, data)
         ).pipe(
             catchError(e => {
-                console.log('Error when adding one userChannelActivity:', e);
                 throw e;
             })
         );
