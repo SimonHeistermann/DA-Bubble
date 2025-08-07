@@ -1,4 +1,4 @@
-import { AfterViewInit, Component, ElementRef, EventEmitter, inject, Input, OnDestroy, Output, QueryList, SimpleChanges, TemplateRef, ViewChild, ViewChildren, ViewContainerRef } from '@angular/core';
+import { AfterViewChecked, Component, ElementRef, EventEmitter, inject, Input, OnDestroy, Output, QueryList, SimpleChanges, TemplateRef, ViewChild, ViewChildren, ViewContainerRef } from '@angular/core';
 import { EmojiComponent } from '../../shared/emoji/emoji.component';
 import { EmojiPickerComponent } from '../../shared/emoji-picker/emoji-picker.component';
 import { Channel } from '../../../../../core/models/channel.interface';
@@ -19,12 +19,12 @@ import { ThreadService } from '../../../../../core/services/thread-service/threa
 
 @Component({
   selector: 'app-message-box',
-  imports: [EmojiComponent, EmojiPickerComponent, CommonModule, ProfileComponent, MessageContentComponent ],
+  imports: [EmojiComponent, EmojiPickerComponent, CommonModule, ProfileComponent, MessageContentComponent],
   standalone: true,
   templateUrl: './message-box.component.html',
   styleUrl: './message-box.component.scss'
 })
-export class MessageBoxComponent implements OnDestroy{
+export class MessageBoxComponent implements AfterViewChecked, OnDestroy {
   @Input() channel: Channel | null = null;
   @Input() messageUser: User | null = null;
   @Input() currentUser: User | null = null;
@@ -32,8 +32,10 @@ export class MessageBoxComponent implements OnDestroy{
   @Input() allUsersWithOutCurrentUser: User[] = [];
   @Input() firstUnreadMessageId: string = '';
 
-  
+
   @Output() threadMessageEmitter = new EventEmitter<Message>();
+
+  @Output() afterInit = new EventEmitter<void>();
 
   private subscriptions = new Subscription();
   unsubscribeChannelMessages: (() => void) | null = null;
@@ -46,41 +48,62 @@ export class MessageBoxComponent implements OnDestroy{
   userChannelActivity: UserReadActivity | null = null;
 
   messages: Message[] = [];
-  
+
 
   @ViewChild('emojiPickerTemplate') emojiPickerTemplate!: TemplateRef<any>;
   @ViewChildren('emojiTriggerAtLeft') emojiTriggerAtLeftRefs!: QueryList<ElementRef>;
   @ViewChildren('emojiTriggerAtRight') emojiTriggerAtRightRefs!: QueryList<ElementRef>;
   @ViewChildren('messageDiv') messageRefs!: QueryList<ElementRef>;
 
-  
+
   emojiPickerOverlayRef!: OverlayRef;
   overlayService = inject(OverlayService);
   viewContainerRef = inject(ViewContainerRef);
   showProfileOverlay = false;
+  isScrolled = false;
 
   clickedMessageIndex = -1;
   isNewInChat = true;
 
   showThread = inject(ThreadService);
-  
+
   lastLoadedId: string | null = null;
   selectedUser: User | null = null;
   editingIndex = -1;
 
 
+  ngAfterViewChecked(): void {
+    this.messageRefs.changes.subscribe(() => this.tryScrollOnce());
+  }
+
+  private tryScrollOnce(): void { 
+    if (!this.isScrolled && this.messageRefs.length > 0) {
+      this.scrollToBottom();
+      this.isScrolled = true;
+      this.afterInit.emit();
+    }
+  }
 
   ngOnChanges(changes: SimpleChanges): void {
     if (changes['channel'] && changes['channel'].currentValue) {
       this.channel = changes['channel'].currentValue;
-       this.isNewInChat = true;
-       this.subChannelMessages();
+      this.isNewInChat = true;
+      this.subChannelMessages();
+      this.isScrolled = false;
+      this.scrollToBottom();
     }
 
     if (changes['messageUser'] && changes['messageUser'].currentValue) {
       this.messageUser = changes['messageUser'].currentValue;
-       this.isNewInChat = true;
-       this.subPrivateMessages(); 
+      this.isNewInChat = true;
+      this.subPrivateMessages();
+      this.isScrolled = false;
+      this.scrollToBottom();
+    }
+
+    if (changes['messages']) {
+      this.isScrolled = false;
+      this.scrollToBottom();
     }
   }
 
@@ -94,65 +117,65 @@ export class MessageBoxComponent implements OnDestroy{
 
     const currentDate = this.dateService.toDate(current.createdAt);
     const previousDate = this.dateService.toDate(previous.createdAt);
- 
+
     return !this.dateService.isSameDay(currentDate, previousDate);
   }
 
   convertReaction(mr: MessageReactions | undefined) {
     if (!mr) return [];
-    const mrKeys= Object.keys(mr);
+    const mrKeys = Object.keys(mr);
     return mrKeys;
   }
 
   buildFirstUnreadMessageId(activity: UserReadActivityData, messages: Message[]) {
-      if(!activity?.updatedAt) return;
+    if (!activity?.updatedAt) return;
 
-      const unreadMessages = messages.filter(
-        msg =>
-          msg.createdAt &&
-          msg.createdAt.toMillis() > activity.updatedAt.toMillis() &&
-          msg.authorID !== this.currentUser?.id
-      );
-      
-      if (unreadMessages.length !==0 ) {
-        if(this.isNewInChat) {
-          this.firstUnreadMessageId = unreadMessages[0].id;
-          this.isNewInChat = false;
-        } else {
-          this.firstUnreadMessageId = unreadMessages[unreadMessages.length - 1].id;
-        }
-        console.log('firstunreadmessageid:', this.firstUnreadMessageId);
-        
+    const unreadMessages = messages.filter(
+      msg =>
+        msg.createdAt &&
+        msg.createdAt.toMillis() > activity.updatedAt.toMillis() &&
+        msg.authorID !== this.currentUser?.id
+    );
+
+    if (unreadMessages.length !== 0) {
+      if (this.isNewInChat) {
+        this.firstUnreadMessageId = unreadMessages[0].id;
+        this.isNewInChat = false;
       } else {
-        this.firstUnreadMessageId = '';
+        this.firstUnreadMessageId = unreadMessages[unreadMessages.length - 1].id;
       }
-      
+      console.log('firstunreadmessageid:', this.firstUnreadMessageId);
+
+    } else {
+      this.firstUnreadMessageId = '';
+    }
+
   }
 
   subChannelUserActivity(activityId: string) {
-    if(!this.currentUser || !activityId) return;
+    if (!this.currentUser || !activityId) return;
 
     this.userChannelActivityService.getUserReadActivityByIDsOnce(this.currentUser.id, activityId, (data: any) => {
       const activities = [...data];
-      if(activities.length === 1) {
+      if (activities.length === 1) {
         const activity = activities[0];
-        if(activity.channelID == activityId && activity.userID == this.currentUser?.id) {
+        if (activity.channelID == activityId && activity.userID == this.currentUser?.id) {
           this.userChannelActivity = activities[0];
           if (this.userChannelActivity) {
             this.buildFirstUnreadMessageId(this.userChannelActivity, this.messages);
           }
-          this.scrollTo() ;
+          this.scrollTo();
         }
       }
     })
-    
+
   }
 
   scrollTo() {
     let element;
     if (this.firstUnreadMessageId) {
-      element = this.messageRefs.find(ref =>ref.nativeElement.getAttribute('data-id') === this.firstUnreadMessageId);
-      if (element) element.nativeElement.scrollIntoView({block: 'start' });
+      element = this.messageRefs.find(ref => ref.nativeElement.getAttribute('data-id') === this.firstUnreadMessageId);
+      if (element) element.nativeElement.scrollIntoView({ block: 'start' });
     } else {
       this.scrollToBottom();
     }
@@ -160,18 +183,18 @@ export class MessageBoxComponent implements OnDestroy{
 
   scrollToBottom() {
     let element = this.messageRefs.get(this.messageRefs.length - 1);
-    if (element) element.nativeElement.scrollIntoView({block: 'start' });
+    if (element) element.nativeElement.scrollIntoView({ block: 'start' });
   }
 
   subPrivateMessages() {
-    if(!this.currentUser || !this.messageUser) return;
+    if (!this.currentUser || !this.messageUser) return;
     this.unsubscribeChannelMessages = this.messageService.getPrivateMessageOrderByCreatedAt(this.messageService.buildConversationID(this.currentUser.id, this.messageUser.id), (data) => {
-      if(data.length == 0) {
+      if (data.length == 0) {
         this.messages = [...data]; return;
       };
 
-      if(!data[0].conversationID?.includes(this.messageUser?.id ?? '')) return;
-      
+      if (!data[0].conversationID?.includes(this.messageUser?.id ?? '')) return;
+
       const isNew = this.isNewMessage(data, this.messageUser?.id || '');
       this.messages = [...data];
 
@@ -183,29 +206,29 @@ export class MessageBoxComponent implements OnDestroy{
   }
 
   subChannelMessages() {
-    if(!this.currentUser || !this.channel) return;
+    if (!this.currentUser || !this.channel) return;
     this.unsubscribeChannelMessages = this.messageService.getChannelMessageOrderByCreatedAt(this.channel.id, (data) => {
-        if(data.length == 0) {
-          this.messages = [...data]; return;
-        };
+      if (data.length == 0) {
+        this.messages = [...data]; return;
+      };
 
-        if(data[0].channelID !== this.channel?.id) return;
-        
-        const isNew = this.isNewMessage(data, this.channel?.id || '');
-        this.messages = [...data];
+      if (data[0].channelID !== this.channel?.id) return;
 
-        if (isNew) this.subChannelUserActivity(this.channel?.id || '');
-         
+      const isNew = this.isNewMessage(data, this.channel?.id || '');
+      this.messages = [...data];
+
+      if (isNew) this.subChannelUserActivity(this.channel?.id || '');
+
     })
   }
 
   isNewMessage(newMessages: Message[], newLoadID: string) {
-    if(!newLoadID) return;
+    if (!newLoadID) return;
 
-    if(this.lastLoadedId !== newLoadID) {
+    if (this.lastLoadedId !== newLoadID) {
       this.lastLoadedId = newLoadID;
       return true;
-    } 
+    }
 
     const prevLastMsgId = this.messages.at(-1)?.id;
     const newLastMsgId = newMessages.at(-1)?.id;
@@ -213,9 +236,9 @@ export class MessageBoxComponent implements OnDestroy{
     return prevLastMsgId !== newLastMsgId;
   }
 
-  findURLByUserId(userID: string): string | ''{
+  findURLByUserId(userID: string): string | '' {
     let user;
-    if(this.allUsers.length == 0) {
+    if (this.allUsers.length == 0) {
       user = this.currentUser;
     } else {
       user = this.allUsers.find(u => u.id === userID) ?? null;
@@ -223,27 +246,27 @@ export class MessageBoxComponent implements OnDestroy{
     return user ? user.photoURL.startsWith('http') ? 'images/icons/avatars/avatar_1.png' : user.photoURL : '';
   }
 
-  findUserByUserId(userID: string): string{
+  findUserByUserId(userID: string): string {
     const user = this.allUsers.find(u => u.id === userID);
-    if(user) {
-      if(user.id === this.currentUser?.id) {
+    if (user) {
+      if (user.id === this.currentUser?.id) {
         return 'Du';
       }
       else {
-         return user?.displayName;
+        return user?.displayName;
       }
     }
     return '';
 
   }
- 
-  buildPosition (pos: string): ConnectedPosition[] {
-    return  pos === 'right'
-    ? [
+
+  buildPosition(pos: string): ConnectedPosition[] {
+    return pos === 'right'
+      ? [
         { originX: 'end', originY: 'top', overlayX: 'end', overlayY: 'bottom' },
         { originX: 'end', originY: 'top', overlayX: 'end', overlayY: 'bottom' }
       ]
-    : [
+      : [
         { originX: 'start', originY: 'top', overlayX: 'start', overlayY: 'bottom' },
         { originX: 'end', originY: 'bottom', overlayX: 'end', overlayY: 'top' },
         { originX: 'start', originY: 'top', overlayX: 'end', overlayY: 'bottom' }
@@ -252,66 +275,66 @@ export class MessageBoxComponent implements OnDestroy{
 
   showEmojiPicker(event: MouseEvent, index: number, pos: 'left' | 'right') {
     const trigger = event.currentTarget as HTMLElement;
-  
+
     this.clickedMessageIndex = index;
 
     this.emojiPickerOverlayRef = this.overlayService.openTemplateOverlay(
-      new ElementRef(trigger), 
-      this.emojiPickerTemplate, 
-      this.viewContainerRef, 
+      new ElementRef(trigger),
+      this.emojiPickerTemplate,
+      this.viewContainerRef,
       this.buildPosition(pos),
     );
 
     this.emojiPickerOverlayRef.backdropClick().subscribe(() => this.closeEmojiPickerOverlay());
   }
 
-  onSelectedEmoji(emojiStr: string){
-    this.clickEmoji(emojiStr,this.messages[this.clickedMessageIndex]);
+  onSelectedEmoji(emojiStr: string) {
+    this.clickEmoji(emojiStr, this.messages[this.clickedMessageIndex]);
     this.clickedMessageIndex = -1;
     this.emojiPickerOverlayRef?.dispose();
-    
+
   }
 
-  clickUserAvatar(userID: string){
+  clickUserAvatar(userID: string) {
     this.subscriptions.add(this.userService.getUserById(userID).subscribe({
-        next: ((user) => {
-          this.selectedUser = user;
-          this.showProfileOverlay = true;
-        })
-      }));
+      next: ((user) => {
+        this.selectedUser = user;
+        this.showProfileOverlay = true;
+      })
+    }));
   }
 
   onSaveEditing(msg: string, message: Message) {
-    if(!this.currentUser) return; 
-    let {id, ...messageData} = message;
+    if (!this.currentUser) return;
+    let { id, ...messageData } = message;
     messageData.content = msg;
     this.subUpdateMessage(id, messageData);
-  
+
   }
 
   clickEmoji(emojiStr: string, message: Message) {
-    if(!this.currentUser) return; 
+    if (!this.currentUser) return;
     const userName = this.currentUser.displayName;
 
-    let {id, ...messageData} = message;
+    let { id, ...messageData } = message;
 
     this.updateMessageReaction(userName, emojiStr, messageData);
     this.subUpdateMessage(id, messageData);
   }
 
-  clickEditMessage(index: number){
+  clickEditMessage(index: number) {
     this.clickedMessageIndex = index;
     this.editingIndex = index;
-    if(this.messages[index].id === this.messages[this.messages.length - 1].id) {
+    if (this.messages[index].id === this.messages[this.messages.length - 1].id) {
       this.scrollToBottom();
     }
   }
 
-  updateMessageReaction(userName: string, emojiStr: string, messageData: MessageData){
+  updateMessageReaction(userName: string, emojiStr: string, messageData: MessageData) {
     if (!messageData.reactions) messageData.reactions = {};
 
     if (!messageData.reactions[emojiStr]) {
-      messageData.reactions[emojiStr] = {users: [userName]};
+      messageData.reactions[emojiStr] = { users: [userName] };
     } else {
       const reaction = messageData.reactions[emojiStr];
       const index = reaction.users.indexOf(userName);
@@ -319,7 +342,7 @@ export class MessageBoxComponent implements OnDestroy{
         reaction.users.push(userName);
       } else {
         reaction.users.splice(index, 1);
-        if(reaction.users.length == 0) delete messageData.reactions[emojiStr];
+        if (reaction.users.length == 0) delete messageData.reactions[emojiStr];
       }
     }
   }
@@ -327,8 +350,8 @@ export class MessageBoxComponent implements OnDestroy{
   subUpdateMessage(id: string, messageData: MessageData) {
     this.subscriptions.add(
       this.messageService.updateMessage(id, messageData).subscribe({
-        next: () =>{
-          if(id === this.messages[this.messages.length - 1].id) {
+        next: () => {
+          if (id === this.messages[this.messages.length - 1].id) {
             this.scrollToBottom();
           }
         }
@@ -360,11 +383,11 @@ export class MessageBoxComponent implements OnDestroy{
     this.subscriptions.unsubscribe();
   }
 
-  showThreadContainer(index: number){
-    this.threadService.show(); 
+  showThreadContainer(index: number) {
+    this.threadService.show();
     this.threadService.setMessage(this.messages[index]);
-    // this.userChannelActivityService.clear();
     this.userChannelActivityService.clearOldFocus();
+    
   }
 
 }
