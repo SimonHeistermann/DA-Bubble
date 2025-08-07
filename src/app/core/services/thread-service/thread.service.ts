@@ -11,7 +11,7 @@ import { User } from '../../models/user.interface';
 import { Subscription } from 'rxjs';
 import { forkJoin } from 'rxjs';
 import { orderBy, where } from 'firebase/firestore';
-import { Channel, ChannelData } from '../../models/channel.interface';
+import { ChannelData } from '../../models/channel.interface';
 import { ThreadContentComponent } from '../../../layout/main-layout/components/thread-content/thread-content.component';
 
 @Injectable({
@@ -67,10 +67,12 @@ export class ThreadService {
 }
 
   show() { 
-    this.threadComp?.tryScrollOnce();
     this.dashboardResponsive.setOpenThread(true);
     this.showThread.next(true);
     this.threadOpen = true;
+    setTimeout(() => { 
+    this.threadComp?.tryScrollOnce(); 
+    }, 0);
   }
 
   hide() {

@@ -387,6 +387,7 @@ export class MessageBoxComponent implements AfterViewChecked, OnDestroy {
     this.threadService.show();
     this.threadService.setMessage(this.messages[index]);
     this.userChannelActivityService.clearOldFocus();
+    
   }
 
 }

@@ -1,4 +1,4 @@
-import { AfterViewChecked, Component, ElementRef, Inject, Input, QueryList, TemplateRef, ViewChild, inject } from '@angular/core';
+import { Component, ElementRef, Input, TemplateRef, ViewChild, inject, SimpleChanges, AfterViewInit, ChangeDetectorRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { toggleMarginLeft20Animation } from '../../animations/expand-collapse.animation';
@@ -30,7 +30,7 @@ import { InputContComponent } from "./input-cont/input-cont.component";
   styleUrl: './thread-content.component.scss',
   animations: [toggleMarginLeft20Animation]
 })
-export class ThreadContentComponent implements AfterViewChecked {
+export class ThreadContentComponent implements AfterViewInit {
 
   @Input() showSelf: boolean = true;
   @Input() channel: ChannelData | null = null;
@@ -72,6 +72,7 @@ export class ThreadContentComponent implements AfterViewChecked {
   overlayService = inject(OverlayService);
   viewContainerRef = inject(ViewContainerRef);
   dashboardResponsive = inject(DashboardResponsiveService);
+  changeDetectorRef = inject(ChangeDetectorRef);
 
   @ViewChild('inputCont') inputCont!: InputContComponent;
   @ViewChild('containerBody') containerBody!: ElementRef;
@@ -83,6 +84,7 @@ export class ThreadContentComponent implements AfterViewChecked {
     this.threadService.message$.subscribe(msg => {
       this.selectedMessage = msg;
       this.isScrolled = false;
+      this.scrollToBottom();
     });
     this.dashboardResponsive.smallScreen$.subscribe(smallScreen => {
       this.smallScreen = smallScreen;
@@ -97,24 +99,37 @@ export class ThreadContentComponent implements AfterViewChecked {
     this.threadService.setComponent(this);
   }
 
-  ngAfterViewChecked(): void {
-    if (this.dashboardResponsive.openThread$ && this.threadContainer) {
-      this.inputCont.setFocus();
+  ngOnChanges(changes: SimpleChanges): void {
+    if (changes['selectedMessage'] && this.threadContainer?.nativeElement) {
+      this.tryScrollOnce();
     }
-    this.threadContainer.nativeElement.scrollTop = this.threadContainer.nativeElement.scrollHeight;
   }
 
-   public tryScrollOnce(): void { debugger;
-    if (!this.isScrolled && this.threadContainer.nativeElement) {
-      this.scrollToBottom();
-      this.isScrolled = true;
+  ngAfterViewInit(): void {
+    if (this.dashboardResponsive.openThread$ && this.threadContainer) {
+      this.inputCont.setFocus();
+      this.tryScrollOnce();
+    }
+  }
+
+  public tryScrollOnce(): void {
+    if (!this.isScrolled && this.threadContainer?.nativeElement) {
+      setTimeout(() => {
+        this.changeDetectorRef.detectChanges();
+        this.scrollToBottom();
+        this.isScrolled = true;
+      }, 100);
     }
   }
 
 
   scrollToBottom() {
-     let element = this.threadContainer.nativeElement;
-    if (element) element.scrollIntoView({ block: 'start' });
+    let element = this.threadContainer?.nativeElement;
+    if (element && !this.isScrolled) {
+      setTimeout(() => {
+        element.scrollTop = element.scrollHeight;
+      }, 0);
+    }
   }
   getReactionsArray() {
     const reaction = this.selectedMessage?.reactions ?? {};
