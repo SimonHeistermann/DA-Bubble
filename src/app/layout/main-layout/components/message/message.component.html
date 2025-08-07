@@ -39,7 +39,7 @@
         <div class="container-input">
             <app-input 
                 (sendMessageEmitter)="onSendMessage($event)" 
-                [allChannelUser]="allUsersWithOutCurrentUser" 
+                [allChannelUserInput]="allUsersWithOutCurrentUser" 
                 [placeHolder]="channel?.name ? '#' + (channel?.name ? channel?.name : '') : '@' +  (messageUser?.displayName ? messageUser?.displayName : '')">
             </app-input>
         </div>
