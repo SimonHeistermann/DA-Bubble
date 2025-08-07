@@ -58,6 +58,7 @@ export class InputComponent implements AfterViewInit {
   @Input() set allChannelUserInput(users: User[]) {
     this.allChannelUser = users;
     this.fullUserList = [...users];
+    
   }
 
 
@@ -142,19 +143,33 @@ export class InputComponent implements AfterViewInit {
 
 
   onTextareaKeyDown(event: KeyboardEvent) {
+    const textarea = this.textareaRef.nativeElement;
+    const cursorPos = textarea.selectionStart;
+    const charBeforeCursor = textarea.value[cursorPos - 1];
+
+    if (event.key === 'Backspace') {
+      // If you're in a mention and the character was deleted, cancel mention
+      if (this.mentionActive && this.mentionStartIndex !== null) {
+        if (cursorPos <= this.mentionStartIndex + 1) {
+          this.cancelMention();
+        }
+      }
+
+      // New: if deleting # or @, reset state
+      if (charBeforeCursor === '#' || charBeforeCursor === '@') {
+        this.cancelMention();
+      }
+    }
 
     if (event.key === '@') {
-      // debugger;
       event.preventDefault();
       this.showUserList();
-      // debugger;
       return;
     }
 
     if (event.key === '#') {
       event.preventDefault();
       this.showChannelList();
-      // debugger;
       return;
     }
 
@@ -162,16 +177,12 @@ export class InputComponent implements AfterViewInit {
       event.preventDefault();
       this.sendMessage();
     }
-
-    if (event.key === 'Backspace' && this.mentionActive && this.mentionStartIndex !== null) {
-      const cursorPos = this.textareaRef.nativeElement.selectionStart;
-      if (cursorPos <= this.mentionStartIndex) {
-        this.cancelMention();
-      }
-    }
   }
 
+
   cancelMention() {
+    console.log('cancel Metion');
+    
     this.mentionActive = false;
     this.mentionStartIndex = null;
     this.showUserListOverlay = false;

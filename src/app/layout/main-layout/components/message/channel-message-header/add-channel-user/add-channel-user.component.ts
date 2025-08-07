@@ -9,10 +9,11 @@ import { User } from '../../../../../../core/models/user.interface';
 import { Subscription } from 'rxjs';
 import { AuthService } from '../../../../../../core/services/auth-service/auth.service';
 import { UserService } from '../../../../../../core/services/user-service/user.service';
-import { Channel, ChannelData } from '../../../../../../core/models/channel.interface';
+import { Channel } from '../../../../../../core/models/channel.interface';
 import { slideFadeInAnimation } from '../../../../animations/slide.animation';
 import { OverlayRef } from '@angular/cdk/overlay';
 import { OverlayService } from '../../../../../../core/services/overlay.service';
+import { UserChannelActivityService } from '../../../../../../core/services/userReadActivity.service';  
 
 
 @Component({
@@ -35,6 +36,7 @@ export class AddChannelUserComponent implements OnDestroy {
   authService = inject(AuthService);
   userService = inject(UserService);
   channelService = inject(ChannelService);
+  userChannelActivityService = inject(UserChannelActivityService);
   tagIDs: string[] = [];
 
   @Output() closeOverlayEmitter = new EventEmitter<void>();
@@ -52,7 +54,7 @@ export class AddChannelUserComponent implements OnDestroy {
   @ViewChild('addChannelUserTemplate') addChannelUserTemplate!: TemplateRef<any>;
   @Input() addMemberRef: ElementRef | null = null;
 
-  ngOnInit() {
+  ngOnInit() { 
     this.subAllUsers();
   }
 
@@ -123,11 +125,11 @@ export class AddChannelUserComponent implements OnDestroy {
     this.richtextEditorRef.insertTag(u);
   }
 
-  clickAddChannelUser() {
+  clickAddChannelUser() { 
     if (this.currentChannel && this.tagIDs.length > 0) {
+    this.userChannelActivityService.clear();
       this.currentChannel.userIDs?.push(...this.tagIDs);
       let {id, ...channelData} = this.currentChannel;
-      // let channelData = ;
       this.subscriptions.add( 
         this.channelService.updateChannel(this.currentChannel?.id, channelData).subscribe({
           complete: () => {

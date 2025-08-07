@@ -1,4 +1,4 @@
-import { Component, inject, OnDestroy, Input } from '@angular/core';
+import { Component, inject, OnDestroy, Input, Output, EventEmitter } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { concat } from 'rxjs';
 import { User } from '../../../../core/models/user.interface';
@@ -15,6 +15,7 @@ import { FormsModule } from '@angular/forms';
 import { Message } from '../../../../core/models/message.interface';
 import { MessageService } from '../../../../core/services/message.service';
 import { ChannelService } from '../../../../core/services/channel.service';
+import { ThreadService } from '../../../../core/services/thread-service/thread.service';
 import { DateService } from '../../../../core/services/date.service';
 import { UserChannelActivityService } from '../../../../core/services/userReadActivity.service';
 import { CommunicatorService } from '../message/search-message-header/search-message-header.component';
@@ -43,6 +44,7 @@ export class MainHeaderComponent implements OnDestroy {
   channelService = inject(ChannelService);
   messageService = inject(MessageService);
   dateService = inject(DateService)
+  threadService = inject(ThreadService);
   userChannelActivityService = inject(UserChannelActivityService);
   communicator = inject(CommunicatorService);
   dialog = inject(Dialog);
@@ -55,12 +57,18 @@ export class MainHeaderComponent implements OnDestroy {
   showList = false;
   allUsers: User[]  = [];
   allChannel: Channel[]  = [];
+  channels : Channel[] = [];
   allChannelMessages: Message[] = [];
   allPrivateMessages: Message[] = [];
   filteredUsers: User[] = [];
   filteredChannels: Channel[] = [];
   filteredPrivateMessages: Message[] = []
   filteredChannelMessages: Message[] = []
+
+
+  public currentChannelIndex: number = 0;
+
+  @Output() clickChannelNameEmitter = new EventEmitter<Channel>();
 
   constructor(public dashboardResponsive: DashboardResponsiveService) {
      this.dashboardResponsive.isTablet$.subscribe(isTablet => {
@@ -104,7 +112,7 @@ export class MainHeaderComponent implements OnDestroy {
     this.inputContent = ''
   }
 
-  inputText() {
+  inputText() { 
     const value = this.inputContent.trim();
 
     if (!value) {
@@ -120,6 +128,10 @@ export class MainHeaderComponent implements OnDestroy {
     } else {
       this.filterByAll(value);
     }
+  }
+
+  activateSearch() {
+    this.threadService.hide();
   }
 
 
@@ -150,7 +162,7 @@ export class MainHeaderComponent implements OnDestroy {
     ) || [];
   }
 
-  filterByAll(value: string) {
+  filterByAll(value: string) { 
     this.filteredChannels = [];
     this.filteredUsers = [];
     this.filteredChannelMessages = []
@@ -160,7 +172,7 @@ export class MainHeaderComponent implements OnDestroy {
       user.email.toLowerCase().includes(value)
     ) || [];
 
-    this.filteredChannels = this.allChannel?.filter(channel =>
+    this.filteredChannels = this.channels?.filter(channel =>
       channel.name.toLowerCase().includes(value)
     ) || [];
 
@@ -208,11 +220,13 @@ export class MainHeaderComponent implements OnDestroy {
   subAllChannels() {
     if(!this.currentUser) return;
     this.subscriptions.add(
-      this.channelService.getChannelsOrderByCreatedAt(this.currentUser.id, (data) => {
-        this.allChannel = [...data];
-
+      this.channelService.getChannels((data) => {
+        this.channels = [...data];
         this.subAllChannelMessages()
         this.subAllPrivateMessages()
+        if (this.channels.length > 0) {
+          this.clickChannelNameEmitter.emit(this.channels[this.currentChannelIndex]);
+        }
       })
     );
   }

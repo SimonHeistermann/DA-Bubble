@@ -94,7 +94,6 @@ export class SearchMessageHeaderComponent implements OnInit {
   }
 
   inputText() {
-
     const value = this.inputContent.trim();
 
     if (!value) {
@@ -116,7 +115,6 @@ export class SearchMessageHeaderComponent implements OnInit {
     this.filteredChannels = [];
     this.showUserList = true;
     this.showChannelList = false;
-
 
     if (value == '@') {
       this.filteredUsers = this.allUsers;

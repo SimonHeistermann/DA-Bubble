@@ -11,7 +11,8 @@ import { User } from '../../models/user.interface';
 import { Subscription } from 'rxjs';
 import { forkJoin } from 'rxjs';
 import { orderBy, where } from 'firebase/firestore';
-import { Channel, ChannelData } from '../../models/channel.interface';
+import { ChannelData } from '../../models/channel.interface';
+import { ThreadContentComponent } from '../../../layout/main-layout/components/thread-content/thread-content.component';
 
 @Injectable({
   providedIn: 'root'
@@ -44,6 +45,8 @@ export class ThreadService {
   private selectedUserSource = new BehaviorSubject<User | null>(null);
   selectedUser$ = this.selectedUserSource.asObservable();
 
+  private threadComp : ThreadContentComponent | null = null
+
   constructor(
     private dateService: DateService,
     private channelService: ChannelService,
@@ -58,10 +61,18 @@ export class ThreadService {
     this.subscriptions.unsubscribe();
   }
 
-  show() {
+  setComponent(comp: ThreadContentComponent) {
+  console.log('setComponent aufgerufen');
+  this.threadComp = comp;
+}
+
+  show() { 
     this.dashboardResponsive.setOpenThread(true);
     this.showThread.next(true);
     this.threadOpen = true;
+    setTimeout(() => { 
+    this.threadComp?.tryScrollOnce(); 
+    }, 0);
   }
 
   hide() {
