@@ -123,7 +123,7 @@
             @if (messageUser) {
                 <div class="private-empty-content">
                     <div class="avatar-div">
-                        <img *ngIf="messageUser" [src]="messageUser.photoURL.startsWith('http') ? 'images/icons/avatars/avatar_1.png' : messageUser.photoURL"/>
+                        <img *ngIf="messageUser" [src]="messageUser.photoURL.startsWith('http') ? '/angular-projects/dabubble/images/icons/avatars/avatar_1.png' : messageUser.photoURL"/>
                         <h3 class="name">
                             {{ messageUser.displayName }} 
                             @if (messageUser.id === currentUser?.id) {

@@ -44,7 +44,9 @@ export class MessageComponent implements OnInit {
   userService = inject(UserService);
   channelService = inject(ChannelService);
   dashboardResponsive = inject(DashboardResponsiveService);
-  mainLayoutContentComponent = inject(MainLayoutContentComponent);
+  
+  @ViewChild('messageBox') messageBoxRef!: MessageBoxComponent;
+
   allUsers: User[] = [];
   allUsersWithOutCurrentUser: User[] = [];
   authService = inject(AuthService);
@@ -177,7 +179,7 @@ export class MessageComponent implements OnInit {
   }
 
 
-  onSendMessage(msg: string) {
+  onSendMessage(msg: string) { 
     if ((this.currentUser && this.channel) || (this.currentUser && this.messageUser)) {
       let messsageData;
       if (this.messageUser) {
@@ -197,7 +199,8 @@ export class MessageComponent implements OnInit {
         }
       ));
     }
-
+    this.messageBoxRef.isScrolled = false;
+     this.messageBoxRef.scrollToBottom();
 
   }
 }
