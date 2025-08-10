@@ -11,7 +11,7 @@ import { emojiMap } from './emoji.map';
 export class EmojiComponent implements AfterContentInit {
   @Input() emoji: string = '';
   emojiPath: string = '';
-  basePath = 'images/icons/emojis/';
+  basePath = '/angular-projects/dabubble/images/icons/emojis/';
   emojiMapWithPath: Record<string, string>;
 
   el = inject(ElementRef);

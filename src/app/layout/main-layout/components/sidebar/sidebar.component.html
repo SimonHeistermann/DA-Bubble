@@ -160,7 +160,7 @@
                                     <div class="li-content-left">
                                         <div class="avatar-div">
                                             <img *ngIf="currentUser"
-                                                [src]="currentUser.photoURL.startsWith('http') ? 'images/icons/avatars/avatar_1.png' : currentUser.photoURL">
+                                                [src]="currentUser.photoURL.startsWith('http') ? '/angular-projects/dabubble/images/icons/avatars/avatar_1.png' : currentUser.photoURL">
                                             @if(!currentUser?.isActive) {
                                             <span class="active-status offline"></span>
                                             } @else {
@@ -181,7 +181,7 @@
                                     <div class="li-content-left">
                                         <div class="avatar-div">
                                             <img
-                                                [src]="user?.photoURL?.startsWith('http') ? 'images/icons/avatars/avatar_1.png' : user?.photoURL">
+                                                [src]="user?.photoURL?.startsWith('http') ? '/angular-projects/dabubble/images/icons/avatars/avatar_1.png' : user?.photoURL">
                                             @if(!user?.isActive) {
                                             <span class="active-status offline"></span>
                                             } @else {
