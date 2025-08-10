@@ -71,7 +71,6 @@ export class GuestLoginService {
       tap(() => localStorage.removeItem(this.GUEST_STORAGE_KEY)),
       map(() => void 0),
       catchError(error => {
-        console.error('Guest sign out failed:', error);
         return of(void 0);
       })
     );

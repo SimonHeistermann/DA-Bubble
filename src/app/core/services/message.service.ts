@@ -20,7 +20,6 @@ export class MessageService {
             this.dataService.addDocument(this.COL_NAME, data)
         ).pipe(
             catchError(e => {
-                console.log('Error when adding one message:', e);
                 throw e;
             })
         );
@@ -33,7 +32,6 @@ export class MessageService {
             this.dataService.updateDocument(this.COL_NAME, docId, data)
         ).pipe(
             catchError(e => {
-                console.log('Error when updating message:', e);
                 throw e;
             })
         );
