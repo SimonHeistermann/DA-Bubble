@@ -65,7 +65,6 @@ export class ThreadService {
   }
 
   setComponent(comp: ThreadContentComponent) {
-    console.log('setComponent aufgerufen');
     this.threadComp = comp;
   }
 
@@ -92,8 +91,6 @@ export class ThreadService {
     this.sortThreadMessage(message);
     this.getUsers(message);
     this.getReactions(message);
-    console.log(this.currentThreadMessages);
-
   }
 
   getMessageUser(message: Message) {
@@ -105,14 +102,8 @@ export class ThreadService {
 
   sortThreadMessage(message: Message) {
     this.firebaseService.getCollectionOnce('threadmessage', (content) => {
-      // this.currentThreadMessages = content.map(doc => ({
-      //   ...doc,
-      //   id: doc.id
-      // }));
       const msgs = content.map(doc => ({ ...doc, id: doc.id }));
       this._currentThreadMessages.next(msgs);
-      console.log(this._currentThreadMessages.value);
-      
       const authorIDs = this._currentThreadMessages.value.map(m => m.authorId);
       const uniqueAuthorIDs = Array.from(new Set(authorIDs));
       this.userService.getUsersByIds(uniqueAuthorIDs).subscribe(users => {

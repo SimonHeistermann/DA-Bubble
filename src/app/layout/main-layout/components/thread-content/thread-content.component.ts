@@ -94,9 +94,6 @@ export class ThreadContentComponent {
 
     this.threadService.currentThreadMessages$.subscribe(msgs => {
       this.threadMessages.set(msgs);
-      console.log(msgs);
-      console.log(this.selectedMessage);
-
       this.threadService.currentThreadMessages = msgs;
     });
 
@@ -225,7 +222,6 @@ export class ThreadContentComponent {
       }
     } else {
       currentMessage.reactions.push({ emojiStr, user: [currentUser] });
-
     }
 
     if (currentMessage.id) {
@@ -249,7 +245,6 @@ export class ThreadContentComponent {
     } else {
       this.editingMode = false;
     }
-
   }
 
   breakEditing() {
