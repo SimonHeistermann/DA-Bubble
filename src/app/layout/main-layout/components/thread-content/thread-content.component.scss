@@ -17,11 +17,7 @@
     border-radius: 30px;
     background-color: #FFFFFF;
     flex: 1;
-    overflow-y: scroll !important;
 }
-    ::-webkit-scrollbar {
-        display: none;
-    }
 
 .thread-header {
     height: 80px;
@@ -43,6 +39,7 @@
 
         &:hover {
             content: url('/angular-projects/dabubble/images/icons/close_hover.png');
+            // content: url('angular-projects/dabubble/images/icons/close_hover.png');
             transition: .35s ease-in-out;
             background-color: var(--bg-color);
 
@@ -70,22 +67,29 @@
     }
 }
 
-
-.container-body-input {
+.container-body {
     height: calc(100% - 80px);
     width: 100%;
     @include displayFlex($fd: column, $jc: flex-start, $ai: normal);
+    flex: 1;
+    overflow-y: scroll;
 }
 
-.container-body {
-    flex: 1;
+::-webkit-scrollbar {
+    display: none;
+}
+
+.thread-wrapper {
     width: 100%;
+    @include displayFlex($fd: column, $jc: flex-start, $ai: normal);
+    height: inherit;
     height: 100%;
-    // overflow-y: scroll;
+    max-height: 408px;
 }
 
 .container-input {
-    flex-shrink: 0;
+    border-bottom-left-radius: 30px;
+    border-bottom-right-radius: 30px;
     width: 100%;
 }
 
@@ -305,6 +309,12 @@
     display: flex;
     margin-top: 5px;
     gap: 5px;
+    width: 248px;
+    overflow-x: scroll;
+}
+
+::-webkit-scrollbar {
+    display: none;
 }
 
 .emoji {
@@ -410,7 +420,8 @@
     .nerd-reacted-bar {
         width: 100%;
         overflow-x: auto;
-     }
+    }
+
     ::-webkit-scrollbar {
         display: none;
     }

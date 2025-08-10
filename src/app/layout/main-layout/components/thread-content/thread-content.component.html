@@ -1,7 +1,7 @@
 <main *ngIf="smallScreen || (!smallScreen && threadService.threadOpen)" [class.full-width]="isTablet"
     class="main-container" [@toggleMarginLeft20]="showSelf ? 'open' : 'closed'">
 
-    <section class="thread-container" #threadContainer
+    <section class="thread-container"
         [class.full-width]="isTablet || smallScreen && (dashboardResponsive.openSidebar$ | async)">
         <div class="thread-header">
             <div class="title">
@@ -13,7 +13,7 @@
             <img (click)="hideThreadContainer()">
         </div>
 
-        <div class="container-body-input container-body scrollbar__none">
+        <div class="container-body"  #threadContainer>
 
             <div class="thread-content">
                 <img src="{{ threadService.mainUser?.photoURL }}">
@@ -45,7 +45,7 @@
                 <section></section>
             </div>
 
-            <div class="scrollbar__none container-body" #containerBody>
+            <div class="thread-wrapper" #containerBody>
                 <ng-container *ngFor="let message of threadService.currentThreadMessages; let i = index">
 
                     @if (message.createdAt) {

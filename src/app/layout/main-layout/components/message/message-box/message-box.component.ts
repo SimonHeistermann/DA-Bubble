@@ -181,7 +181,7 @@ export class MessageBoxComponent implements AfterViewChecked, OnDestroy {
     }
   }
 
-  scrollToBottom() {
+  scrollToBottom() { 
     let element = this.messageRefs.get(this.messageRefs.length - 1);
     if (element) element.nativeElement.scrollIntoView({ block: 'start' });
   }
@@ -243,7 +243,7 @@ export class MessageBoxComponent implements AfterViewChecked, OnDestroy {
     } else {
       user = this.allUsers.find(u => u.id === userID) ?? null;
     }
-    return user ? user.photoURL.startsWith('http') ? 'images/icons/avatars/avatar_1.png' : user.photoURL : '';
+    return user ? user.photoURL.startsWith('http') ? '/angular-projects/dabubble/images/icons/avatars/avatar_1.png' : user.photoURL : '';
   }
 
   findUserByUserId(userID: string): string {
@@ -384,10 +384,9 @@ export class MessageBoxComponent implements AfterViewChecked, OnDestroy {
   }
 
   showThreadContainer(index: number) {
-    this.threadService.show();
     this.threadService.setMessage(this.messages[index]);
+    this.threadService.show();
     this.userChannelActivityService.clearOldFocus();
-    
   }
 
 }

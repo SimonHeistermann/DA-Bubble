@@ -45,7 +45,10 @@ export class ThreadService {
   private selectedUserSource = new BehaviorSubject<User | null>(null);
   selectedUser$ = this.selectedUserSource.asObservable();
 
-  private threadComp : ThreadContentComponent | null = null
+  private _currentThreadMessages = new BehaviorSubject<ThreadMessage[]>([]);
+  currentThreadMessages$ = this._currentThreadMessages.asObservable();
+
+  private threadComp: ThreadContentComponent | null = null
 
   constructor(
     private dateService: DateService,
@@ -62,16 +65,16 @@ export class ThreadService {
   }
 
   setComponent(comp: ThreadContentComponent) {
-  console.log('setComponent aufgerufen');
-  this.threadComp = comp;
-}
+    console.log('setComponent aufgerufen');
+    this.threadComp = comp;
+  }
 
-  show() { 
+  show() {
     this.dashboardResponsive.setOpenThread(true);
     this.showThread.next(true);
     this.threadOpen = true;
-    setTimeout(() => { 
-    this.threadComp?.tryScrollOnce(); 
+    setTimeout(() => {
+      this.threadComp?.scrollToBottom();
     }, 0);
   }
 
@@ -86,9 +89,11 @@ export class ThreadService {
 
     this.subChannelUsers();
     this.getMessageUser(message);
-    this.sortThreadMessage(message)
+    this.sortThreadMessage(message);
     this.getUsers(message);
     this.getReactions(message);
+    console.log(this.currentThreadMessages);
+
   }
 
   getMessageUser(message: Message) {
@@ -100,11 +105,15 @@ export class ThreadService {
 
   sortThreadMessage(message: Message) {
     this.firebaseService.getCollectionOnce('threadmessage', (content) => {
-      this.currentThreadMessages = content.map(doc => ({
-        ...doc,
-        id: doc.id
-      }));
-      const authorIDs = this.currentThreadMessages.map(m => m.authorId);
+      // this.currentThreadMessages = content.map(doc => ({
+      //   ...doc,
+      //   id: doc.id
+      // }));
+      const msgs = content.map(doc => ({ ...doc, id: doc.id }));
+      this._currentThreadMessages.next(msgs);
+      console.log(this._currentThreadMessages.value);
+      
+      const authorIDs = this._currentThreadMessages.value.map(m => m.authorId);
       const uniqueAuthorIDs = Array.from(new Set(authorIDs));
       this.userService.getUsersByIds(uniqueAuthorIDs).subscribe(users => {
         const userMap = new Map(users.map(u => [u.id, u]));

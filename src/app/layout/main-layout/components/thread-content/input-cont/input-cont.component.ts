@@ -59,9 +59,9 @@ export class InputContComponent {
     this.fullUserList = [...users];
   }
 
-
   @Output() sendMessageEmitter = new EventEmitter<string>();
-  sendMessage() {
+
+  sendMessage() { 
     let message = this.inputMessage.trim();
     if (message) {
       this.sendMessageEmitter.emit(message);
@@ -137,17 +137,14 @@ export class InputContComponent {
   onTextareaKeyDown(event: KeyboardEvent) {
 
     if (event.key === '@') {
-      // debugger;
       event.preventDefault();
       this.showUserList();
-      // debugger;
       return;
     }
 
     if (event.key === '#') {
       event.preventDefault();
       this.showChannelList();
-      // debugger;
       return;
     }
 

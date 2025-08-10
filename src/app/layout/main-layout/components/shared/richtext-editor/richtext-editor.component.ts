@@ -150,7 +150,7 @@ import { User } from '../../../../../core/models/user.interface';
 
     getTagTemplate(u: User) {
       return `
-      <img src="${u.photoURL.startsWith('http') ? 'images/icons/avatars/avatar_1.png' : u.photoURL}" />
+      <img src="${u.photoURL.startsWith('http') ? '/angular-projects/dabubble/images/icons/avatars/avatar_1.png' : u.photoURL}" />
       <span class="tag-name">${u.displayName}</span>
       <div class="tag-close"></div>
       `;

@@ -1,4 +1,4 @@
-import { Component, ElementRef, Input, TemplateRef, ViewChild, inject, SimpleChanges, AfterViewInit, ChangeDetectorRef } from '@angular/core';
+import { Component, ElementRef, Input, TemplateRef, ViewChild, inject, SimpleChanges, AfterViewInit, ChangeDetectorRef, signal, effect, afterNextRender } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { toggleMarginLeft20Animation } from '../../animations/expand-collapse.animation';
@@ -30,7 +30,7 @@ import { InputContComponent } from "./input-cont/input-cont.component";
   styleUrl: './thread-content.component.scss',
   animations: [toggleMarginLeft20Animation]
 })
-export class ThreadContentComponent implements AfterViewInit {
+export class ThreadContentComponent {
 
   @Input() showSelf: boolean = true;
   @Input() channel: ChannelData | null = null;
@@ -56,7 +56,6 @@ export class ThreadContentComponent implements AfterViewInit {
   smallScreen = false;
   isTablet = false;
   isMobile = false;
-  isScrolled = false;
 
 
   emojiPickerOverlayRef!: OverlayRef;
@@ -79,13 +78,10 @@ export class ThreadContentComponent implements AfterViewInit {
   @ViewChild('threadContainer') threadContainer!: ElementRef<HTMLElement>;
   @ViewChild('emojiPickerTemplate') emojiPickerTemplate !: TemplateRef<any>;
 
+  threadMessages = signal(this.threadService.currentThreadMessages);
 
-  ngOnInit(): void {
-    this.threadService.message$.subscribe(msg => {
-      this.selectedMessage = msg;
-      this.isScrolled = false;
-      this.scrollToBottom();
-    });
+  constructor() {
+
     this.dashboardResponsive.smallScreen$.subscribe(smallScreen => {
       this.smallScreen = smallScreen;
     })
@@ -96,36 +92,30 @@ export class ThreadContentComponent implements AfterViewInit {
       this.isMobile = isMobile;
     })
 
-    this.threadService.setComponent(this);
-  }
+    this.threadService.currentThreadMessages$.subscribe(msgs => {
+      this.threadMessages.set(msgs);
+      console.log(msgs);
+      console.log(this.selectedMessage);
 
-  ngOnChanges(changes: SimpleChanges): void {
-    if (changes['selectedMessage'] && this.threadContainer?.nativeElement) {
-      this.tryScrollOnce();
-    }
-  }
+      this.threadService.currentThreadMessages = msgs;
+    });
 
-  ngAfterViewInit(): void {
-    if (this.dashboardResponsive.openThread$ && this.threadContainer) {
-      this.inputCont.setFocus();
-      this.tryScrollOnce();
-    }
-  }
+    this.threadService.message$.subscribe(msg => {
+      this.selectedMessage = msg;
+    });
 
-  public tryScrollOnce(): void {
-    if (!this.isScrolled && this.threadContainer?.nativeElement) {
-      setTimeout(() => {
-        this.changeDetectorRef.detectChanges();
-        this.scrollToBottom();
-        this.isScrolled = true;
-      }, 100);
-    }
+    effect(() => {
+      const msgs = this.threadMessages();
+      if (msgs.length > 0) {
+        queueMicrotask(() => this.scrollToBottom());
+      }
+    });
+    this.scrollToBottom();
   }
-
 
   scrollToBottom() {
     let element = this.threadContainer?.nativeElement;
-    if (element && !this.isScrolled) {
+    if (element) {
       setTimeout(() => {
         element.scrollTop = element.scrollHeight;
       }, 0);
@@ -168,8 +158,8 @@ export class ThreadContentComponent implements AfterViewInit {
       messageId: this.selectedMessage?.id ?? '',
       authorId: this.threadService.currentUser?.id ?? '',
       content: msg,
-      createdAt: this.selectedMessage?.createdAt ?? Timestamp.now(),
-      editedAt: this.selectedMessage?.updatedAt ?? Timestamp.now(),
+      createdAt: Timestamp.now(),
+      editedAt: Timestamp.now(),
       isEdited: false,
       mentions: this.threadService.mentions,
       reactions: [] as ThreadReactions[],
@@ -177,12 +167,13 @@ export class ThreadContentComponent implements AfterViewInit {
   }
 
   sendMessage(msg: string) {
-    this.buildMessageData(msg);
+    if (!msg.trim() || !this.selectedMessage) return;
     if (this.selectedMessage) {
       this.selectedMessage.threadCount++;
       this.dataService.updateDocument('messages', this.selectedMessage.id, this.selectedMessage);
       this.dataService.addDocument('threadmessage', this.buildMessageData(msg)).then(() => {
         this.threadService.setMessage(this.selectedMessage!);
+        this.scrollToBottom();
       });
     }
   }
