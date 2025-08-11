@@ -32,36 +32,36 @@ export class RegisterComponent implements OnInit, OnDestroy {
 
   private readonly errorMessages: FormErrorMessages = {
     firstName: {
-      required: '*Vorname ist erforderlich.',
-      minlength: '*Mindestens 2 Zeichen erforderlich.',
-      maxlength: '*Maximal 50 Zeichen erlaubt.',
-      invalidCharacters: '*Nur Buchstaben, Leerzeichen und Bindestrich sind erlaubt.',
-      onlySpecialChars: '*Name darf nicht nur aus Sonderzeichen bestehen.'
+      required: '*Vorname erforderlich.',
+      minlength: '*Mind. 2 Zeichen.',
+      maxlength: '*Max. 50 Zeichen.',
+      invalidCharacters: '*Nur Buchstaben, Leer- und Bindestriche.',
+      onlySpecialChars: '*Name darf nicht nur Sonderzeichen enthalten.'
     },
     lastName: {
-      required: '*Nachname ist erforderlich.',
-      minlength: '*Mindestens 2 Zeichen erforderlich.',
-      maxlength: '*Maximal 50 Zeichen erlaubt.',
-      invalidCharacters: '*Nur Buchstaben, Leerzeichen und Bindestrich sind erlaubt.',
-      onlySpecialChars: '*Name darf nicht nur aus Sonderzeichen bestehen.'
+      required: '*Nachname erforderlich.',
+      minlength: '*Mind. 2 Zeichen.',
+      maxlength: '*Max. 50 Zeichen.',
+      invalidCharacters: '*Nur Buchstaben, Leer- und Bindestriche.',
+      onlySpecialChars: '*Name darf nicht nur Sonderzeichen enthalten.'
     },
     email: {
-      required: '*E-Mail-Adresse ist erforderlich.',
-      email: '*Bitte geben Sie eine gültige E-Mail-Adresse ein.'
+      required: '*E-Mail erforderlich.',
+      email: '*Ungültige E-Mail-Adresse.'
     },
     password: {
-      required: '*Passwort ist erforderlich.',
-      password: '*Passwort muss mindestens 8 Zeichen enthalten und mindestens einen Großbuchstaben, einen Kleinbuchstaben, eine Zahl und ein Sonderzeichen haben.'
+      required: '*Passwort erforderlich.',
+      password: '*Mind. 8 Zeichen, 1 Groß-, 1 Kleinbuchstabe, 1 Zahl, 1 Sonderzeichen.'
     },
     confirmPassword: {
-      required: '*Passwort bestätigen ist erforderlich.',
+      required: '*Bestätigung erforderlich.',
       passwordMismatch: '*Passwörter stimmen nicht überein.'
     },
     privacyPolicy: {
-      required: '*Sie müssen der Datenschutzerklärung zustimmen.'
+      required: '*Datenschutz-Zustimmung erforderlich.'
     },
     website: {
-      honeypot: '*Verdächtige Aktivität erkannt.'
+      honeypot: '*Verdächtige Aktivität.'
     }
   };
 
@@ -175,19 +175,19 @@ export class RegisterComponent implements OnInit, OnDestroy {
   private handleRegistrationError(error: any): void {
     console.error('Registration error:', error);
     if (error.code === 'auth/email-already-in-use') {
-      this.errorMessage = 'Diese E-Mail-Adresse wird bereits verwendet.';
+      this.errorMessage = 'E-Mail bereits verwendet.';
     } else if (error.code === 'auth/weak-password') {
-      this.errorMessage = 'Das Passwort ist zu schwach.';
+      this.errorMessage = 'Passwort zu schwach.';
     } else if (error.code === 'auth/invalid-email') {
-      this.errorMessage = 'Die E-Mail-Adresse ist ungültig.';
+      this.errorMessage = 'E-Mail ungültig.';
     } else {
-      this.errorMessage = error.message || 'Ein unerwarteter Fehler ist aufgetreten. Bitte versuchen Sie es erneut.';
+      this.errorMessage = error.message || 'Unerwarteter Fehler. Bitte erneut versuchen.';
     }
   }
 
   private showValidationErrors(): void {
     this.markAllFieldsAsTouched();
-    this.errorMessage = 'Bitte korrigieren Sie die markierten Fehler.';
+    this.errorMessage = 'Bitte Fehler korrigieren.';
   }
 
   private markAllFieldsAsTouched(): void {
@@ -240,21 +240,21 @@ export class RegisterComponent implements OnInit, OnDestroy {
   private getPasswordErrorMessage(passwordErrors: any): string {
     const errors = [];
     if (passwordErrors.minLength) {
-      errors.push('mindestens 8 Zeichen');
+      errors.push('8 Zeichen');
     }
     if (passwordErrors.uppercase) {
-      errors.push('einen Großbuchstaben');
+      errors.push('1 Großbuchstabe');
     }
     if (passwordErrors.lowercase) {
-      errors.push('einen Kleinbuchstaben');
+      errors.push('1 Kleinbuchstabe');
     }
     if (passwordErrors.number) {
-      errors.push('eine Zahl');
+      errors.push('1 Zahl');
     }
     if (passwordErrors.specialChar) {
-      errors.push('ein Sonderzeichen');
+      errors.push('1 Sonderzeichen');
     }
-    return `*Passwort muss ${errors.join(', ')} enthalten.`;
+    return `*Benötigt: ${errors.join(', ')}.`;
   }
 
   isFieldInvalid(fieldName: string): boolean {

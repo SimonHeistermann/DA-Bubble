@@ -36,7 +36,8 @@
                                 [ngClass]="{
                                     error__state: isFieldInvalid('firstName'),
                                     has__content: hasFieldContent('firstName'),
-                                    valid__state: isFieldValid('firstName')
+                                    valid__state: isFieldValid('firstName'),
+                                    has__error: getFieldError('firstName')
                                 }"
                             >
                                 <div class="input__wrapper">
@@ -76,7 +77,8 @@
                                 [ngClass]="{
                                     error__state: isFieldInvalid('lastName'),
                                     has__content: hasFieldContent('lastName'),
-                                    valid__state: isFieldValid('lastName')
+                                    valid__state: isFieldValid('lastName'),
+                                    has__error: getFieldError('lastName')
                                 }"
                             >
                                 <div class="input__wrapper">
@@ -117,7 +119,8 @@
                             [ngClass]="{
                                 error__state: isFieldInvalid('email'),
                                 has__content: hasFieldContent('email'),
-                                valid__state: isFieldValid('email')
+                                valid__state: isFieldValid('email'),
+                                has__error: getFieldError('email')
                             }"
                         >
                             <div class="input__wrapper">
@@ -157,7 +160,8 @@
                             [ngClass]="{
                                 error__state: isFieldInvalid('password'),
                                 has__content: hasFieldContent('password'),
-                                valid__state: isFieldValid('password')
+                                valid__state: isFieldValid('password'),
+                                has__error: getFieldError('password')
                             }"
                         >
                             <div class="input__wrapper">
@@ -197,7 +201,8 @@
                             [ngClass]="{
                                 error__state: isFieldInvalid('confirmPassword'),
                                 has__content: hasFieldContent('confirmPassword'),
-                                valid__state: isFieldValid('confirmPassword')
+                                valid__state: isFieldValid('confirmPassword'),
+                                has__error: getFieldError('confirmPassword')
                             }"
                         >
                             <div class="input__wrapper">

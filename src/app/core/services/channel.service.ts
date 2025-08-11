@@ -19,7 +19,6 @@ export class ChannelService{
             this.dataService.updateDocument(this.CHANNEL_COL_NAME, docId, data)
         ).pipe(
             catchError(e => {
-                console.log('Error when updating channel:', e);
                 throw e;
             })
         );
@@ -30,7 +29,6 @@ export class ChannelService{
             this.dataService.addDocument(this.CHANNEL_COL_NAME, data)
         ).pipe(
             catchError(e => {
-                console.log('Error when adding one channel:', e);
                 throw e;
             })
         );
@@ -60,7 +58,6 @@ export class ChannelService{
           )
         ).pipe(
           catchError(error => {
-            console.error('Error loading channel by name once:', error);
             return of([]);
           })
         );
@@ -71,7 +68,6 @@ export class ChannelService{
             this.dataService.getDocument(this.CHANNEL_COL_NAME, id)
         ).pipe(
             catchError(e => {
-                console.log('Error when fetching channel by its ID:', e);
                 throw e;
             })
         );
@@ -80,7 +76,6 @@ export class ChannelService{
     getAllChannelsOnce(): Observable<Channel[]> {
         return from(this.dataService.getCollectionOncePromise(this.CHANNEL_COL_NAME)).pipe(
           catchError(error => {
-            console.error('Error loading all channels:', error);
             return of([]);
           })
         );
