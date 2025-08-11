@@ -108,7 +108,6 @@ export class LoginComponent implements OnInit, OnDestroy {
 
   onSubmit(): void {
     if (this.loginForm.get('honeypot')?.value) {
-      console.warn('Honeypot field filled. Possible bot.');
       this.notificationService.showError('Verdächtige Aktivität erkannt.');
       return;
     }
@@ -202,7 +201,6 @@ export class LoginComponent implements OnInit, OnDestroy {
     this.notificationService.showSuccess('Als Gast angemeldet!');
     this.router.navigate(['/dashboard']).then(success => {
       if (!success) {
-        console.error('Navigation to dashboard failed');
         setTimeout(() => {
           this.router.navigate(['/dashboard']);
         }, 100);

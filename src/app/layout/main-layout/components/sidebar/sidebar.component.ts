@@ -139,11 +139,7 @@ export class SidebarComponent implements OnInit, OnDestroy {
           const el = this.channelItems.get(index)?.nativeElement;
           if (el) {
             el.scrollIntoView({ behavior: 'smooth', block: 'center' });
-          } else {
-            console.warn('Element not found at index', index);
           }
-        } else {
-          console.warn('channelItems not ready or index out of bounds', index, this.channelItems?.length);
         }
       }, 0);
     });

@@ -68,7 +68,6 @@ export class ForgotPasswordComponent implements OnInit, OnDestroy {
 
   onSubmit(): void {
     if (this.isHoneypotFilled()) {
-      console.warn('Honeypot triggered - potential bot detected');
       this.simulateSubmission();
       return;
     }

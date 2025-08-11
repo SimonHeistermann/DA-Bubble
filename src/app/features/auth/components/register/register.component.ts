@@ -173,7 +173,6 @@ export class RegisterComponent implements OnInit, OnDestroy {
   }
 
   private handleRegistrationError(error: any): void {
-    console.error('Registration error:', error);
     if (error.code === 'auth/email-already-in-use') {
       this.errorMessage = 'E-Mail bereits verwendet.';
     } else if (error.code === 'auth/weak-password') {

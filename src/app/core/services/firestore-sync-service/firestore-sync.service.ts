@@ -26,7 +26,6 @@ export class FirestoreSyncService {
       
       return await this.handleUserSync(firebaseUser, existingUser, now, registerData);
     } catch (error) {
-      console.error('Error syncing user to Firestore:', error);
       return false;
     }
   }

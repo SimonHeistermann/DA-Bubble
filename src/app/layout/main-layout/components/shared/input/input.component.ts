@@ -181,8 +181,6 @@ export class InputComponent implements AfterViewInit {
 
 
   cancelMention() {
-    console.log('cancel Metion');
-    
     this.mentionActive = false;
     this.mentionStartIndex = null;
     this.showUserListOverlay = false;

@@ -257,8 +257,6 @@ export class ThreadContentComponent implements AfterViewInit {
     if (currentMessage.id) {
       this.dataService.updateDocument('threadmessage', currentMessage.id,
         { reactions: currentMessage.reactions })
-    } else {
-      console.error('currentMessage.id is undefined, cannot update document.');
     }
     this.emojiPickerOverlayRef?.dispose();
   }
@@ -287,6 +285,7 @@ export class ThreadContentComponent implements AfterViewInit {
     this.editingMode = false;
 
   }
+  
   edittedMessage(content: string, index: number) {
     this.threadService.currentThreadMessages[index].content = content;
     this.threadService.currentThreadMessages[index].editedAt = Timestamp.now();
@@ -294,9 +293,6 @@ export class ThreadContentComponent implements AfterViewInit {
     if (typeof messageId === 'string') {
       this.dataService.updateDocument('threadmessage', messageId,
         { content: content, editedAt: Timestamp.now() })
-    } else {
-      console.error('Message ID is undefined, cannot update document.');
     }
   }
-
 }

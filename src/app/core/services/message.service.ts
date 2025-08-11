@@ -73,7 +73,6 @@ export class MessageService {
                 ...docSnap.data()
             } as Message : null),
             catchError(error => {
-                console.error('Error getting message by ID:', error);
                 return of(null);
             })
         );
@@ -87,7 +86,6 @@ export class MessageService {
                 ...doc.data()
             } as Message))),
             catchError(error => {
-                console.error('Error getting all messages:', error);
                 return of([]);
             })
         );
@@ -95,7 +93,6 @@ export class MessageService {
 
     deleteMessagesByUser(userId: string): Observable<void> {
         if (!this.isGuestUser(userId)) {
-            console.warn('Attempted to delete messages for non-guest user:', userId);
             return of(void 0);
         }
         return from(this.dataService.getCollectionOncePromise(this.COL_NAME)).pipe(
@@ -114,7 +111,6 @@ export class MessageService {
                 );
             }),
             catchError(error => {
-                console.error('Error deleting messages by user:', error);
                 return of(void 0);
             })
         );

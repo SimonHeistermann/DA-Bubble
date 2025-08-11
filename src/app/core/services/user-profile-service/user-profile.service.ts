@@ -135,7 +135,6 @@ export class UserProfileService {
         }
       );
     } catch (error) {
-      console.error('Error updating offline status:', error);
     }
   }
 }

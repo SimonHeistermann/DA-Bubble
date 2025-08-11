@@ -100,7 +100,6 @@ export class UserChannelActivityService{
             return from(Promise.all(deletes)).pipe(map(() => void 0));
           }),
           catchError(error => {
-            console.error('Error deleting read activities by user:', error);
             return of(void 0);
           })
         );

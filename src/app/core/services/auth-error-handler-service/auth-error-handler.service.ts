@@ -9,22 +9,18 @@ export class AuthErrorHandlerService {
   // ========== ERROR HANDLERS ==========
 
   handleSignInError(error: any, logMessage: string = 'Email sign in error:'): Observable<never> {
-    console.error(logMessage, error);
     throw this.handleAuthError(error);
   }
 
   handleRegistrationError(error: any): Observable<never> {
-    console.error('Email registration error:', error);
     throw this.handleAuthError(error);
   }
 
   handleSignOutError(error: any): Observable<never> {
-    console.error('Sign out error:', error);
     throw error;
   }
 
   handlePasswordResetError(error: any, logMessage: string = 'Password reset error:'): Observable<never> {
-    console.error(logMessage, error);
     if (error.message && error.message.includes('email-not-found')) {
       throw new Error('email-not-found');
     }
@@ -32,7 +28,6 @@ export class AuthErrorHandlerService {
   }
 
   handleVerificationError(error: any): Observable<never> {
-    console.error('Verify password reset code error:', error);
     throw this.handleAuthError(error);
   }
 

@@ -34,7 +34,6 @@ export class FirebaseService {
             const result = await signInWithPopup(this.auth, this.googleProvider);
             return result.user;
         } catch (error) {
-            console.error('Google Sign-In Error:', error);
             throw error;
         }
     }
@@ -44,7 +43,6 @@ export class FirebaseService {
             const userCredential = await createUserWithEmailAndPassword(this.auth, email, password);
             return userCredential.user;
         } catch (error) {
-            console.error('Email Registration Error:', error);
             throw error;
         }
     }
@@ -54,7 +52,6 @@ export class FirebaseService {
             const userCredential = await signInWithEmailAndPassword(this.auth, email, password);
             return userCredential.user;
         } catch (error) {
-            console.error('Email Sign-In Error:', error);
             throw error;
         }
     }
@@ -63,7 +60,6 @@ export class FirebaseService {
         try {
             await signOut(this.auth);
         } catch (error) {
-            console.error('Sign Out Error:', error);
             throw error;
         }
     }
@@ -72,7 +68,6 @@ export class FirebaseService {
         try {
             await sendPasswordResetEmail(this.auth, email);
         } catch (error) {
-            console.error('Password Reset Error:', error);
             throw error;
         }
     }
@@ -87,7 +82,6 @@ export class FirebaseService {
                 photoURL: photoURL || undefined
             });
         } catch (error) {
-            console.error('Update Profile Error:', error);
             throw error;
         }
     }
@@ -96,7 +90,6 @@ export class FirebaseService {
         try {
             await confirmPasswordReset(this.auth, oobCode, newPassword);
         } catch (error) {
-            console.error('Confirm Password Reset Error:', error);
             throw error;
         }
     }
@@ -106,7 +99,6 @@ export class FirebaseService {
             const email = await verifyPasswordResetCode(this.auth, oobCode);
             return email;
         } catch (error) {
-            console.error('Verify Password Reset Code Error:', error);
             throw error;
         }   
     }
@@ -126,7 +118,6 @@ export class FirebaseService {
             const docRef = doc(this.firestore, collectionName, docId);
             await setDoc(docRef, data);
         } catch (error) {
-            console.error(`Error setting document in ${collectionName}:`, error);
             throw error;
         }
     }
@@ -137,7 +128,6 @@ export class FirebaseService {
             const docRef = await addDoc(colRef, data);
             return docRef.id;
         } catch (error) {
-            console.error(`Error adding document to ${collectionName}:`, error);
             throw error;
         }
     }
@@ -152,7 +142,6 @@ export class FirebaseService {
                 return null;
             }
         } catch (error) {
-            console.error(`Error getting document from ${collectionName}:`, error);
             throw error;
         }
     }
@@ -162,7 +151,6 @@ export class FirebaseService {
             const docRef = doc(this.firestore, collectionName, docId);
             await updateDoc(docRef, data);
         } catch (error) {
-            console.error(`Error updating document in ${collectionName}:`, error);
             throw error;
         }
     }
@@ -173,7 +161,6 @@ export class FirebaseService {
             await updateDoc(docRef, data);
             return docId;
         } catch (error) {
-            console.error(`Error updating document in ${collectionName}:`, error);
             throw error;
         }
     }
@@ -183,7 +170,6 @@ export class FirebaseService {
             const docRef = doc(this.firestore, collectionName, docId);
             await deleteDoc(docRef);
         } catch (error) {
-            console.error(`Error deleting document from ${collectionName}:`, error);
             throw error;
         }
     }
@@ -203,11 +189,8 @@ export class FirebaseService {
                     ...doc.data()
                 }));
                 callback(data);
-            }, (error) => {
-                console.error(`Error subscribing to ${collectionName}:`, error);
             });
         } catch (error) {
-            console.error(`Error setting up subscription for ${collectionName}:`, error);
             throw error;
         }
     }
@@ -229,7 +212,6 @@ export class FirebaseService {
 
             callback(data);
         } catch (error) {
-            console.error(`Error getting documents once from ${collectionName}:`, error);
             throw error;
         }
     }
@@ -247,7 +229,6 @@ export class FirebaseService {
             ...doc.data()
           }));
         } catch (error) {
-          console.error(`Error getting documents once from ${collectionName}:`, error);
           throw error;
         }
       }      
@@ -265,11 +246,8 @@ export class FirebaseService {
                 } else {
                     callback(null);
                 }
-            }, (error) => {
-                console.error(`Error subscribing to document ${docId} in ${collectionName}:`, error);
             });
         } catch (error) {
-            console.error(`Error setting up document subscription:`, error);
             throw error;
         }
     }

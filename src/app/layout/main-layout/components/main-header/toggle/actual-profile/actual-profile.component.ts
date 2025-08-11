@@ -24,8 +24,6 @@ export class ActualProfileComponent {
 
   editProfile() {
     this.editMode = true;
-    console.log(`Is Editing`, this.editMode);
-
   }
 
   saveProfile() {
