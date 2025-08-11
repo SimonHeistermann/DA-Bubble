@@ -1,16 +1,13 @@
-import { Component, ElementRef, Input, TemplateRef, ViewChild, inject, SimpleChanges, AfterViewInit, ChangeDetectorRef, signal, effect, afterNextRender } from '@angular/core';
-import { CommonModule } from '@angular/common';
+import { Component, ElementRef, AfterViewInit, Input, TemplateRef, ViewChild, inject, ChangeDetectorRef, signal, effect, afterNextRender, runInInjectionContext, EnvironmentInjector, PLATFORM_ID } from '@angular/core';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { toggleMarginLeft20Animation } from '../../animations/expand-collapse.animation';
 import { ThreadService } from '../../../../core/services/thread-service/thread.service';
 import { Message, ThreadMessage, ThreadReactions } from '../../../../core/models/message.interface';
 import { User } from '../../../../core/models/user.interface';
-import { FirebaseService } from '../../../../core/services/firebase-service/firebase.service';
 import { ChannelData } from '../../../../core/models/channel.interface';
-import { ChannelService } from '../../../../core/services/channel.service';
 import { DateService } from '../../../../core/services/date.service';
 import { UserService } from '../../../../core/services/user-service/user.service';
-import { MessageService } from '../../../../core/services/message.service';
 import { ActivatedRoute } from '@angular/router';
 import { Timestamp } from 'firebase/firestore';
 import { DataService } from '../../../../core/services/data-service/data.service';
@@ -30,7 +27,7 @@ import { InputContComponent } from "./input-cont/input-cont.component";
   styleUrl: './thread-content.component.scss',
   animations: [toggleMarginLeft20Animation]
 })
-export class ThreadContentComponent {
+export class ThreadContentComponent implements AfterViewInit {
 
   @Input() showSelf: boolean = true;
   @Input() channel: ChannelData | null = null;
@@ -60,12 +57,9 @@ export class ThreadContentComponent {
 
   emojiPickerOverlayRef!: OverlayRef;
   threadService = inject(ThreadService);
-  channelService = inject(ChannelService);
   dataService = inject(DataService);
   dateService = inject(DateService);
   userService = inject(UserService);
-  messageService = inject(MessageService);
-  authService = inject(FirebaseService);
   firestore = inject(Firestore);
   route = inject(ActivatedRoute);
   overlayService = inject(OverlayService);
@@ -78,10 +72,30 @@ export class ThreadContentComponent {
   @ViewChild('threadContainer') threadContainer!: ElementRef<HTMLElement>;
   @ViewChild('emojiPickerTemplate') emojiPickerTemplate !: TemplateRef<any>;
 
+  platformId = inject(PLATFORM_ID);
+  injector = inject(EnvironmentInjector);
+
   threadMessages = signal(this.threadService.currentThreadMessages);
 
   constructor() {
 
+    this.responsiveSubs();
+
+    this.threadServiceSubs();
+
+    this.effectScroll();
+  }
+
+
+  ngAfterViewInit() {
+    if (isPlatformBrowser(this.platformId)) {
+      runInInjectionContext(this.injector, () => {
+        afterNextRender(() => this.scrollToBottom());
+      });
+    }
+  }
+
+  responsiveSubs() {
     this.dashboardResponsive.smallScreen$.subscribe(smallScreen => {
       this.smallScreen = smallScreen;
     })
@@ -91,7 +105,9 @@ export class ThreadContentComponent {
     this.dashboardResponsive.isMobile$.subscribe(isMobile => {
       this.isMobile = isMobile;
     })
+  }
 
+  threadServiceSubs() {
     this.threadService.currentThreadMessages$.subscribe(msgs => {
       this.threadMessages.set(msgs);
       this.threadService.currentThreadMessages = msgs;
@@ -101,10 +117,15 @@ export class ThreadContentComponent {
       this.selectedMessage = msg;
     });
 
+  }
+
+  effectScroll() {
     effect(() => {
       const msgs = this.threadMessages();
       if (msgs.length > 0) {
-        queueMicrotask(() => this.scrollToBottom());
+        runInInjectionContext(this.injector, () => {
+          afterNextRender(() => this.scrollToBottom());
+        });
       }
     });
     this.scrollToBottom();
@@ -210,7 +231,13 @@ export class ThreadContentComponent {
       currentMessage.reactions = [];
     }
 
+    this.handleSameReaction(currentMessage, currentUser, emojiStr);
+  }
+
+  handleSameReaction(currentMessage: ThreadMessage, currentUser: string, emojiStr: string): void {
+
     const existingReaction = currentMessage.reactions.find(reaction => reaction.emojiStr === emojiStr);
+
     if (existingReaction) {
       if (!existingReaction.user.includes(currentUser)) {
         existingReaction.user.push(currentUser);
@@ -220,9 +247,12 @@ export class ThreadContentComponent {
           currentMessage.reactions.splice(currentMessage.reactions.indexOf(existingReaction), 1);
         }
       }
-    } else {
-      currentMessage.reactions.push({ emojiStr, user: [currentUser] });
-    }
+    } else { currentMessage.reactions.push({ emojiStr, user: [currentUser] }); }
+
+    this.updateEmoji(currentMessage);
+  }
+
+  updateEmoji(currentMessage: ThreadMessage) {
 
     if (currentMessage.id) {
       this.dataService.updateDocument('threadmessage', currentMessage.id,
@@ -231,7 +261,6 @@ export class ThreadContentComponent {
       console.error('currentMessage.id is undefined, cannot update document.');
     }
     this.emojiPickerOverlayRef?.dispose();
-
   }
 
   closeEmojiPickerOverlay() {
