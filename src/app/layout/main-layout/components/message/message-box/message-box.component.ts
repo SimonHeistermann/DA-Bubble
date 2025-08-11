@@ -1,4 +1,4 @@
-import { AfterViewChecked, Component, ElementRef, EventEmitter, inject, Input, OnDestroy, Output, QueryList, SimpleChanges, TemplateRef, ViewChild, ViewChildren, ViewContainerRef } from '@angular/core';
+import { AfterViewChecked, Component, ElementRef, EventEmitter, inject, Input, OnDestroy, Output, QueryList, SimpleChanges, TemplateRef, ViewChild, ViewChildren, ViewContainerRef, Inject, PLATFORM_ID } from '@angular/core';
 import { EmojiComponent } from '../../shared/emoji/emoji.component';
 import { EmojiPickerComponent } from '../../shared/emoji-picker/emoji-picker.component';
 import { Channel } from '../../../../../core/models/channel.interface';
@@ -9,7 +9,7 @@ import { MessageService } from '../../../../../core/services/message.service';
 import { ConnectedPosition, OverlayRef } from '@angular/cdk/overlay';
 import { OverlayService } from '../../../../../core/services/overlay.service';
 import { DateService } from '../../../../../core/services/date.service';
-import { CommonModule } from '@angular/common';
+import { CommonModule, isPlatformBrowser } from '@angular/common';
 import { UserChannelActivityService } from '../../../../../core/services/userReadActivity.service';
 import { UserReadActivity, UserReadActivityData } from '../../../../../core/models/userReadActivity.interface';
 import { ProfileComponent } from '../../shared/profile/profile.component';
@@ -25,6 +25,8 @@ import { ThreadService } from '../../../../../core/services/thread-service/threa
   styleUrl: './message-box.component.scss'
 })
 export class MessageBoxComponent implements AfterViewChecked, OnDestroy {
+   constructor(@Inject(PLATFORM_ID) private platformId: Object) {}
+
   @Input() channel: Channel | null = null;
   @Input() messageUser: User | null = null;
   @Input() currentUser: User | null = null;
@@ -73,7 +75,9 @@ export class MessageBoxComponent implements AfterViewChecked, OnDestroy {
 
 
   ngAfterViewChecked(): void {
+     if (isPlatformBrowser(this.platformId)) {
     this.messageRefs.changes.subscribe(() => this.tryScrollOnce());
+  }
   }
 
   private tryScrollOnce(): void { 
@@ -180,8 +184,12 @@ export class MessageBoxComponent implements AfterViewChecked, OnDestroy {
   }
 
   scrollToBottom() { 
-    let element = this.messageRefs.get(this.messageRefs.length - 1);
-    if (element) element.nativeElement.scrollIntoView({ block: 'start' });
+   if (isPlatformBrowser(this.platformId)) {
+      const element = this.messageRefs.get(this.messageRefs.length - 1);
+      if (element) {
+        element.nativeElement.scrollIntoView({ block: 'start' });
+      }
+    }
   }
 
   subPrivateMessages() {
