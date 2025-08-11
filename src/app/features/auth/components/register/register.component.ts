@@ -204,12 +204,15 @@ export class RegisterComponent implements OnInit, OnDestroy {
   private triggerErrorAnimation(fieldName: string): void {
     const element = document.getElementById(`${fieldName}-group`);
     if (element) {
-      element.classList.remove('error__state');
-      element.offsetHeight;
-      element.classList.add('error__state');
-      setTimeout(() => {
-        element.classList.remove('error__state');
-      }, 300);
+      const inputWrapper = element.querySelector('.input__wrapper') as HTMLElement;
+      if (inputWrapper) {
+        inputWrapper.classList.remove('error__state');
+        inputWrapper.offsetHeight;
+        inputWrapper.classList.add('error__state');
+        setTimeout(() => {
+          inputWrapper.classList.remove('error__state');
+        }, 300);
+      }
     }
   }
 
