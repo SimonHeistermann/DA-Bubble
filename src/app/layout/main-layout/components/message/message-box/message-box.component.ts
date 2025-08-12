@@ -81,7 +81,7 @@ export class MessageBoxComponent implements AfterViewChecked, OnDestroy {
   }
 
   private tryScrollOnce(): void { 
-    if (!this.isScrolled && this.messageRefs.length > 0) {
+    if (!this.isScrolled && this.messageRefs && this.messageRefs.length > 0) {
       this.scrollToBottom();
       this.isScrolled = true;
       this.afterInit.emit();
@@ -94,7 +94,6 @@ export class MessageBoxComponent implements AfterViewChecked, OnDestroy {
       this.isNewInChat = true;
       this.subChannelMessages();
       this.isScrolled = false;
-      this.scrollToBottom();
     }
 
     if (changes['messageUser'] && changes['messageUser'].currentValue) {
@@ -102,12 +101,10 @@ export class MessageBoxComponent implements AfterViewChecked, OnDestroy {
       this.isNewInChat = true;
       this.subPrivateMessages();
       this.isScrolled = false;
-      this.scrollToBottom();
     }
 
     if (changes['messages']) {
       this.isScrolled = false;
-      this.scrollToBottom();
     }
   }
 
@@ -184,7 +181,7 @@ export class MessageBoxComponent implements AfterViewChecked, OnDestroy {
   }
 
   scrollToBottom() { 
-   if (isPlatformBrowser(this.platformId)) {
+   if (isPlatformBrowser(this.platformId) && this.messageRefs && this.messageRefs.length > 0) {
       const element = this.messageRefs.get(this.messageRefs.length - 1);
       if (element) {
         element.nativeElement.scrollIntoView({ block: 'start' });

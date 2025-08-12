@@ -116,11 +116,13 @@ export class MainHeaderComponent implements OnDestroy {
     const value = this.inputContent.trim();
 
     if (!value) {
-      this.showList = false;
+      this.filteredChannelMessages = [];
+      this.filteredPrivateMessages = [];
+      this.filteredUsers = [];
+      this.filteredChannels = [];
       return;
     }
     
-    this.showList = true;
     if (value.startsWith('@')) {
       this.filterUsers(value);
     } else if (value.startsWith('#')) {

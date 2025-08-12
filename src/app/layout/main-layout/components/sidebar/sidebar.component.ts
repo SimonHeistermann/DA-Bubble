@@ -405,7 +405,7 @@ export class SidebarComponent implements OnInit, OnDestroy {
     if (value == '@') {
       this.filteredUsers = this.allUsers;
     } else {
-      const search = value.slice(1).toLowerCase(); // remove '@'
+      const search = value.slice(1).toLowerCase();
       this.filteredUsers = this.allUsers?.filter(user =>
         user.displayName.toLowerCase().includes(search)
       ) || [];
@@ -433,7 +433,7 @@ export class SidebarComponent implements OnInit, OnDestroy {
     this.filteredPrivateMessages = []
 
     this.filteredUsers = this.allUsers?.filter(user =>
-      user.email.toLowerCase().includes(value)
+      user.displayName.toLowerCase().includes(value)
     ) || [];
 
     this.filteredChannels = this.channels?.filter(channel =>
