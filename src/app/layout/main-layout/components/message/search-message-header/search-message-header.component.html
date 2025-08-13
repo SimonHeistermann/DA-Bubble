@@ -1,6 +1,6 @@
 <div class="search-message-header-container" #wrapper>
     <h2>Neue Nachricht</h2>
-    <input type="text" placeholder="An: #chnanel, order @jemand oder E-Mail Addresse" (input)="inputText()" [(ngModel)]="inputContent">
+    <input type="text" placeholder="An: #Channel oder @jemand oder Name oder E-Mail" (input)="inputText()" [(ngModel)]="inputContent">
 
     <div class="search-result scrollbar__none" *ngIf="showList">
         <div class="search-result-user" *ngIf="showUserList">

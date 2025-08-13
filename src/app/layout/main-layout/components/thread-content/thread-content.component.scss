@@ -39,7 +39,6 @@
 
         &:hover {
             content: url('/angular-projects/dabubble/images/icons/close_hover.png');
-            // content: url('/angular-projects/dabubble/angular-projects/dabubble/images/icons/close_hover.png');
             transition: .35s ease-in-out;
             background-color: var(--bg-color);
 
@@ -82,8 +81,7 @@
 .thread-wrapper {
     width: 100%;
     @include displayFlex($fd: column, $jc: flex-start, $ai: normal);
-    height: inherit;
-    height: 100%;
+    height: calc(100vh - 478px);
     max-height: 408px;
 }
 

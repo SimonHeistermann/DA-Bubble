@@ -122,7 +122,7 @@ export class ThreadContentComponent implements AfterViewInit {
   effectScroll() {
     effect(() => {
       const msgs = this.threadMessages();
-      if (msgs.length > 0) {
+      if (msgs.length > 0 && this.threadContainer) {
         runInInjectionContext(this.injector, () => {
           afterNextRender(() => this.scrollToBottom());
         });
@@ -132,6 +132,7 @@ export class ThreadContentComponent implements AfterViewInit {
   }
 
   scrollToBottom() {
+    if (!this.threadContainer?.nativeElement) return;
     let element = this.threadContainer?.nativeElement;
     if (element) {
       setTimeout(() => {

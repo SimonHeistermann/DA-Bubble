@@ -30,6 +30,7 @@ export class ActualProfileComponent {
     this.editMode = false;
     if (this.nameInput) {
       const enteredName = this.nameInput.nativeElement.value.trim();
+      if (enteredName === '') return;
       if (enteredName.split(/\s/).length < 2) {
         this.currentUser!.profile.firstName = enteredName;
         this.currentUser!.displayName = enteredName + ' ' + this.currentUser!.profile.lastName;

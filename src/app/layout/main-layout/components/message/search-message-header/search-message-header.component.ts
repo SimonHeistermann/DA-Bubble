@@ -107,7 +107,7 @@ export class SearchMessageHeaderComponent implements OnInit {
     } else if (value.startsWith('#')) {
       this.filterChannel(value);
     } else {
-      this.filterByEmail(value);
+      this.filterByName(value);
     }
   }
 
@@ -119,7 +119,7 @@ export class SearchMessageHeaderComponent implements OnInit {
     if (value == '@') {
       this.filteredUsers = this.allUsers;
     } else {
-      const search = value.slice(1).toLowerCase(); // remove '@'
+      const search = value.slice(1).toLowerCase(); 
       this.filteredUsers = this.allUsers?.filter(user =>
         user.displayName.toLowerCase().includes(search)
       ) || [];
@@ -139,13 +139,13 @@ export class SearchMessageHeaderComponent implements OnInit {
     ) || [];
   }
 
-  filterByEmail(value: string) {
+  filterByName(value: string) {
     this.filteredChannels = [];
     this.showUserList = true;
     this.showChannelList = false;
 
     this.filteredUsers = this.allUsers?.filter(user =>
-      user.email.toLowerCase().includes(value)
+      user.displayName.toLowerCase().includes(value) ||  user.email.toLowerCase().includes(value)
     ) || [];
   }
 
