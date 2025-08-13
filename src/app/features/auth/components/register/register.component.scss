@@ -41,13 +41,12 @@
     text-align: center;
     width: 100%;
 }
-
 h1 {
     @include fontNunito($fs: 46px, $fw: 700);
     text-align: center;
     color: var(--purple-1);
     margin: 0;
-    flex: 1
+    white-space: nowrap;
 }
 
 p {
@@ -69,6 +68,11 @@ p {
     width: 100%;
     position: relative;
     min-height: 46px;
+}
+
+.header__title__row {
+    @include displayFlex($ai: center, $jc: center, $g: 20px);
+    width: 100%;
 }
 
 .auth__form {
@@ -358,8 +362,6 @@ form.submitting {
 }
 
 .back__arrow {
-    position: absolute;
-    left: 0;
     width: 40px;
     height: 40px;
     cursor: pointer;
@@ -368,7 +370,7 @@ form.submitting {
     background-size: contain;
     background-repeat: no-repeat;
     background-position: center;
-    z-index: 2;
+    flex-shrink: 0;
     
     &:hover {
         transform: translateX(-2px);
@@ -449,9 +451,24 @@ form.submitting {
     }
 }
 
-@media screen and (max-height: 500px) {
-    .header__top {
-        min-height: 32px;
+@media screen and (max-width: 480px) {
+    .header__title__row {
+        gap: 12px;
+    }
+    
+    .back__arrow {
+        width: 32px;
+        height: 32px;
+    }
+    
+    h1 {
+        @include fontNunito($fs: 28px, $fw: 700);
+    }
+}
+
+@media screen and (max-width: 400px) {
+    .header__title__row {
+        gap: 8px;
     }
     
     .back__arrow {
@@ -476,7 +493,7 @@ form.submitting {
     }
 
     .back__arrow {
-        top: 30px;
+        top: 20px;
         left: 20px;
     }
 
@@ -741,13 +758,20 @@ form.submitting {
     }
 }
 
-@media screen and (max-width: 290px) {
+@media screen and (max-width: 320px) {
+    h1 {
+        @include fontNunito($fs: 22px, $fw: 700);
+        white-space: normal; 
+    }
+}
+
+@media screen and (max-height: 500px) {
     .back__arrow {
-        width: 24px;
-        height: 24px;
+        width: 28px;
+        height: 28px;
     }
     
     h1 {
-        @include fontNunito($fs: 22px, $fw: 700);
+        @include fontNunito($fs: 24px, $fw: 700);
     }
 }
