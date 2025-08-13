@@ -39,6 +39,7 @@
 .auth__form__header {
     @include displayFlex($ai: center, $jc: center, $g: 24px, $fd: column);
     text-align: center;
+    width: 100%;
 }
 
 h1 {
@@ -46,6 +47,7 @@ h1 {
     text-align: center;
     color: var(--purple-1);
     margin: 0;
+    flex: 1
 }
 
 p {
@@ -60,6 +62,13 @@ p {
     width: 100%;
     flex: 1;
     @include displayFlex($fd: column);
+}
+
+.header__top {
+    @include displayFlex($ai: center, $jc: center);
+    width: 100%;
+    position: relative;
+    min-height: 46px;
 }
 
 .auth__form {
@@ -348,6 +357,25 @@ form.submitting {
     opacity: 0.8;
 }
 
+.back__arrow {
+    position: absolute;
+    left: 0;
+    width: 40px;
+    height: 40px;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    background-image: url('/angular-projects/dabubble/images/icons/arrow_left_default.png');
+    background-size: contain;
+    background-repeat: no-repeat;
+    background-position: center;
+    z-index: 2;
+    
+    &:hover {
+        transform: translateX(-2px);
+        background-image: url('/angular-projects/dabubble/images/icons/arrow_left_hover.png');
+    }
+}
+
 @keyframes spin {
     0% { transform: rotate(0deg); }
     100% { transform: rotate(360deg); }
@@ -418,6 +446,21 @@ form.submitting {
 
     .privacy__error {
         height: 22px;
+    }
+}
+
+@media screen and (max-height: 500px) {
+    .header__top {
+        min-height: 32px;
+    }
+    
+    .back__arrow {
+        width: 28px;
+        height: 28px;
+    }
+    
+    h1 {
+        @include fontNunito($fs: 24px, $fw: 700);
     }
 }
 
@@ -695,5 +738,16 @@ form.submitting {
 
     .auth__form {
         gap: 14px !important;
+    }
+}
+
+@media screen and (max-width: 290px) {
+    .back__arrow {
+        width: 24px;
+        height: 24px;
+    }
+    
+    h1 {
+        @include fontNunito($fs: 22px, $fw: 700);
     }
 }
