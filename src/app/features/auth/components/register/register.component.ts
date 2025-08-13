@@ -173,7 +173,6 @@ export class RegisterComponent implements OnInit, OnDestroy {
   }
 
   private handleRegistrationError(error: any): void {
-    console.error('Registration error:', error);
     if (error.code === 'auth/email-already-in-use') {
       this.errorMessage = 'E-Mail bereits verwendet.';
     } else if (error.code === 'auth/weak-password') {
@@ -205,12 +204,15 @@ export class RegisterComponent implements OnInit, OnDestroy {
   private triggerErrorAnimation(fieldName: string): void {
     const element = document.getElementById(`${fieldName}-group`);
     if (element) {
-      element.classList.remove('error__state');
-      element.offsetHeight;
-      element.classList.add('error__state');
-      setTimeout(() => {
-        element.classList.remove('error__state');
-      }, 300);
+      const inputWrapper = element.querySelector('.input__wrapper') as HTMLElement;
+      if (inputWrapper) {
+        inputWrapper.classList.remove('error__state');
+        inputWrapper.offsetHeight;
+        inputWrapper.classList.add('error__state');
+        setTimeout(() => {
+          inputWrapper.classList.remove('error__state');
+        }, 300);
+      }
     }
   }
 

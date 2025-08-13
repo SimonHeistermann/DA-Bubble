@@ -95,7 +95,6 @@ export class DataService {
         try {
         return this.firebaseCore.getCollectionOncePromise(collectionName, ...queryConstraints);
         } catch (error) {
-        console.error(`Error in DataService.getCollectionOncePromise:`, error);
         throw error;
         }
     }

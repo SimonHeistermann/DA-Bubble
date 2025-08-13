@@ -73,7 +73,6 @@ export class UserService {
       this.firebaseService.getDocument(APP_CONSTANTS.COLLECTIONS.USERS, uid)
     ).pipe(
       catchError(error => {
-        console.error('Error loading user by ID:', error);
         return of(null);
       })
     );
@@ -94,7 +93,6 @@ export class UserService {
         return user || null;
       }),
       catchError(error => {
-        console.error('Error loading user by email:', error);
         return of(null);
       })
     );
@@ -110,7 +108,6 @@ export class UserService {
     return this.allUsers$.pipe(
       map(allUsers => allUsers.filter(user => uids.includes(user.id))),
       catchError(error => {
-        console.error('Error loading users by IDs:', error);
         return of([]);
       })
     );
@@ -124,7 +121,6 @@ export class UserService {
       this.firebaseService.getCollectionOncePromise(APP_CONSTANTS.COLLECTIONS.USERS)
     ).pipe(
       catchError(error => {
-        console.error('Error getting all users:', error);
         return of([]);
       })
     );
@@ -146,7 +142,6 @@ export class UserService {
         user.email.toLowerCase().includes(lowerSearchTerm)
       )),
       catchError(error => {
-        console.error('Error searching users:', error);
         return of([]);
       })
     );
@@ -174,7 +169,6 @@ export class UserService {
       )
     ).pipe(
       catchError(error => {
-        console.error('Error deleting user:', error);
         throw error;
       })
     );
@@ -192,7 +186,6 @@ export class UserService {
       )
     ).pipe(
       catchError(error => {
-        console.error('Error updating user profile:', error);
         throw error;
       })
     );
@@ -210,7 +203,6 @@ export class UserService {
       )
     ).pipe(
       catchError(error => {
-        console.error('Error updating display name:', error);
         throw error;
       })
     );
@@ -231,7 +223,6 @@ export class UserService {
       )
     ).pipe(
       catchError(error => {
-        console.error('Error setting user online:', error);
         throw error;
       })
     );
@@ -252,7 +243,6 @@ export class UserService {
       )
     ).pipe(
       catchError(error => {
-        console.error('Error setting user offline:', error);
         throw error;
       })
     );
@@ -273,7 +263,6 @@ export class UserService {
       )
     ).pipe(
       catchError(error => {
-        console.error('Error updating user heartbeat:', error);
         return of(void 0);
       })
     );
@@ -395,7 +384,6 @@ export class UserService {
     return this.allUsers$.pipe(
       map(users => users.some(user => user.email.toLowerCase() === normalizedEmail)),
       catchError(error => {
-        console.error('Error checking email existence:', error);
         return of(false);
       })
     );

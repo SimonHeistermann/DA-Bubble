@@ -113,7 +113,6 @@ export class ChooseAvatarComponent implements OnInit, OnDestroy {
           setTimeout(() => this.router.navigate(['/dashboard']), 1000);
         },
         error: (error) => {
-          console.error('Error updating avatar:', error);
           const message = error.message || 'Fehler beim Aktualisieren des Avatars. Bitte versuchen Sie es erneut.';
           this.notificationService.showError('Error!');
         }

@@ -123,7 +123,6 @@ export class AuthService {
       }),
       catchError(error => {
         this.setLoading(false);
-        console.error('Guest login failed:', error);
         throw error;
       })
     );
@@ -212,7 +211,6 @@ export class AuthService {
         }),    
         catchError(error => {
           this.setLoading(false);
-          console.error('Guest sign out failed:', error);
           throw error;
         })
       );
@@ -298,7 +296,6 @@ export class AuthService {
     return this.userService.getUserByEmail(email).pipe(
       map(user => user !== null),
       catchError(error => {
-        console.error('Error checking email existence:', error);
         return of(false);
       })
     );
@@ -321,7 +318,6 @@ export class AuthService {
         this.setLoading(false);
       }),
       catchError(error => {
-        console.error('Error updating avatar:', error);
         this.setLoading(false);
         throw error;
       })
@@ -377,11 +373,9 @@ export class AuthService {
       const allgemeinChannel = await this.findAllgemeinChannel();
       if (allgemeinChannel) {
         await this.addUserToChannelIfNotExists(allgemeinChannel, userId);
-      } else {
-        console.warn('Allgemein channel not found');
       }
     } catch (error) {
-      console.error('Error adding user to Allgemein channel:', error);
+      throw new Error('Failed to add user to Allgemein channel');
     }
   }
 

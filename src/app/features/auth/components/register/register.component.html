@@ -62,11 +62,11 @@
                                 </div>
                                 <div 
                                     class="error" 
-                                    *ngIf="getFieldError('firstName')" 
                                     id="firstName-error"
                                     role="alert"
+                                    [attr.aria-hidden]="!getFieldError('firstName')"
                                 >
-                                    <small>{{ getFieldError('firstName') }}</small>
+                                    <small *ngIf="getFieldError('firstName')">{{ getFieldError('firstName') }}</small>
                                 </div>
                             </div>
                         </div>
@@ -103,11 +103,11 @@
                                 </div>
                                 <div 
                                     class="error" 
-                                    *ngIf="getFieldError('lastName')" 
                                     id="lastName-error"
                                     role="alert"
+                                    [attr.aria-hidden]="!getFieldError('lastName')"
                                 >
-                                    <small>{{ getFieldError('lastName') }}</small>
+                                    <small *ngIf="getFieldError('lastName')">{{ getFieldError('lastName') }}</small>
                                 </div>
                             </div>
                         </div>
@@ -145,11 +145,11 @@
                             </div>
                             <div 
                                 class="error" 
-                                *ngIf="getFieldError('email')" 
                                 id="email-error"
                                 role="alert"
+                                [attr.aria-hidden]="!getFieldError('email')"
                             >
-                                <small>{{ getFieldError('email') }}</small>
+                                <small *ngIf="getFieldError('email')">{{ getFieldError('email') }}</small>
                             </div>
                         </div>
                     </div>
@@ -186,11 +186,11 @@
                             </div>
                             <div 
                                 class="error" 
-                                *ngIf="getFieldError('password')" 
                                 id="password-error"
                                 role="alert"
+                                [attr.aria-hidden]="!getFieldError('password')"
                             >
-                                <small>{{ getFieldError('password') }}</small>
+                                <small *ngIf="getFieldError('password')">{{ getFieldError('password') }}</small>
                             </div>
                         </div>
                     </div>
@@ -227,11 +227,11 @@
                             </div>
                             <div 
                                 class="error" 
-                                *ngIf="getFieldError('confirmPassword')" 
                                 id="confirmPassword-error"
                                 role="alert"
+                                [attr.aria-hidden]="!getFieldError('confirmPassword')"
                             >
-                                <small>{{ getFieldError('confirmPassword') }}</small>
+                                <small *ngIf="getFieldError('confirmPassword')">{{ getFieldError('confirmPassword') }}</small>
                             </div>
                         </div>
                     </div>
@@ -269,11 +269,11 @@
                         </div>
                         <div 
                             class="error privacy__error" 
-                            *ngIf="getFieldError('privacyPolicy')" 
                             id="privacy-error"
                             role="alert"
+                            [attr.aria-hidden]="!getFieldError('privacyPolicy')"
                         >
-                            <small>{{ getFieldError('privacyPolicy') }}</small>
+                            <small *ngIf="getFieldError('privacyPolicy')">{{ getFieldError('privacyPolicy') }}</small>
                         </div>
                     </div>
                     <button 

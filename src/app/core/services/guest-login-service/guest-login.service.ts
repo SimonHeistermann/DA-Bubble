@@ -147,7 +147,6 @@ export class GuestLoginService {
 
   private performCompleteGuestCleanup(guest: GuestUser): Observable<void> {
     if (!this.isGuestUser(guest.uid)) {
-      console.warn('Attempted cleanup of non-guest user:', guest.uid);
       return of(void 0);
     }
     return forkJoin([
@@ -159,7 +158,6 @@ export class GuestLoginService {
     ]).pipe(
       map(() => void 0),
       catchError(error => {
-        console.error('Failed to perform complete guest cleanup:', error);
         return of(void 0);
       })
     );
