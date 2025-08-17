@@ -126,11 +126,6 @@ export class MainHeaderComponent implements OnDestroy {
     const value = this.inputContent.trim();
 
     if (!value) {
-      // this.filteredChannelMessages = [];
-      // this.filteredPrivateMessages = [];
-      // this.filteredUsers = [];
-      // this.filteredChannels = [];
-      // this.showList = false;
       this.clearFilter();
       return;
     }
