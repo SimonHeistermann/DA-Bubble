@@ -73,6 +73,12 @@ export class MessageBoxComponent implements AfterViewChecked, OnDestroy {
   selectedUser: User | null = null;
   editingIndex = -1;
 
+  ngOnInit(): void {
+    
+      this.subChannelMessages();
+      this.subPrivateMessages();
+  }
+
 
   ngAfterViewChecked(): void {
      if (isPlatformBrowser(this.platformId)) {
