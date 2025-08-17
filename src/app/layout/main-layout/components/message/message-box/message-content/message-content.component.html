@@ -1,10 +1,27 @@
- <div class="message-content-container">
+@if (messageUserID === currentUserId) {
+<div class="ownMessage-content-container">
     @if (isEditing && message?.content != null) {
-        <app-input #inputContainer [allChannelUserInput]="allUsersWithOutCurrentUser" (saveEditingEmitter)="onSaveEditing($event)" (breakEditingEmitter)="onBreakEditing()" [editingMode]="true" [originalInputMessage]="message?.content"></app-input>
+    <app-input #inputContainer [allChannelUserInput]="allUsersWithOutCurrentUser"
+        (saveEditingEmitter)="onSaveEditing($event)" (breakEditingEmitter)="onBreakEditing()" [editingMode]="true"
+        [originalInputMessage]="message?.content"></app-input>
     }
     <p>
         {{ message?.content }}
     </p>
-   
- </div>
- 
+
+</div>
+
+} @else {
+<div class="message-content-container">
+    @if (isEditing && message?.content != null) {
+    <app-input #inputContainer [allChannelUserInput]="allUsersWithOutCurrentUser"
+        (saveEditingEmitter)="onSaveEditing($event)" (breakEditingEmitter)="onBreakEditing()" [editingMode]="true"
+        [originalInputMessage]="message?.content"></app-input>
+    }
+    <p>
+        {{ message?.content }}
+    </p>
+
+</div>
+
+}

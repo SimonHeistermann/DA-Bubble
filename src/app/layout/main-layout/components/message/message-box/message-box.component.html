@@ -26,7 +26,7 @@
                             
                             </div>
                             <div class="message-content-middle">
-                               <app-message-content [allUsersWithOutCurrentUser]="allUsersWithOutCurrentUser"  [message]="message" [isEditing]="editingIndex == index" (saveEditingEmitter)="onSaveEditing($event, message); editingIndex = -1; clickedMessageIndex = -1" (breakEditingEmitter)="editingIndex = -1; clickedMessageIndex = -1"></app-message-content>
+                               <app-message-content [allUsersWithOutCurrentUser]="allUsersWithOutCurrentUser" [currentUserId]="currentUser?.id" [messageUserID]="message.authorID" [message]="message" [isEditing]="editingIndex == index" (saveEditingEmitter)="onSaveEditing($event, message); editingIndex = -1; clickedMessageIndex = -1" (breakEditingEmitter)="editingIndex = -1; clickedMessageIndex = -1"></app-message-content>
 
                             </div>
                             <div class="message-content-bottom">
