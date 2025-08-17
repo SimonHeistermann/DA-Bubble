@@ -214,7 +214,7 @@ export class MessageBoxComponent implements AfterViewChecked, OnDestroy {
     })
   }
 
-  subChannelMessages() { debugger;
+  subChannelMessages() {
     if (!this.currentUser || !this.channel) return;
     this.unsubscribeChannelMessages = this.messageService.getChannelMessageOrderByCreatedAt(this.channel.id, (data) => {
       if (data.length == 0) {
