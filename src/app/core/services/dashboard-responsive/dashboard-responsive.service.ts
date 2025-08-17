@@ -7,6 +7,7 @@ import { BehaviorSubject } from 'rxjs';
 })
 export class DashboardResponsiveService {
 
+  private normalScreen = new BehaviorSubject<boolean>(true);
   private smallScreen = new BehaviorSubject<boolean>(false);
   private isMobile = new BehaviorSubject<boolean>(false);
   private isTablet = new BehaviorSubject<boolean>(false);
@@ -16,6 +17,7 @@ export class DashboardResponsiveService {
   private openSidebar = new BehaviorSubject<boolean>(true);
   private openThread = new BehaviorSubject<boolean>(false);
 
+  normalScreen$ = this.normalScreen.asObservable();
   smallScreen$ = this.smallScreen.asObservable();
   isTablet$ = this.isTablet.asObservable();
   isMobile$ = this.isMobile.asObservable();
@@ -27,6 +29,10 @@ export class DashboardResponsiveService {
   
 
   constructor( private breakpointObserver: BreakpointObserver ) { 
+     this.breakpointObserver.observe(['(min-width: 960px)']).subscribe(result => {
+      this.normalScreen.next(result.matches);
+    });
+
     this.breakpointObserver.observe(['(max-width: 1420px)']).subscribe(result => {
       this.smallScreen.next(result.matches);
     });

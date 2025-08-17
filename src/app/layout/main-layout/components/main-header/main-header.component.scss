@@ -18,6 +18,7 @@
     width: 60%;
     max-width: 989px;
     height: 70px;
+    z-index: 1001;
 }
 
 .search-field {
@@ -49,25 +50,27 @@
     overflow-y: auto;
 
     .divider {
-        background-color: var(--grey) ;
+        background-color: var(--grey);
         width: 100%;
         height: 1px;
         margin-top: 10px;
         margin-bottom: 10px;
     }
 
-    .search-result-user,  .search-result-channel, .search-result-messages {
+    .search-result-user,
+    .search-result-channel,
+    .search-result-messages {
 
         ul {
             li {
-                
+
                 width: 100%;
                 padding: 10px;
                 border-radius: 20px;
                 cursor: pointer;
                 @include displayFlex($g: 10px, $jc: flex-start);
 
-                    &:hover {
+                &:hover {
                     background-color: var(--bg-color);
                 }
 
@@ -77,14 +80,14 @@
                     border-radius: 50%;
                 }
             }
-            
+
         }
-    }  
-    
+    }
+
     .search-result-messages {
         .message-li {
             align-items: flex-start !important;
-            
+
             .message-li-right {
                 h4 {
                     span {
@@ -96,7 +99,7 @@
             }
         }
     }
-    
+
 }
 
 .profile-container {
@@ -105,6 +108,7 @@
     align-items: center;
     gap: 20px;
     cursor: pointer;
+
     >span {
         font-size: 2rem;
         font-weight: 700;
@@ -133,14 +137,26 @@
     flex-direction: row;
     align-items: center;
     gap: 2px;
-    :nth-child(1){
+
+    :nth-child(1) {
         cursor: pointer;
     }
+
     >span {
         font-size: 24px;
         font-weight: 700;
         margin-left: 10px;
     }
+}
+
+.overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
 }
 
 @media (min-width: 1610px) {
@@ -163,8 +179,9 @@
 }
 
 @media (max-width: 1180px) {
-  .profile-container {
-    gap: 14px;
+    .profile-container {
+        gap: 14px;
+
         >span {
             font-size: 1.4rem;
         }
@@ -183,14 +200,14 @@
     .search-field {
         display: none;
     }
-    
+
     .logo {
         width: 10.20em;
     }
 }
 
 @media (max-width: 730px) {
-     .main-container {
+    .main-container {
         justify-content: space-around;
     }
 }
@@ -199,10 +216,12 @@
     .main-container {
         justify-content: center;
     }
+
     .profile-container {
         >span {
             display: none;
         }
+
         :nth-child(3) {
             display: none;
         }

@@ -25,13 +25,14 @@ import { CommunicatorService } from '../message/search-message-header/search-mes
 @Component({
   selector: 'app-main-header',
   standalone: true,
-  imports: [ CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule],
   templateUrl: './main-header.component.html',
   styleUrl: './main-header.component.scss'
 })
 export class MainHeaderComponent implements OnDestroy {
 
   @Input() allChannelUsers: User[] = [];
+
   router = inject(Router);
 
   currentUser: User | null = null;
@@ -50,6 +51,7 @@ export class MainHeaderComponent implements OnDestroy {
   dialog = inject(Dialog);
   mainLayoutContentComponent = inject(MainLayoutContentComponent);
 
+  normalScreen = false;
   isMobile = false;
   isTablet = false;
 
@@ -71,6 +73,11 @@ export class MainHeaderComponent implements OnDestroy {
   @Output() clickChannelNameEmitter = new EventEmitter<Channel>();
 
   constructor(public dashboardResponsive: DashboardResponsiveService) {
+     this.dashboardResponsive.normalScreen$.subscribe(normalScreen => {
+      this.normalScreen = normalScreen;
+      console.log(this.normalScreen);
+    })
+
      this.dashboardResponsive.isTablet$.subscribe(isTablet => {
       this.isTablet = isTablet;
     })
@@ -120,9 +127,10 @@ export class MainHeaderComponent implements OnDestroy {
       this.filteredPrivateMessages = [];
       this.filteredUsers = [];
       this.filteredChannels = [];
+      this.showList = false;
       return;
     }
-    
+    this.showList = true;
     if (value.startsWith('@')) {
       this.filterUsers(value);
     } else if (value.startsWith('#')) {
@@ -145,7 +153,7 @@ export class MainHeaderComponent implements OnDestroy {
     if (value == '@') {
       this.filteredUsers = this.allUsers;
     } else {
-      const search = value.slice(1).toLowerCase(); // remove '@'
+      const search = value.slice(1).toLowerCase(); 
       this.filteredUsers = this.allUsers?.filter(user =>
         user.displayName.toLowerCase().includes(search)
       ) || [];
