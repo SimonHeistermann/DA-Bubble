@@ -18,14 +18,15 @@
                         </div>
                         <div class="message-content">
                             <div class="message-content-top">
-                                <span class="name">{{ message.authorName }}</span>
+                                <span *ngIf="currentUser?.id === message.authorID" class="name">{{ currentUser?.displayName }}</span>
+                                <span *ngIf="currentUser?.id !== message.authorID" class="name">{{ message.authorName }}</span>
                                 @if (message.createdAt) {
                                     <span class="time">{{ dateService.getHoursAndMinutes(message.createdAt) }} Uhr</span>
                                 }
                             
                             </div>
                             <div class="message-content-middle">
-                               <app-message-content [allUsersWithOutCurrentUser]="allUsersWithOutCurrentUser"  [message]="message" [isEditing]="editingIndex == index" (saveEditingEmitter)="onSaveEditing($event, message); editingIndex = -1; clickedMessageIndex = -1" (breakEditingEmitter)="editingIndex = -1; clickedMessageIndex = -1"></app-message-content>
+                               <app-message-content [allUsersWithOutCurrentUser]="allUsersWithOutCurrentUser" [currentUserId]="currentUser?.id" [messageUserID]="message.authorID" [message]="message" [isEditing]="editingIndex == index" (saveEditingEmitter)="onSaveEditing($event, message); editingIndex = -1; clickedMessageIndex = -1" (breakEditingEmitter)="editingIndex = -1; clickedMessageIndex = -1"></app-message-content>
 
                             </div>
                             <div class="message-content-bottom">
