@@ -2,6 +2,22 @@
 
 .message-content-container {
     @include displayFlex($fd: column, $ai: flex-end, $g: 10px);
+
+    p {
+        width: fit-content;
+        font-weight: 400;
+        font-size: 16px;
+        padding: 10px 20px;
+        border-radius: 20px;
+        border-top-left-radius: 0;
+        background-color: var(--purple-2);
+        color: var(--white);
+    }
+}
+
+.ownMessage-content-container {
+    @include displayFlex($fd: column, $ai: flex-end, $g: 10px);
+
     p {
         width: fit-content;
         font-weight: 400;

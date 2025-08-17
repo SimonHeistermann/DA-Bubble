@@ -14,6 +14,8 @@ export class MessageContentComponent implements OnChanges {
   @Input() message: Message | null = null;
   @Input() isEditing = false;
   @Input() allUsersWithOutCurrentUser: User[] = [];
+  @Input() currentUserId: any = '';
+  @Input() messageUserID: any = '';
 
   @Output() breakEditingEmitter = new EventEmitter<void>();
   @Output() saveEditingEmitter = new EventEmitter<string>();
@@ -22,6 +24,7 @@ export class MessageContentComponent implements OnChanges {
     if(changes['isEditing'] && changes['isEditing'].currentValue) {
       this.isEditing = changes['isEditing'].currentValue;
     }
+    
   }
 
   onBreakEditing() {
