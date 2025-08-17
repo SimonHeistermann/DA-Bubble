@@ -1,4 +1,4 @@
-import { Component, inject, OnDestroy, Input, Output, EventEmitter } from '@angular/core';
+import { Component, inject, OnDestroy, Input, Output, EventEmitter, ViewChild, ElementRef } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { concat } from 'rxjs';
 import { User } from '../../../../core/models/user.interface';
@@ -8,7 +8,7 @@ import { UserService } from '../../../../core/services/user-service/user.service
 import { DashboardResponsiveService } from '../../../../core/services/dashboard-responsive/dashboard-responsive.service'
 import { ToggleComponent } from "./toggle/toggle.component";
 import { MainLayoutContentComponent } from '../../main-layout-content/main-layout-content.component';
-import { Dialog} from '@angular/cdk/dialog';
+import { Dialog } from '@angular/cdk/dialog';
 import { Router } from '@angular/router';
 import { Channel } from '../../../../core/models/channel.interface';
 import { FormsModule } from '@angular/forms';
@@ -57,9 +57,9 @@ export class MainHeaderComponent implements OnDestroy {
 
   inputContent: string = ''
   showList = false;
-  allUsers: User[]  = [];
-  allChannel: Channel[]  = [];
-  channels : Channel[] = [];
+  allUsers: User[] = [];
+  allChannel: Channel[] = [];
+  channels: Channel[] = [];
   allChannelMessages: Message[] = [];
   allPrivateMessages: Message[] = [];
   filteredUsers: User[] = [];
@@ -70,15 +70,17 @@ export class MainHeaderComponent implements OnDestroy {
 
   public currentChannelIndex: number = 0;
 
+  @ViewChild('search') search!: ElementRef;
+
   @Output() clickChannelNameEmitter = new EventEmitter<Channel>();
 
   constructor(public dashboardResponsive: DashboardResponsiveService) {
-     this.dashboardResponsive.normalScreen$.subscribe(normalScreen => {
+    this.dashboardResponsive.normalScreen$.subscribe(normalScreen => {
       this.normalScreen = normalScreen;
       console.log(this.normalScreen);
     })
 
-     this.dashboardResponsive.isTablet$.subscribe(isTablet => {
+    this.dashboardResponsive.isTablet$.subscribe(isTablet => {
       this.isTablet = isTablet;
     })
     this.dashboardResponsive.isMobile$.subscribe(isMobile => {
@@ -91,21 +93,21 @@ export class MainHeaderComponent implements OnDestroy {
     this.subCurrentUser();
   }
 
-  clickUser(user: User){
+  clickUser(user: User) {
     this.clearFilter();
     this.communicator.sendUserMessage(user);
-    if(user && this.currentUser) {
+    if (user && this.currentUser) {
       this.userChannelActivityService.markMessageAsReadByCurrentUser(this.currentUser?.id, user.id);
-    } 
+    }
     this.router.navigate(['/dashboard', 'users', user.id]);
   }
 
   clickChannel(channel: Channel) {
     this.clearFilter();
     this.communicator.sendChannelMessage(channel);
-    
+
     if (this.currentUser) {
-       this.userChannelActivityService.markMessageAsReadByCurrentUser(this.currentUser?.id, channel.id);
+      this.userChannelActivityService.markMessageAsReadByCurrentUser(this.currentUser?.id, channel.id);
     }
     this.router.navigate(['/dashboard', 'channels', channel.id]);
   }
@@ -117,20 +119,24 @@ export class MainHeaderComponent implements OnDestroy {
     this.filteredChannels = [];
     this.showList = false;
     this.inputContent = ''
+    this.search.nativeElement.style.zIndex = 'auto';
   }
 
-  inputText() { 
+  inputText() {
     const value = this.inputContent.trim();
 
     if (!value) {
-      this.filteredChannelMessages = [];
-      this.filteredPrivateMessages = [];
-      this.filteredUsers = [];
-      this.filteredChannels = [];
-      this.showList = false;
+      // this.filteredChannelMessages = [];
+      // this.filteredPrivateMessages = [];
+      // this.filteredUsers = [];
+      // this.filteredChannels = [];
+      // this.showList = false;
+      this.clearFilter();
       return;
     }
     this.showList = true;
+    this.search.nativeElement.style.zIndex = '1001';
+
     if (value.startsWith('@')) {
       this.filterUsers(value);
     } else if (value.startsWith('#')) {
@@ -144,6 +150,10 @@ export class MainHeaderComponent implements OnDestroy {
     this.threadService.hide();
   }
 
+  closeOverlay() {
+    this.showList = false;
+    this.search.nativeElement.style.zIndex = 'auto';
+  }
 
   filterUsers(value: string) {
     this.filteredChannels = [];
@@ -153,7 +163,7 @@ export class MainHeaderComponent implements OnDestroy {
     if (value == '@') {
       this.filteredUsers = this.allUsers;
     } else {
-      const search = value.slice(1).toLowerCase(); 
+      const search = value.slice(1).toLowerCase();
       this.filteredUsers = this.allUsers?.filter(user =>
         user.displayName.toLowerCase().includes(search)
       ) || [];
@@ -165,14 +175,14 @@ export class MainHeaderComponent implements OnDestroy {
     this.filteredChannelMessages = [];
     this.filteredPrivateMessages = [];
 
-    const search = value.slice(1).toLowerCase(); 
+    const search = value.slice(1).toLowerCase();
 
     this.filteredChannels = this.allChannel?.filter(channel =>
       channel.name.toLowerCase().includes(search)
     ) || [];
   }
 
-  filterByAll(value: string) { 
+  filterByAll(value: string) {
     this.filteredChannels = [];
     this.filteredUsers = [];
     this.filteredChannelMessages = []
@@ -188,7 +198,7 @@ export class MainHeaderComponent implements OnDestroy {
 
     this.filterPrivateMessage(value);
     this.filterChannelMessage(value);
-    
+
   }
 
   filterPrivateMessage(value: string) {
@@ -198,7 +208,7 @@ export class MainHeaderComponent implements OnDestroy {
   }
 
   filterChannelMessage(value: string) {
-     this.filteredChannelMessages = this.allChannelMessages?.filter(message =>
+    this.filteredChannelMessages = this.allChannelMessages?.filter(message =>
       message.content.toLowerCase().includes(value)
     ) || [];
   }
@@ -211,7 +221,7 @@ export class MainHeaderComponent implements OnDestroy {
     this.subscriptions.add(
       this.userService.currentUser$.subscribe(user => {
         this.currentUser = user;
-          this.subAllUsers();
+        this.subAllUsers();
       })
     );
   }
@@ -223,12 +233,12 @@ export class MainHeaderComponent implements OnDestroy {
         this.allUsers = this.allUsers.filter(u => u.id !== this.currentUser?.id);
 
         this.subAllChannels();
-        
+
       }));
   }
 
   subAllChannels() {
-    if(!this.currentUser) return;
+    if (!this.currentUser) return;
     this.subscriptions.add(
       this.channelService.getChannels((data) => {
         this.channels = [...data];
@@ -242,7 +252,7 @@ export class MainHeaderComponent implements OnDestroy {
   }
 
   subAllChannelMessages() {
-    if(!this.currentUser) return;
+    if (!this.currentUser) return;
     for (let index = 0; index < this.allChannel.length; index++) {
       let c = this.allChannel[index]
       this.subscriptions.add(
@@ -254,15 +264,15 @@ export class MainHeaderComponent implements OnDestroy {
   }
 
   subAllPrivateMessages() {
-    if(!this.currentUser) return;
+    if (!this.currentUser) return;
     for (let index = 0; index < this.allUsers.length; index++) {
       const user = this.allUsers[index];
       const userID = user.id;
       this.subscriptions.add(
         this.messageService.getPrivateMessageOrderByCreatedAt(this.messageService.buildConversationID(this.currentUser.id, userID), (data) => {
           this.allPrivateMessages = this.allPrivateMessages.concat([...data])
-      }));
-      
+        }));
+
     }
   }
 
@@ -271,7 +281,7 @@ export class MainHeaderComponent implements OnDestroy {
     if (user) {
       return user.displayName;
     } else {
-      if(id == this.currentUser?.id) {
+      if (id == this.currentUser?.id) {
         return this.currentUser.displayName;
       } else {
         return '';
@@ -283,21 +293,21 @@ export class MainHeaderComponent implements OnDestroy {
     this.subscriptions.unsubscribe();
   }
 
-  showProfile( user: User) {
-  const dialogRef = this.dialog.open<{action: string}>(ToggleComponent, {
-    data: { user },
-    panelClass: 'profile-dialog',
-  });
-  
-   dialogRef.closed.subscribe(result => {
-    if (result?.action === 'logout') {
-      this.closeProfile();
-    }
-  })
+  showProfile(user: User) {
+    const dialogRef = this.dialog.open<{ action: string }>(ToggleComponent, {
+      data: { user },
+      panelClass: 'profile-dialog',
+    });
+
+    dialogRef.closed.subscribe(result => {
+      if (result?.action === 'logout') {
+        this.closeProfile();
+      }
+    })
     this.showProfileOverlay = true;
   }
 
-  navigateToMain(){
+  navigateToMain() {
     this.dashboardResponsive.setOpenSidebar(true);
   }
 

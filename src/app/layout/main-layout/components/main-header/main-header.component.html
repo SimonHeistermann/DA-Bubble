@@ -9,9 +9,9 @@
     <span>Devspace</span>
     </div>
 
-    <div class="overlay" *ngIf="showList && normalScreen" (click)="showList = false"> </div>
+    <div class="overlay" *ngIf="showList && normalScreen" (click)="closeOverlay()"> </div>
 
-    <div class="search-field-container">
+    <div class="search-field-container" #search>
         <input type="text" class="search-field" placeholder="Devspace durchsuchen" [(ngModel)]="inputContent" (input)="inputText()" (focus)="activateSearch()">
         <div class="search-result scrollbar__none" *ngIf="!(this.filteredUsers.length == 0 && this.filteredChannels.length == 0 && this.filteredChannelMessages.length == 0 && this.filteredPrivateMessages.length == 0) && showList && normalScreen">
             <div class="search-result-user" *ngIf="filteredUsers.length > 0">
