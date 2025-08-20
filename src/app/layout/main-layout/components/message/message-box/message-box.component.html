@@ -1,0 +1,192 @@
+<div class="message-container">
+    <div class="message">
+         @for (message of messages; let index = $index; track message.id) {
+             @if (allUsers.length || messageUser) {
+                <div class="message-content" #messageDiv [attr.data-id]="message.id">
+                    @if (message.createdAt) {
+                        @if (shouldShowDateDivider(index)) {
+                            <div class="data-divider">
+                                <div class="divider"></div>
+                                <div class="data">{{ dateService.getGermanFullDate(message.createdAt) }}</div>
+                            </div>
+                        }
+                    }
+
+                    <div class="message-body" [class.active]="clickedMessageIndex === index" [class.reversed]="currentUser?.id === message.authorID">
+                        <div class="avatar pointer" (click)="clickUserAvatar(message.authorID)">
+                            <img [src]="findURLByUserId(message.authorID)">
+                        </div>
+                        <div class="message-content">
+                            <div class="message-content-top">
+                                <span *ngIf="currentUser?.id === message.authorID" class="name">{{ currentUser?.displayName }}</span>
+                                <span *ngIf="currentUser?.id !== message.authorID" class="name">{{ message.authorName }}</span>
+                                @if (message.createdAt) {
+                                    <span class="time">{{ dateService.getHoursAndMinutes(message.createdAt) }} Uhr</span>
+                                }
+                            
+                            </div>
+                            <div class="message-content-middle">
+                               <app-message-content [allUsersWithOutCurrentUser]="allUsersWithOutCurrentUser" [currentUserId]="currentUser?.id" [messageUserID]="message.authorID" [message]="message" [isEditing]="editingIndex == index" (saveEditingEmitter)="onSaveEditing($event, message); editingIndex = -1; clickedMessageIndex = -1" (breakEditingEmitter)="editingIndex = -1; clickedMessageIndex = -1"></app-message-content>
+
+                            </div>
+                            <div class="message-content-bottom">
+                                @if(message.reactions && convertReaction(message.reactions).length > 0) {
+                                    <div class="emoji-wrapper">
+                                        <div class="emoji-picker-trigger pointer"  (click)="showEmojiPicker($event, index, currentUser?.id === message.authorID ? 'right' : 'left')"></div>
+                                        <div class="emojis">
+                                            @for (emo of convertReaction(message.reactions); let j = $index; track $index) {
+                                                @if(message.reactions[emo].users && message.reactions[emo].users.length > 0) {
+                                                    <div class="emoji-div pointer" (click)="clickEmoji(emo, message)">
+                                                        @switch (emo) {
+                                                            @case ('check-mark') {
+                                                                 <app-emoji [emoji]="'checkmark'" ></app-emoji>
+                                                            }
+                                                            @case ('thumbs-up') {
+                                                                <app-emoji [emoji]="'thumbs_up'" ></app-emoji>
+                                                            }
+                                                            @default {
+                                                                <span>{{emo}}</span>
+                                                            }
+                                                        }
+                                                       
+                                                        
+                                                        <span>{{ message.reactions[emo].users.length }}</span>
+                                                        <div class="reactions">
+                                                            @switch (emo) {
+                                                                @case ('check-mark') {
+                                                                    <app-emoji [emoji]="'checkmark'"></app-emoji>
+                                                                }
+                                                                @case ('thumbs-up') {
+                                                                    <app-emoji [emoji]="'thumbs_up'" ></app-emoji>
+                                                                }
+                                                                @default {
+                                                                    <span>{{emo}}</span>
+                                                                }
+                                                            }
+                                                            <div class="name-div">
+                                                                @for (un of message.reactions[emo].users; track $index) {
+                                                                    <span class="name">{{un}}</span>
+                                                                }
+                                                            </div>
+                                                            <span class="has-reacted">hat reagiert</span>
+                                                        </div>
+                                                    </div>
+                                                }
+                                            }
+                                        </div>
+                                    </div>
+                                }
+                                @if(message.threadCount  && message.threadCount > 0) {
+                                    <div class="thread-wrapper">
+                                        <span class="answer pointer">
+                                            {{ message.threadCount }} 
+                                            <span class="answer-action pointer" (click)="showThreadContainer(index)">
+                                            Antwort<ng-container *ngIf="message.threadCount > 1">en</ng-container>
+                                            </span>
+                                        </span>
+                                        @if(message.lastAnswerTime) {
+                                            <span class="last-answer-time">Letzte Antwort {{ dateService.getHoursAndMinutes(message.lastAnswerTime )}} Uhr</span>
+                                        }
+                                        
+                                    </div>
+                                }
+                                
+                            </div>
+                        </div>
+                        <div class="reaction-bar">
+                            <ul>
+                                <li>
+                                    <span class="check-mark pointer" (click)="clickEmoji('check-mark', message)"></span>
+                                </li>
+                                <li>
+                                    <span class="thumbs-up pointer" (click)="clickEmoji('thumbs-up', message)"></span>
+                                </li>
+                                <li>
+                                    <span class="emoji pointer"  (click)="showEmojiPicker($event, index, currentUser?.id === message.authorID ? 'left' : 'right')"></span>
+                                </li>
+                                <li>
+                                    <span class="answer pointer" (click)="showThreadContainer(index)"></span>
+                                </li>
+                                <li>
+                                    <span class="option pointer" (click)="clickEditMessage(index)">
+                                        <p class="edit-message">
+                                            Nachricht bearbeiten
+                                        </p>
+                                    </span>
+                                    
+                                </li>
+                            </ul>
+                        </div>
+                    </div>  
+                </div>
+            }  
+        } @empty {
+            @if (messageUser) {
+                <div class="private-empty-content">
+                    <div class="avatar-div">
+                        <img *ngIf="messageUser" [src]="messageUser.photoURL.startsWith('http') ? '/angular-projects/dabubble/images/icons/avatars/avatar_1.png' : messageUser.photoURL"/>
+                        <h3 class="name">
+                            {{ messageUser.displayName }} 
+                            @if (messageUser.id === currentUser?.id) {
+                                (Du)
+                            }
+                        </h3>
+                    </div>
+                    <p>
+                        @if (messageUser.id === currentUser?.id) {
+                            <span class="starter">Dieser Raum ist nur für dich da.</span> Mach dir Notizen, liste deine To-dos oder bewahre Links und Dateien griffbereit auf. Du kannst hier auch gerne Dinge mit dir selbst besprechen.
+                        } @else {
+                            Diese Unterhaltung findet nur zwischen 
+                            <span class="message-user-name">&#64;{{messageUser.displayName}}</span>
+                            und dir statt.
+                        }
+                        
+                    </p>
+                </div>
+            } @else if(channel) {
+                <div class="channel-empty-content">
+                    <div class="empty-content-header">
+                        <img src="images/icons/tag.png" alt="">
+                        <h3 class="empty-content-title">{{channel.name}}</h3>
+                    </div>
+                    <p> 
+                        @if (channel && channel.createdBy) {
+                            @if (channel.createdBy == 'System Administrator') {
+                                <span>{{ channel.createdBy  }}</span>
+                            } @else { 
+                                <span>{{  findUserByUserId(channel.createdBy) }}</span>
+                            }
+                            
+                        }
+                        hast diesen Channel 
+                        @if (channel && channel.createdAt) {
+                            @switch (dateService.getGermanFullDate(channel.createdAt)) {
+                                @case ('Heute') {
+                                    heute
+                                }
+                                @case ('Gestern') {
+                                    gestern
+                                }
+                                @default {
+                                    am {{ dateService.getGermanFullDate(channel.createdAt) }}
+                                }
+                            }
+                        }
+                    
+                        erstellt. Das ist der Anfang des Channels 
+                        <span class="empty-content-name"># {{channel.name}}</span>
+                    </p>
+                </div>
+            } 
+            
+        }
+    </div>
+
+</div>
+
+
+<ng-template #emojiPickerTemplate>
+    <app-emoji-picker (closeOverlayEmitter)="closeEmojiPickerOverlay()" (selectedEojiEmitter)="onSelectedEmoji($event)"></app-emoji-picker>
+</ng-template>
+<app-profile [showOverlay]="showProfileOverlay" (closeOverlayEmitter)="showProfileOverlay = false; clickedMessageIndex = -1;" [currentUser]="selectedUser"></app-profile>
+

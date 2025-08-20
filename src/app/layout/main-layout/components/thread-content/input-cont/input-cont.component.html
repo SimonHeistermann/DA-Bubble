@@ -1,0 +1,44 @@
+<div class="input-container scrollbar__none" #inputContainer [ngStyle]="{'margin': editingMode ? '0' : '20px', 'width': editingMode ? '100%' : 'calc(100% - 40px)'}">
+    <div class="user-list" *ngIf="showUserListOverlay" [style.left]="editingMode ? '50%' : '20px'" [style.transform]="editingMode ? 'translateX(-50%)' : 'none'">
+         <app-user-list (closeOverlayEmitter)="closeAtUserListOverlay()" (clickedUser)="onClickUser($event)"  [dataSource]="allChannelUser" [maxHeight]="editingMode ? '25vh' : '50vh'" ></app-user-list>
+    </div>
+     <div class="user-list" *ngIf="showChannelListOverlay" [style.left]="editingMode ? '50%' : '20px'" [style.transform]="editingMode ? 'translateX(-50%)' : 'none'">
+         <app-channel-list (closeOverlayEmitter)="closeChannelListOverlay()" (clickChannelNameEmitter)="onclickChannel($event)" [maxHeight]="editingMode ? '25vh' : '50vh'" ></app-channel-list>
+    </div>
+    <textarea 
+        #textarea
+        autoResize
+        class="scrollbar__none" name="message" id="message" 
+        placeholder="Nachricht an {{placeHolder}}"  
+        [(ngModel)]="inputMessage" 
+        (input)="typing()"
+        (keydown)="onTextareaKeyDown($event)"
+        ></textarea>
+    <div class="input-icons">
+        <div class="input-icons-left">
+            <span class="emoji pointer" #emojiPickerTrigger (click)="showEmojiPicker()">
+
+            </span>
+             @if (!editingMode) {
+                <span class="at pointer"  (click)="showUserList()">
+
+                </span>
+            }
+        </div>
+        @if (!editingMode) {
+            <span class="send-button pointer" (click)="sendMessage()">
+
+            </span>
+        } @else {
+            <div class="buttons">
+                <button class="break pointer" (click)="breakEditing()">Abbrechen</button>
+                <button class="save pointer" (click)="saveEditing()">Speichern</button>
+            </div>
+        }
+        
+    </div>
+</div>
+
+<ng-template #emojiPickerTemplate>
+    <app-emoji-picker (closeOverlayEmitter)="closeEmojiPickerOverlay()" (selectedEojiEmitter)="onSelectedEmoji($event)"></app-emoji-picker>
+</ng-template>

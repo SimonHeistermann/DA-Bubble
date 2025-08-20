@@ -1,0 +1,138 @@
+
+@use './../../../../../../styles.scss' as *;
+@use './../../../../../../styles/overlay.scss' as *;
+@use './../../main-header/toggle/actual-profile/actual-profile.component.scss' as *;
+
+
+.overlay-content {
+    width: 380px !important;
+    gap: 30px !important;
+    position: fixed;
+    .img-wrapper {
+
+        img {
+            border-radius: 50%;
+            width: 200px;
+            height: 200px;
+        }
+    }
+
+    .name-wrapper {
+        width: 100%;
+        @include displayFlex($fd: column, $g: 10px, $ai: flex-start);
+
+        >span {
+            font-weight: 700;
+            font-size: 32px;
+        }
+
+        .status {
+            @include displayFlex($g: 20px, $jc: flex-start);
+
+            >span:nth-child(1) {
+                display: inline-block;
+                width: 16px;
+                height: 16px;
+                background-color: var(--green);
+                border-radius: 50%;
+            }
+
+            >span:nth-child(2) {
+                color: var(--green);
+                font-weight: 400;
+                font-size: 20px;
+            }
+
+            &.offline {
+                >span:nth-child(1) {
+                    background-color: var(--grey);
+                }
+
+                >span:nth-child(2) {
+                    color: var(--grey);
+                }
+            }
+        }
+
+    }
+
+   .email-wrapper {
+            width: 100% !important;
+            @include displayFlex($fd: column, $g: 20px, $ai: flex-start);
+
+        .email-head {
+            width: 100% !important;
+            @include displayFlex($ai: center, $jc: flex-start, $g: 10px);
+        }
+
+        .email-main {
+            @include displayFlex($g: 10px, $ai: flex-start, $jc: center, $fd: column);
+            width: 100% !important;
+            padding-left: 38px;
+            >span {
+                font-size: 20px;
+                font-weight: 700;
+            }
+
+            >a {
+                width: 100% !important;
+                font-weight: 400;
+                font-size: 18px;
+                overflow-x: auto;
+            }
+            ::-webkit-scrollbar {
+                display: none;
+            }
+        }
+
+    }
+
+    .footer {
+        .button {
+            height: 50px;
+            background-color: var(--purple-1);
+            border-radius: 50px;
+            padding: 12px 25px;
+            @include displayFlex($g: 10px);
+
+            >span {
+                color: var(--white);
+            }
+        }
+    }
+}
+
+    .mobile-version {
+     
+        top: auto !important;
+        left: auto !important;
+    }
+
+@media (max-width: 960px) {
+    .overlay-content {
+       width: 90%;
+       max-width: 380px;
+       top: auto;
+       bottom: auto;
+       border-top-right-radius: 30px !important;
+       left: auto;
+    }
+
+    .overlay-profile {
+        position: static !important;
+    }
+
+    .profile {
+        height: fit-content !important;
+        border-radius: 30px !important;
+    }
+}
+
+@media (max-width: 575px) {
+    .overlay-content {
+       width: 96% !important;
+       max-width: 380px !important;
+       height: unset !important;
+       border-radius: 30px !important;
+    }
+}

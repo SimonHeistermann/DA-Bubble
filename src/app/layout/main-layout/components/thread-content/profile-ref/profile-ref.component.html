@@ -1,0 +1,45 @@
+
+<div class="overlay" (click)="closeOverlay()" *ngIf="showOverlay" >
+    <div class="overlay-container">
+        <div class="overlay-content mobile-version"  (click)="$event.stopPropagation()">
+            <div class="content-header">
+                <h3 class="content-title">Profile</h3>
+                <div class="close" (click)="closeOverlay()">
+                    <div class="close-content"></div>
+                </div>
+            </div>
+            <div class="img-wrapper">
+                <img src="{{ currentUser?.photoURL }}">
+            </div>
+            <div class="name-wrapper">
+                <span>{{ currentUser?.displayName }}</span>
+                @if (currentUser?.isActive) {
+                    <div class="status">
+                        <span></span>
+                        <span>Aktiv</span>
+                    </div>
+                } @else {
+                    <div class="status offline">
+                        <span></span>
+                        <span>Abwesend</span>
+                    </div>
+                }
+            </div>
+             <div class="email-wrapper">
+                <div class="email-head">
+                    <img src="images/icons/mail.png">
+                    <span>E-Mail-Addresse</span>
+                </div>
+                <div class="email-main">
+                    <a href="mailto:{{currentUser?.email}}">{{currentUser?.email}}</a>
+                </div>
+            </div>
+            <div class="footer">
+                <div (click)="openUserChat()" class="button pointer">
+                    <img src="images/icons/message.png">
+                    <span>Nachricht</span>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>

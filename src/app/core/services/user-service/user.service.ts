@@ -1,8 +1,7 @@
 import { Injectable } from '@angular/core';
-import { Observable, BehaviorSubject, from, of } from 'rxjs';
+import { Observable, BehaviorSubject, from, of, Subject } from 'rxjs';
 import { map, catchError } from 'rxjs/operators';
 import { Unsubscribe, Timestamp } from 'firebase/firestore';
-
 import { FirebaseService } from './../firebase-service/firebase.service';
 import { User, UserProfile } from '../../models/user.interface';
 import { APP_CONSTANTS } from '../../constants/app.constants';
@@ -24,6 +23,14 @@ export class UserService {
     this.initializeAllUsersListener();
   }
 
+
+  private userClickSubject = new Subject<{ index: number, user: any }>();
+  userClick$ = this.userClickSubject.asObservable();
+
+  triggerUserClick(index: number, user: any) {
+    this.userClickSubject.next({ index, user });
+  }
+
   /**
    * Listener für alle Benutzer initialisieren
    */
@@ -33,8 +40,8 @@ export class UserService {
       (users: User[]) => {
         this.allUsersSubject.next(users);
         const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000);
-        const onlineUsers = users.filter(user => 
-          user.isActive && 
+        const onlineUsers = users.filter(user =>
+          user.isActive &&
           user.lastSeen.toDate() > fiveMinutesAgo
         );
         this.onlineUsersSubject.next(onlineUsers);
@@ -66,29 +73,26 @@ export class UserService {
       this.firebaseService.getDocument(APP_CONSTANTS.COLLECTIONS.USERS, uid)
     ).pipe(
       catchError(error => {
-        console.error('Error loading user by ID:', error);
         return of(null);
       })
     );
   }
 
   /**
-   * Benutzer nach E-Mail suchen
-   */
+   * Optimierte getUserByEmail-Methode für bessere Performance
+   * Ersetzt die bestehende Methode in deinem UserService
+  */
   getUserByEmail(email: string): Observable<User | null> {
-    return new Observable<User | null>(observer => {
-      const unsubscribe = this.firebaseService.subscribeToCollection(
-        APP_CONSTANTS.COLLECTIONS.USERS,
-        (users: User[]) => {
-          const user = users.find(u => u.email === email);
-          observer.next(user || null);
-        },
-      );
-      return () => unsubscribe();
-    }).pipe(
-      map(users => Array.isArray(users) ? users.find(u => u.email === email) || null : users),
+    if (!email || !email.trim()) {
+      return of(null);
+    }
+    const normalizedEmail = email.toLowerCase().trim();
+    return this.allUsers$.pipe(
+      map(users => {
+        const user = users.find(u => u.email.toLowerCase() === normalizedEmail);
+        return user || null;
+      }),
       catchError(error => {
-        console.error('Error loading user by email:', error);
         return of(null);
       })
     );
@@ -102,9 +106,21 @@ export class UserService {
       return of([]);
     }
     return this.allUsers$.pipe(
-      map(allUsers => allUsers.filter(user => uids.includes(user.uid))),
+      map(allUsers => allUsers.filter(user => uids.includes(user.id))),
       catchError(error => {
-        console.error('Error loading users by IDs:', error);
+        return of([]);
+      })
+    );
+  }
+
+  /**
+  * Alle Benutzer aus Firestore abrufen (einmaliger Abruf)
+  */
+  getAllUsers(): Observable<User[]> {
+    return from(
+      this.firebaseService.getCollectionOncePromise(APP_CONSTANTS.COLLECTIONS.USERS)
+    ).pipe(
+      catchError(error => {
         return of([]);
       })
     );
@@ -119,15 +135,41 @@ export class UserService {
     }
     const lowerSearchTerm = searchTerm.toLowerCase();
     return this.allUsers$.pipe(
-      map(users => users.filter(user => 
+      map(users => users.filter(user =>
         user.displayName.toLowerCase().includes(lowerSearchTerm) ||
         user.profile.firstName.toLowerCase().includes(lowerSearchTerm) ||
         user.profile.lastName.toLowerCase().includes(lowerSearchTerm) ||
         user.email.toLowerCase().includes(lowerSearchTerm)
       )),
       catchError(error => {
-        console.error('Error searching users:', error);
         return of([]);
+      })
+    );
+  }
+
+  /**
+  * Neuen Benutzer in Firestore anlegen
+  */
+  createUser(user: User): Promise<void> {
+    return this.firebaseService.setDocument(
+      APP_CONSTANTS.COLLECTIONS.USERS,
+      user.id,
+      user
+    );
+  }
+
+  /**
+  * Benutzer aus der Datenbank löschen
+  */
+  deleteUser(uid: string): Observable<void> {
+    return from(
+      this.firebaseService.deleteDocument(
+        APP_CONSTANTS.COLLECTIONS.USERS,
+        uid
+      )
+    ).pipe(
+      catchError(error => {
+        throw error;
       })
     );
   }
@@ -144,7 +186,6 @@ export class UserService {
       )
     ).pipe(
       catchError(error => {
-        console.error('Error updating user profile:', error);
         throw error;
       })
     );
@@ -162,7 +203,6 @@ export class UserService {
       )
     ).pipe(
       catchError(error => {
-        console.error('Error updating display name:', error);
         throw error;
       })
     );
@@ -183,7 +223,6 @@ export class UserService {
       )
     ).pipe(
       catchError(error => {
-        console.error('Error setting user online:', error);
         throw error;
       })
     );
@@ -204,7 +243,6 @@ export class UserService {
       )
     ).pipe(
       catchError(error => {
-        console.error('Error setting user offline:', error);
         throw error;
       })
     );
@@ -225,7 +263,6 @@ export class UserService {
       )
     ).pipe(
       catchError(error => {
-        console.error('Error updating user heartbeat:', error);
         return of(void 0);
       })
     );
@@ -245,7 +282,7 @@ export class UserService {
   getUserStatus(user: User): 'online' | 'offline' | 'away' {
     const oneMinuteAgo = new Date(Date.now() - 1 * 60 * 1000);
     const fiveMinutesAgo = new Date(Date.now() - 5 * 60 * 1000);
-    
+
     if (user.isActive && user.lastSeen.toDate() > oneMinuteAgo) {
       return 'online';
     } else if (user.isActive && user.lastSeen.toDate() > fiveMinutesAgo) {
@@ -268,7 +305,7 @@ export class UserService {
   getUserInitials(user: User): string {
     const firstName = user.profile.firstName || user.displayName.split(' ')[0] || '';
     const lastName = user.profile.lastName || user.displayName.split(' ')[1] || '';
-    
+
     return `${firstName.charAt(0)}${lastName.charAt(0)}`.toUpperCase();
   }
 
@@ -321,5 +358,34 @@ export class UserService {
     if (this.allUsersSubscription) {
       this.allUsersSubscription();
     }
+  }
+
+  /**
+  * Schnelle synchrone E-Mail-Existenz-Prüfung
+  * Nutzt bereits geladene Benutzer aus dem allUsers$ Stream
+  */
+  checkEmailExistsSync(email: string): boolean {
+    if (!email || !email.trim()) {
+      return false;
+    }
+    const normalizedEmail = email.toLowerCase().trim();
+    const users = this.allUsersSubject.value;
+    return users.some(user => user.email.toLowerCase() === normalizedEmail);
+  }
+
+  /**
+  * Asynchrone E-Mail-Existenz-Prüfung mit Observable
+  */
+  checkEmailExists(email: string): Observable<boolean> {
+    if (!email || !email.trim()) {
+      return of(false);
+    }
+    const normalizedEmail = email.toLowerCase().trim();
+    return this.allUsers$.pipe(
+      map(users => users.some(user => user.email.toLowerCase() === normalizedEmail)),
+      catchError(error => {
+        return of(false);
+      })
+    );
   }
 }

@@ -1,21 +1,23 @@
 import { Injectable } from '@angular/core';
-import { BehaviorSubject, Observable, from, of } from 'rxjs';
-import { map, switchMap, catchError } from 'rxjs/operators';
+import { BehaviorSubject, Observable, from, of, merge } from 'rxjs';
+import { map, switchMap, catchError, distinctUntilChanged } from 'rxjs/operators';
 import { Router } from '@angular/router';
 import { User as FirebaseUser, Unsubscribe } from 'firebase/auth';
-import { Timestamp } from 'firebase/firestore';
 import { FirebaseService } from './../firebase-service/firebase.service';
 import { UserService } from './../user-service/user.service';
+import { UserProfileService } from './../user-profile-service/user-profile.service';
+import { FirestoreSyncService } from './../firestore-sync-service/firestore-sync.service';
+import { ChannelService } from '../channel.service';
+import { AuthErrorHandlerService } from './../auth-error-handler-service/auth-error-handler.service';
 import { LoginCredentials, RegisterData, AuthUser } from './../../models/auth.interface';
-import { User } from '../../models/user.interface';
-import { APP_CONSTANTS } from '../../constants/app.constants';
+import { Channel } from '../../models/channel.interface';
+import { GuestLoginService, GuestUser } from './../guest-login-service/guest-login.service';
 
 @Injectable({
   providedIn: 'root'
 })
 export class AuthService {
   private currentUserSubject = new BehaviorSubject<AuthUser | null>(null);
-  public currentUser$ = this.currentUserSubject.asObservable();
   private loadingSubject = new BehaviorSubject<boolean>(false);
   public loading$ = this.loadingSubject.asObservable();
   private authStateSubscription: Unsubscribe | null = null;
@@ -23,107 +25,52 @@ export class AuthService {
   constructor(
     private firebaseService: FirebaseService,
     private userService: UserService,
+    private userProfileService: UserProfileService,
+    private firestoreSyncService: FirestoreSyncService,
+    private channelService: ChannelService,
+    private authErrorHandler: AuthErrorHandlerService,
+    private guestLoginService: GuestLoginService,
     private router: Router
   ) {
     this.initializeAuthStateListener();
   }
 
-  // ========== AUTH STATE MANAGEMENT ==========
+  // ========== UNIFIED GETTERS ==========
 
-  private initializeAuthStateListener(): void {
-    this.authStateSubscription = this.firebaseService.onAuthStateChanged(
-      async (firebaseUser: FirebaseUser | null) => {
-        await this.handleAuthStateChange(firebaseUser);
-      }
-    );
-  }
-
-  private async handleAuthStateChange(firebaseUser: FirebaseUser | null): Promise<void> {
+  get currentUser(): AuthUser | null {
+    const firebaseUser = this.currentUserSubject.value;
     if (firebaseUser) {
-      const authUser = this.mapFirebaseUserToAuthUser(firebaseUser);
-      this.currentUserSubject.next(authUser);
-      await this.syncUserToFirestore(firebaseUser);
-    } else {
-      this.currentUserSubject.next(null);
+      return firebaseUser;
     }
+    const guestUser = this.guestLoginService.currentGuest;
+    return guestUser ? this.mapGuestToAuthUser(guestUser) : null;
   }
 
-  private mapFirebaseUserToAuthUser(firebaseUser: FirebaseUser): AuthUser {
-    return {
-      uid: firebaseUser.uid,
-      email: firebaseUser.email || '',
-      displayName: firebaseUser.displayName || '',
-      photoURL: firebaseUser.photoURL || '',
-      emailVerified: firebaseUser.emailVerified
-    };
+  get isAuthenticated(): boolean {
+    return this.currentUser !== null;
   }
 
-  // ========== FIRESTORE SYNC ==========
-
-  private async syncUserToFirestore(firebaseUser: FirebaseUser): Promise<void> {
-    try {
-      const existingUser = await this.getExistingUser(firebaseUser.uid);
-      const now = Timestamp.now();
-      
-      if (!existingUser) {
-        await this.createNewUserInFirestore(firebaseUser, now);
-      } else {
-        await this.updateUserLastSeen(firebaseUser.uid, now);
-      }
-    } catch (error) {
-      console.error('Error syncing user to Firestore:', error);
-    }
-  }
-
-  private async getExistingUser(uid: string): Promise<any> {
-    return await this.firebaseService.getDocument(
-      APP_CONSTANTS.COLLECTIONS.USERS, 
-      uid
+  get isAuthenticated$(): Observable<boolean> {
+    return this.currentUser$.pipe(
+      map(user => user !== null)
     );
   }
 
-  private async createNewUserInFirestore(firebaseUser: FirebaseUser, timestamp: Timestamp): Promise<void> {
-    const newUser: Omit<User, 'uid'> = this.buildNewUserData(firebaseUser, timestamp);
-    await this.firebaseService.setDocument(
-      APP_CONSTANTS.COLLECTIONS.USERS,
-      firebaseUser.uid,
-      newUser
+  get currentUser$(): Observable<AuthUser | null> {
+    return merge(
+      this.currentUserSubject.asObservable(),
+      this.guestLoginService.currentGuest$.pipe(
+        map(guest => guest ? this.mapGuestToAuthUser(guest) : null)
+      )
+    ).pipe(
+      map(() => this.currentUser),
+      distinctUntilChanged((a, b) => a?.uid === b?.uid)
     );
   }
 
-  private buildNewUserData(firebaseUser: FirebaseUser, timestamp: Timestamp): Omit<User, 'uid'> {
-    const nameParts = this.splitDisplayName(firebaseUser.displayName);
-    return {
-      email: firebaseUser.email || '',
-      displayName: firebaseUser.displayName || '',
-      photoURL: firebaseUser.photoURL || '',
-      lastSeen: timestamp,
-      isActive: true,
-      createdAt: timestamp,
-      updatedAt: timestamp,
-      profile: {
-        firstName: nameParts.firstName,
-        lastName: nameParts.lastName
-      }
-    };
-  }
-
-  private splitDisplayName(displayName: string | null): {firstName: string, lastName: string} {
-    const parts = displayName?.split(' ') || ['', ''];
-    return {
-      firstName: parts[0] || '',
-      lastName: parts[1] || ''
-    };
-  }
-
-  private async updateUserLastSeen(uid: string, timestamp: Timestamp): Promise<void> {
-    await this.firebaseService.updateDocument(
-      APP_CONSTANTS.COLLECTIONS.USERS,
-      uid,
-      {
-        lastSeen: timestamp,
-        isActive: true
-      }
+  get isAuthenticatedExtended$(): Observable<boolean> {
+    return this.currentUser$.pipe(
+      map(user => user !== null)
     );
   }
 
@@ -133,7 +80,10 @@ export class AuthService {
     this.setLoading(true);
     return this.performEmailSignIn(credentials).pipe(
       switchMap(() => this.waitForCurrentUser()),
-      catchError(error => this.handleSignInError(error))
+      catchError(error => {
+        this.setLoading(false);
+        return this.authErrorHandler.handleSignInError(error);
+      })
     );
   }
 
@@ -149,7 +99,10 @@ export class AuthService {
     this.setLoading(true);
     return this.performGoogleSignIn().pipe(
       switchMap(() => this.waitForCurrentUser()),
-      catchError(error => this.handleSignInError(error, 'Google sign in error:'))
+      catchError(error => {
+        this.setLoading(false);
+        return this.authErrorHandler.handleSignInError(error, 'Google sign in error:');
+      })
     );
   }
 
@@ -159,32 +112,88 @@ export class AuthService {
     );
   }
 
-  registerWithEmail(registerData: RegisterData): Observable<AuthUser> {
+  signInAsGuest(): Observable<AuthUser> {
     this.setLoading(true);
-    return this.performEmailRegistration(registerData).pipe(
-      switchMap(() => this.waitForCurrentUser()),
-      catchError(error => this.handleRegistrationError(error))
+    return this.guestLoginService.signInAsGuest().pipe(
+      switchMap(guestUser => {
+        const authUser = this.mapGuestToAuthUser(guestUser);
+        this.userService.loadCurrentUser(authUser.uid);
+        this.setLoading(false);
+        return of(authUser);
+      }),
+      catchError(error => {
+        this.setLoading(false);
+        throw error;
+      })
     );
   }
 
-  private performEmailRegistration(registerData: RegisterData): Observable<AuthUser> {
+  // ========== REGISTRATION ==========
+
+  registerWithEmail(registerData: Omit<RegisterData, 'photoURL'>): Observable<AuthUser> {
+    this.setLoading(true);
+    const completeData: RegisterData = {
+      ...registerData,
+      photoURL: this.userProfileService.getRandomAvatar() 
+    };
+    const wasListening = !!this.authStateSubscription;
+    if (wasListening) {
+      this.authStateSubscription?.();
+      this.authStateSubscription = null;
+    }
     return from(
-      this.firebaseService.createUserWithEmail(registerData.email, registerData.password)
+      this.firebaseService.createUserWithEmail(completeData.email, completeData.password)
     ).pipe(
-      switchMap(firebaseUser => this.updateUserProfileAfterRegistration(firebaseUser, registerData)),
-      map(firebaseUser => this.mapFirebaseUserToAuthUser(firebaseUser))
+      switchMap(firebaseUser => this.processRegistration(firebaseUser, completeData, wasListening)),
+      map(authUser => {
+        this.setLoading(false);
+        return authUser;
+      }),
+      catchError(error => {
+        if (wasListening) {
+          this.initializeAuthStateListener();
+        }
+        this.setLoading(false);
+        return this.authErrorHandler.handleRegistrationError(error);
+      })
     );
   }
 
-  private updateUserProfileAfterRegistration(firebaseUser: FirebaseUser | null, registerData: RegisterData): Observable<FirebaseUser> {
+  private processRegistration(
+    firebaseUser: FirebaseUser | null, 
+    completeData: RegisterData, 
+    wasListening: boolean
+  ): Observable<AuthUser> {
     if (!firebaseUser) {
       throw new Error('Registration failed');
     }
-    const displayName = `${registerData.firstName} ${registerData.lastName}`;
+    const displayName = `${completeData.firstName} ${completeData.lastName}`.trim();
     return from(
-      this.firebaseService.updateUserProfile(displayName, registerData.photoURL)
+      this.firebaseService.updateUserProfile(displayName, completeData.photoURL)
     ).pipe(
-      map(() => firebaseUser)
+      switchMap(() => this.finalizeRegistration(firebaseUser, completeData, wasListening))
+    );
+  }
+
+  private finalizeRegistration(
+    firebaseUser: FirebaseUser,
+    completeData: RegisterData,
+    wasListening: boolean
+  ): Observable<AuthUser> {
+    const updatedFirebaseUser = this.firebaseService.currentUser;
+    if (!updatedFirebaseUser) {
+      throw new Error('Failed to get updated user');
+    }
+    return from(this.firestoreSyncService.syncUserToFirestore(updatedFirebaseUser, completeData)).pipe(
+      switchMap(() => from(this.addUserToAllgemeinChannel(firebaseUser.uid))),
+      map(() => {
+        if (wasListening) {
+          this.initializeAuthStateListener();
+        }
+        const authUser = this.mapFirebaseUserToAuthUser(this.firebaseService.currentUser!);
+        this.currentUserSubject.next(authUser);
+        return authUser;
+      })
     );
   }
 
@@ -192,9 +201,29 @@ export class AuthService {
 
   signOut(): Observable<void> {
     this.setLoading(true);
+    if (this.guestLoginService.isCurrentUserGuest()) {
+      return this.guestLoginService.signOutGuest().pipe(
+        switchMap(() => {
+          this.userService.stopCurrentUserListener();
+          this.setLoading(false);
+          this.router.navigate(['/auth/login']);
+          return of(void 0);
+        }),    
+        catchError(error => {
+          this.setLoading(false);
+          throw error;
+        })
+      );
+    }
     return this.performSignOut().pipe(
-      map(() => this.navigateToLogin()),
-      catchError(error => this.handleSignOutError(error))
+      map(() => {
+        this.userService.stopCurrentUserListener();
+        this.navigateToLogin();
+      }),
+      catchError(error => {
+        this.setLoading(false);
+        return this.authErrorHandler.handleSignOutError(error);
+      })
     );
   }
 
@@ -204,40 +233,37 @@ export class AuthService {
     );
   }
 
-  private async updateUserOfflineStatus(): Promise<void> {
-    const currentUser = this.currentUserSubject.value;
-    if (!currentUser) return;
-    
-    await this.setUserOfflineStatus(currentUser.uid);
-  }
-
-  private async setUserOfflineStatus(uid: string): Promise<void> {
-    try {
-      await this.firebaseService.updateDocument(
-        APP_CONSTANTS.COLLECTIONS.USERS,
-        uid,
-        {
-          isActive: false,
-          lastSeen: Timestamp.now()
-        }
-      );
-    } catch (error) {
-      console.error('Error updating offline status:', error);
-    }
-  }
-
-  private navigateToLogin(): void {
-    this.setLoading(false);
-    this.router.navigate(['/auth/login']);
-  }
-
   // ========== PASSWORD RESET ==========
 
   resetPassword(email: string): Observable<void> {
     this.setLoading(true);
     return this.sendPasswordResetEmail(email).pipe(
       map(() => this.setLoading(false)),
-      catchError(error => this.handlePasswordResetError(error))
+      catchError(error => {
+        this.setLoading(false);
+        return this.authErrorHandler.handlePasswordResetError(error);
+      })
+    );
+  }
+  
+  resetPasswordSecure(email: string): Observable<void> {
+    this.setLoading(true);
+    return this.resetPasswordWithValidation(email);
+  }
+
+  private resetPasswordWithValidation(email: string): Observable<void> {
+    return this.checkEmailExists(email).pipe(
+      switchMap(exists => {
+        if (!exists) {
+          throw new Error('email-not-found');
+        }
+        return this.sendPasswordResetEmail(email);
+      }),
+      map(() => this.setLoading(false)),
+      catchError(error => {
+        this.setLoading(false);
+        return this.authErrorHandler.handlePasswordResetError(error);
+      })
     );
   }
 
@@ -249,7 +275,10 @@ export class AuthService {
     this.setLoading(true);
     return this.executePasswordReset(oobCode, newPassword).pipe(
       map(() => this.setLoading(false)),
-      catchError(error => this.handlePasswordResetError(error, 'Confirm password reset error:'))
+      catchError(error => {
+        this.setLoading(false);
+        return this.authErrorHandler.handlePasswordResetError(error, 'Confirm password reset error:');
+      })
     );
   }
 
@@ -259,11 +288,189 @@ export class AuthService {
 
   verifyPasswordResetCode(oobCode: string): Observable<string> {
     return from(this.firebaseService.verifyPasswordResetCode(oobCode)).pipe(
-      catchError(error => this.handleVerificationError(error))
+      catchError(error => this.authErrorHandler.handleVerificationError(error))
     );
   }
 
+  checkEmailExists(email: string): Observable<boolean> {
+    return this.userService.getUserByEmail(email).pipe(
+      map(user => user !== null),
+      catchError(error => {
+        return of(false);
+      })
+    );
+  }
+
+  // ========== AVATAR UPDATE ==========
+
+  updateUserAvatar(avatarPath: string): Observable<void> {
+    const currentUser = this.currentUser;
+    if (!currentUser) {
+      throw new Error('No user logged in');
+    }
+    if (this.isCurrentUserGuest()) {
+      throw new Error('Guest users cannot update avatars');
+    }
+    this.setLoading(true);
+    return this.userProfileService.updateUserAvatar(currentUser, avatarPath).pipe(
+      map(updatedUser => {
+        this.currentUserSubject.next(updatedUser);
+        this.setLoading(false);
+      }),
+      catchError(error => {
+        this.setLoading(false);
+        throw error;
+      })
+    );
+  }
+
+  // ========== GUEST MANAGEMENT ==========
+
+  isCurrentUserGuest(): boolean {
+    return this.guestLoginService.isCurrentUserGuest();
+  }
+
+  getCurrentGuestUser(): GuestUser | null {
+    return this.guestLoginService.currentGuest;
+  }
+
+  extendGuestSession(): Observable<void> {
+    if (!this.guestLoginService.isCurrentUserGuest()) {
+      throw new Error('No guest session to extend');
+    }
+    return this.guestLoginService.extendGuestSession().pipe(
+      map(() => void 0)
+    );
+  }
+
+  cleanupExpiredGuests(): Observable<void> {
+    return this.guestLoginService.cleanupExpiredGuests();
+  }
+
+  convertGuestToRegularUser(registerData: Omit<RegisterData, 'photoURL'>): Observable<AuthUser> {
+    const currentGuest = this.guestLoginService.currentGuest;
+    if (!currentGuest) {
+      throw new Error('No guest user to convert');
+    }
+    this.guestLoginService.signOutGuest();
+    const completeRegisterData: RegisterData = {
+      ...registerData,
+      photoURL: currentGuest.photoURL
+    };
+    return this.registerWithEmail(completeRegisterData).pipe(
+      switchMap(authUser => {
+        return this.userService.deleteUser(currentGuest.uid).pipe(
+          map(() => authUser)
+        );
+      })
+    );
+  }
+
+  // ========== CHANNEL MANAGEMENT ==========
+
+  private async addUserToAllgemeinChannel(userId: string): Promise<void> {
+    try {
+      const allgemeinChannel = await this.findAllgemeinChannel();
+      if (allgemeinChannel) {
+        await this.addUserToChannelIfNotExists(allgemeinChannel, userId);
+      }
+    } catch (error) {
+      throw new Error('Failed to add user to Allgemein channel');
+    }
+  }
+
+  private async addUserToChannelIfNotExists(channel: Channel, userId: string): Promise<void> {
+    const currentUserIDs = channel.userIDs || [];
+    if (!currentUserIDs.includes(userId)) {
+      await this.updateChannelWithNewUser(channel, userId, currentUserIDs);
+    }
+  }
+
+  private async updateChannelWithNewUser(
+    channel: Channel, 
+    userId: string, 
+    currentUserIDs: string[]
+  ): Promise<void> {
+    const updatedUserIDs = [...currentUserIDs, userId];
+    await this.channelService.updateChannel(channel.id, {
+      ...channel,
+      userIDs: updatedUserIDs
+    }).toPromise();
+  }
+
+  private async findAllgemeinChannel(): Promise<Channel | null> {
+    return new Promise((resolve) => {
+      const unsubscribe = this.channelService.getChannelByName('Allgemein', (channels: Channel[]) => {
+        unsubscribe();
+        resolve(channels.length > 0 ? channels[0] : null);
+      });
+    });
+  }
+
+  // ========== AUTH STATE MANAGEMENT ==========
+
+  private initializeAuthStateListener(): void {
+    this.authStateSubscription = this.firebaseService.onAuthStateChanged(
+      async (firebaseUser: FirebaseUser | null) => {
+        await this.handleAuthStateChange(firebaseUser);
+      }
+    );
+    this.scheduleGuestCleanup();
+  }
+
+  private async handleAuthStateChange(firebaseUser: FirebaseUser | null): Promise<void> {
+    if (firebaseUser) {
+      await this.processAuthenticatedUser(firebaseUser);
+    } else {
+      this.currentUserSubject.next(null);
+    }
+  }
+
+  private async processAuthenticatedUser(firebaseUser: FirebaseUser): Promise<void> {
+    const authUser = this.mapFirebaseUserToAuthUser(firebaseUser);
+    this.currentUserSubject.next(authUser);
+    this.userService.loadCurrentUser(firebaseUser.uid);
+    const isNewUser = await this.firestoreSyncService.syncUserToFirestore(firebaseUser);
+    if (isNewUser) {
+      await this.addUserToAllgemeinChannel(firebaseUser.uid);
+      if (this.isGoogleSignIn(firebaseUser)) {
+        this.router.navigate(['/auth/choose-avatar']);
+      }
+    }
+  }
+
+  private isGoogleSignIn(firebaseUser: FirebaseUser): boolean {
+    return firebaseUser.providerData.some(provider => provider.providerId === 'google.com');
+  }
+
+  private scheduleGuestCleanup(): void {
+    setInterval(() => {
+      this.cleanupExpiredGuests().subscribe({
+      });
+    }, 24 * 60 * 60 * 1000);
+  }
+
   // ========== UTILITY METHODS ==========
+
+  private mapFirebaseUserToAuthUser(firebaseUser: FirebaseUser): AuthUser {
+    return {
+      uid: firebaseUser.uid,
+      email: firebaseUser.email || '',
+      displayName: firebaseUser.displayName || '',
+      photoURL: firebaseUser.photoURL || '',
+      emailVerified: firebaseUser.emailVerified
+    };
+  }
+
+  private mapGuestToAuthUser(guestUser: GuestUser): AuthUser {
+    return {
+      uid: guestUser.uid,
+      email: guestUser.email,
+      displayName: guestUser.displayName,
+      photoURL: guestUser.photoURL,
+      emailVerified: guestUser.emailVerified
+    };
+  }
 
   private validateAndMapUser(firebaseUser: FirebaseUser | null, errorMessage: string): AuthUser {
     if (!firebaseUser) {
@@ -275,90 +482,62 @@ export class AuthService {
   private waitForCurrentUser(): Observable<AuthUser> {
     this.setLoading(false);
     return this.currentUser$.pipe(
-      map(user => {
-        if (!user) throw new Error('User not found after authentication');
-        return user;
-      })
+      map(user => this.validateCurrentUser(user))
     );
+  }
+
+  private validateCurrentUser(user: AuthUser | null): AuthUser {
+    if (!user) {
+      throw new Error('User not found after authentication');
+    }
+    return user;
   }
 
   private setLoading(loading: boolean): void {
     this.loadingSubject.next(loading);
   }
 
-  // ========== ERROR HANDLERS ==========
+  private async updateUserOfflineStatus(): Promise<void> {
+    const currentUser = this.currentUser;
+    if (currentUser && !this.isCurrentUserGuest()) {
+      await this.userProfileService.setUserOfflineStatus(currentUser.uid);
+    }
+  }
 
-  private handleSignInError(error: any, logMessage: string = 'Email sign in error:'): Observable<never> {
-    console.error(logMessage, error);
+  private navigateToLogin(): void {
     this.setLoading(false);
-    throw this.handleAuthError(error);
+    this.router.navigate(['/auth/login']);
   }
 
-  private handleRegistrationError(error: any): Observable<never> {
-    console.error('Email registration error:', error);
-    this.setLoading(false);
-    throw this.handleAuthError(error);
+  // ========== HELPER METHODS ==========
+
+  isGuestUserId(userId: string): boolean {
+    return userId.startsWith('guest_');
   }
 
-  private handleSignOutError(error: any): Observable<never> {
-    console.error('Sign out error:', error);
-    this.setLoading(false);
-    throw error;
+  getUserRole(): 'regular' | 'guest' | null {
+    if (this.currentUser && !this.isCurrentUserGuest()) return 'regular';
+    if (this.isCurrentUserGuest()) return 'guest';
+    return null;
   }
 
-  private handlePasswordResetError(error: any, logMessage: string = 'Password reset error:'): Observable<never> {
-    console.error(logMessage, error);
-    this.setLoading(false);
-    throw this.handleAuthError(error);
-  }
-
-  private handleVerificationError(error: any): Observable<never> {
-    console.error('Verify password reset code error:', error);
-    throw this.handleAuthError(error);
-  }
-
-  private handleAuthError(error: any): Error {
-    const errorMessages = this.getErrorMessages();
-    const message = errorMessages[error.code] || error.message || 'Ein unbekannter Fehler ist aufgetreten';
-    return new Error(message);
-  }
-
-  private getErrorMessages(): {[key: string]: string} {
-    return {
-      'auth/user-not-found': 'Benutzer nicht gefunden',
-      'auth/wrong-password': 'Falsches Passwort',
-      'auth/email-already-in-use': 'E-Mail-Adresse wird bereits verwendet',
-      'auth/weak-password': 'Passwort ist zu schwach',
-      'auth/invalid-email': 'Ungültige E-Mail-Adresse',
-      'auth/too-many-requests': 'Zu viele Anfragen. Bitte versuchen Sie es später erneut',
-      'auth/network-request-failed': 'Netzwerkfehler. Prüfen Sie Ihre Internetverbindung',
-      'auth/popup-closed-by-user': 'Anmeldung wurde abgebrochen'
-    };
-  }
-
-  // ========== GETTERS ==========
-
-  get currentUser(): AuthUser | null {
-    return this.currentUserSubject.value;
-  }
-
-  get isAuthenticated(): boolean {
-    return this.currentUserSubject.value !== null;
-  }
-
-  get isAuthenticated$(): Observable<boolean> {
-    return this.currentUser$.pipe(
-      map(user => user !== null)
-    );
+  isFeatureAvailable(feature: string): boolean {
+    const userRole = this.getUserRole();
+    const guestRestrictedFeatures = [
+      'profile-edit',
+      'password-change',
+      'account-deletion',
+      'premium-features'
+    ];
+    if (userRole === 'guest' && guestRestrictedFeatures.includes(feature)) {
+      return false;
+    }
+    return true;
   }
 
   // ========== CLEANUP ==========
 
   ngOnDestroy(): void {
-    this.cleanupAuthStateSubscription();
-  }
-
-  private cleanupAuthStateSubscription(): void {
     if (this.authStateSubscription) {
       this.authStateSubscription();
     }

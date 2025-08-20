@@ -1,0 +1,53 @@
+<div class="overlay" (click)="closeOverlay()" *ngIf="showOverlay">
+    <div class="overlay-container">
+        <div class="overlay-content" (click)="$event.stopPropagation()">
+            <div class="content-header">
+                <h3 class="content-title">Profile</h3>
+                <div class="close" (click)="closeOverlay()">
+                    <div class="close-content"></div>
+                </div>
+            </div>
+            <div class="img-wrapper">
+                <img [src]="currentUser?.photoURL?.startsWith('http') ? '/angular-projects/dabubble/images/icons/avatars/avatar_1.png' : currentUser?.photoURL"
+                    alt="">
+            </div>
+            <div class="name-wrapper">
+                <span>{{ currentUser?.displayName }}</span>
+                @if (currentUser?.isActive) {
+                <div class="status">
+                    <span></span>
+                    <span>Aktiv</span>
+                </div>
+                } @else {
+                <div class="status offline">
+                    <span></span>
+                    <span>Abwesend</span>
+                </div>
+                }
+
+
+            </div>
+            <div class="email-wrapper">
+                <div class="email-left">
+                    <img src="images/icons/mail.png" alt="">
+
+                </div>
+                <div class="email-right">
+                    <span>E-Mail-Addresse</span>
+                    @if (currentUser?.isActive) {
+                    {{ currentUser?.email }}
+                    } @else {
+                    <a href="mailto:{{currentUser?.email}}">{{currentUser?.email}}</a>
+                    }
+                </div>
+            </div>
+            <div class="footer">
+                <div class="button pointer" (click)="openUserChat()">
+                    <img src="images/icons/message.png">
+                    <span>Nachricht</span>
+                </div>
+            </div>
+
+        </div>
+    </div>
+</div>

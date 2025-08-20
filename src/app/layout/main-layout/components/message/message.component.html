@@ -1,0 +1,49 @@
+<main class="main-content" *ngIf="!isTablet || (isTablet && dashboardResponsive.openMain$ | async)" #messageContainer>
+    <div class="container-head" [style.height.px]="showHeader == 'new' ? '140' : '80'">
+        <div class="new-message-to" *ngIf="showHeader == 'new'">
+            <app-search-message-header></app-search-message-header>
+        </div>
+        <div class="channel-message" *ngIf="showHeader == 'channel'">
+            <app-channel-message-header [channel]="channel"></app-channel-message-header>
+        </div>
+        
+        <div class="direct-message" *ngIf="showHeader == 'direct'">
+            <div class="avatar-div">
+                <img *ngIf="messageUser" [src]="messageUser.photoURL.startsWith('http') ? '/angular-projects/dabubble/images/icons/avatars/avatar_1.png' : messageUser.photoURL">
+                
+                @if(!messageUser?.isActive) {
+                    <span class="active-status offline"></span>
+                } @else {
+                    <span class="active-status"></span>
+                }
+                
+            </div>
+            <span class="name">
+                {{ messageUser?.displayName }} 
+                @if (messageUser?.id === currentUser?.id) {
+                    (Du)
+                }
+            </span>
+        </div>
+    </div>
+    <div class="container-body-input scrollbar__none">
+        <div class="container-body scrollbar__none" #containerBody>
+            <app-message-box  #messageBox
+                [allUsersWithOutCurrentUser]="allUsersWithOutCurrentUser" 
+                [messageUser]="messageUser" 
+                [channel]="channel" 
+                [currentUser]="currentUser" 
+                [allUsers]="allUsers">
+            </app-message-box>
+        </div>
+        <div class="container-input">
+            <app-input 
+                (sendMessageEmitter)="onSendMessage($event)" 
+                [allChannelUserInput]="allUsersWithOutCurrentUser" 
+                [placeHolder]="channel?.name ? '#' + (channel?.name ? channel?.name : '') : '@' +  (messageUser?.displayName ? messageUser?.displayName : '')">
+            </app-input>
+        </div>
+    </div>
+</main>
+
+

@@ -3,7 +3,7 @@
 .auth__container {
     @include displayFlex();
     background-color: white;
-    padding: 32px 48px;
+    padding: 36px 48px;
     border-radius: 30px;
 }
 
@@ -40,6 +40,15 @@ p {
     width: 100%;
     @include displayFlex($g: 7px);
     flex-direction: column;
+}
+
+.honeypot {
+    position: absolute;
+    left: -9999px;
+    width: 1px;
+    height: 1px;
+    opacity: 0;
+    pointer-events: none;
 }
 
 .form__fields {
@@ -157,6 +166,7 @@ p {
 .link {
     color: var(--purple-2);
     @include fontFigtree($fw: 400);
+    @include displayFlex();
     text-decoration: none;
     cursor: pointer;
     padding: 5px 15px;
@@ -221,7 +231,7 @@ p {
     .btn__icon {
         width: 38px;
         height: 38px;
-        background-image: url('/icons/google_icon.png');
+        background-image: url('/angular-projects/dabubble/images/icons/google_icon.png');
         background-size: cover;
         background-position: center;
         background-repeat: no-repeat;
@@ -250,6 +260,10 @@ p {
 }
 
 .btn {
+    border: none;
+    cursor: pointer;
+    transition: all 0.2s ease;
+
     .loading__spinner {
         width: 16px;
         height: 16px;
@@ -258,6 +272,12 @@ p {
         border-radius: 50%;
         animation: spin 1s linear infinite;
         margin-left: 0.5rem;
+    }
+
+    &:disabled {
+        opacity: 0.6;
+        cursor: not-allowed;
+        pointer-events: none;
     }
 }
 
@@ -340,20 +360,24 @@ p {
 }
 
 .visually__hidden {
-    position: absolute;
-    width: 1px;
-    height: 1px;
-    padding: 0;
-    margin: -1px;
-    overflow: hidden;
-    clip: rect(0, 0, 0, 0);
-    white-space: nowrap;
-    border: 0;
+    position: absolute !important;
+    width: 1px !important;
+    height: 1px !important;
+    padding: 0 !important;
+    margin: -1px !important;
+    overflow: hidden !important;
+    clip: rect(0, 0, 0, 0) !important;
+    white-space: nowrap !important;
+    border: 0 !important;
 }
   
 form.submitting {
     pointer-events: none;
     opacity: 0.8;
+}
+  
+.input__wrapper {
+    position: relative;
 }
   
 @keyframes spin {
@@ -368,4 +392,61 @@ form.submitting {
     60% { transform: translateX(-5px); }
     80% { transform: translateX(5px); }
     100% { transform: translateX(0); }
+}
+
+@media screen and (max-width: 430px) {
+    .auth__container {
+        @include displayFlex();
+        background-color: white;
+        padding: 36px 16px;
+        border-radius: 30px;
+    }
+
+    .auth__form__header {
+        gap: 15px !important;
+    }
+
+    .auth__form__container {
+        gap: 16px !important;
+    }
+
+    h1 {
+        @include fontNunito($fs: 32px, $fw: 700);
+    }
+
+    p {
+        @include fontNunito($fs: 17px, $fw: 400);
+    }
+
+    .form__group {
+        height: 77px;
+
+        .input__wrapper {
+            height: 50px;
+            padding: 12px 32px;
+            @include fontNunito($fs: 18px, $fw: 500);
+        }
+    }
+
+    .link {
+        @include fontFigtree($fw: 400, $fs: 17px);
+    }
+
+    .divider {
+        span {
+            @include fontNunito($fs: 17px, $fw: 400);
+        }
+    }
+
+    .btn__google {
+        height: 50px;
+
+        &:not(:disabled):hover {
+            height: 50px;
+        }
+    
+        &:not(:disabled):active {
+            height: 50px;
+        }
+    }
 }

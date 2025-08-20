@@ -1,0 +1,204 @@
+@use './../../../../../../../styles.scss' as *;
+@use './../../../../../../../styles/overlay.scss' as *;
+
+
+.overlay-content {
+    width: 380px !important;
+    gap: 30px !important;
+    position: fixed;
+    top: 0px;
+    left: -98px;
+    border-top-right-radius: 0px !important;
+
+    .img-wrapper {
+
+        img {
+            border-radius: 50%;
+            width: 200px;
+            height: 200px;
+        }
+    }
+
+    .name-overlay {
+        width: 100%;
+        @include displayFlex($fd: column, $g: 10px, $ai: flex-start);
+
+        .name-wrapper {
+            width: 100%;
+            @include displayFlex($fd: row, $jc: space-between, $ai: center);
+
+            >span {
+                font-weight: 700;
+                font-size: 32px;
+            }
+
+            >img {
+                cursor: pointer;
+                background: var(--bg-color);
+                border-radius: 50%;
+            }
+        }
+
+        .status {
+            @include displayFlex($g: 20px, $jc: flex-start);
+
+            >span:nth-child(1) {
+                display: inline-block;
+                width: 16px;
+                height: 16px;
+                background-color: var(--green);
+                border-radius: 50%;
+            }
+
+            >span:nth-child(2) {
+                color: var(--green);
+                font-weight: 400;
+                font-size: 20px;
+            }
+
+            &.offline {
+                >span:nth-child(1) {
+                    background-color: var(--grey);
+                }
+
+                >span:nth-child(2) {
+                    color: var(--grey);
+                }
+            }
+        }
+
+    }
+
+    .email-wrapper {
+        width: 100% !important;
+        @include displayFlex($fd: column, $g: 20px, $ai: flex-start);
+
+        .email-head {
+            width: 100% !important;
+            @include displayFlex($ai: center, $jc: flex-start, $g: 10px);
+        }
+
+        .email-main {
+            @include displayFlex($g: 10px, $ai: flex-start, $jc: center, $fd: column);
+            width: 100% !important;
+            padding-left: 38px;
+
+            >span {
+                font-size: 20px;
+                font-weight: 700;
+            }
+
+            >a {
+                width: 100% !important;
+                font-weight: 400;
+                font-size: 18px;
+                overflow-x: auto;
+            }
+
+            ::-webkit-scrollbar {
+                display: none;
+            }
+        }
+
+    }
+
+    .footer {
+        .button {
+            height: 50px;
+            background-color: var(--purple-1);
+            border-radius: 50px;
+            padding: 12px 25px;
+            @include displayFlex($g: 10px);
+
+            >span {
+                color: var(--white);
+            }
+        }
+    }
+}
+
+.edit-header {
+    width: 100%;
+    @include displayFlex($fd: row, $jc: flex-start, $ai: center, $g: 20px);
+
+    >span {
+        font-weight: 700;
+        font-size: 20px;
+    }
+}
+
+.indicate {
+    font-size: 1rem;
+    color: #ff0000;
+    text-align: center;
+}
+
+
+.edit-input {
+    width: 100%;
+    height: 52px;
+    gap: 10px;
+    border-radius: 30px;
+    border-width: 1px;
+    padding: 15px 20px;
+    border: 1px solid #ADB0D9;
+    font-size: 18px;
+    font-weight: 500;
+    color: var(--grey);
+}
+
+.btn-wrapper {
+    width: 100%;
+    @include displayFlex($fd: row, $jc: flex-end, $ai: center, $g: 20px);
+
+    :nth-child(1) {
+        width: 141px;
+        height: 49px;
+        border-radius: 50px;
+        padding: 12px 25px;
+        color: var(--purple-1);
+        background-color: var(--white);
+        border: 1px solid #797EF3;
+        font-size: 18px;
+        font-weight: 700;
+    }
+
+    :nth-child(2) {
+        width: 141px;
+        height: 49px;
+        border-radius: 50px;
+        padding: 12px 25px;
+        color: var(--purple-1);
+        background-color: var(--purple-1);
+        color: var(--white);
+        font-size: 18px;
+        font-weight: 700;
+    }
+}
+
+@media (max-width: 960px) {
+    .overlay-content {
+        width: 90%;
+        max-width: 380px;
+        top: auto;
+        bottom: auto;
+        border-top-right-radius: 30px !important;
+        left: auto;
+    }
+
+    .overlay-profile {
+        position: static !important;
+    }
+
+    .profile {
+        height: fit-content !important;
+        border-radius: 30px !important;
+    }
+}
+
+@media (max-width: 575px) {
+    .overlay-content {
+        width: 96% !important;
+        max-width: 380px !important;
+    }
+}
