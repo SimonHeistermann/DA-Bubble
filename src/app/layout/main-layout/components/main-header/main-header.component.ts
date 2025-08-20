@@ -77,7 +77,6 @@ export class MainHeaderComponent implements OnDestroy {
   constructor(public dashboardResponsive: DashboardResponsiveService) {
     this.dashboardResponsive.normalScreen$.subscribe(normalScreen => {
       this.normalScreen = normalScreen;
-      console.log(this.normalScreen);
     })
 
     this.dashboardResponsive.isTablet$.subscribe(isTablet => {

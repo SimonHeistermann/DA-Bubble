@@ -252,7 +252,7 @@ export class MessageBoxComponent implements AfterViewChecked, OnDestroy {
     } else {
       user = this.allUsers.find(u => u.id === userID) ?? null;
     }
-    return user ? user.photoURL.startsWith('http') ? '/angular-projects/dabubble/images/icons/avatars/avatar_1.png' : user.photoURL : '';
+    return user ? user.photoURL.startsWith('http') ? '/images/icons/avatars/avatar_1.png' : user.photoURL : '';
   }
 
   findUserByUserId(userID: string): string {

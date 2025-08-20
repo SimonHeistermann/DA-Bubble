@@ -58,14 +58,14 @@
             height: 24px;
             background: {
                 repeat: no-repeat;
-                image: url('/angular-projects/dabubble/images/icons/close.png');
+                image: url('/images/icons/close.png');
                 position: center;
             };
         }
     
         .tag-close:hover {
             background: {
-                image: url('/angular-projects/dabubble/images/icons/close_hover.png');
+                image: url('/images/icons/close_hover.png');
             };
         }
     }

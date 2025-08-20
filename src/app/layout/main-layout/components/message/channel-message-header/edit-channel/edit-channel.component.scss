@@ -30,7 +30,7 @@
                 width: 24px;
                 height: 24px;
                 background: {
-                    image: url('/angular-projects/dabubble/images/icons/close.png');
+                    image: url('/images/icons/close.png');
                 };
             }
 
@@ -38,7 +38,7 @@
                 background: var(--bg-color);
                 .close-content {
                     background: {
-                        image: url('/angular-projects/dabubble/images/icons/close_hover.png');
+                        image: url('/images/icons/close_hover.png');
                         
                     };
                 }
@@ -86,7 +86,7 @@
                         left: 18px;
                         top: 50%;
                         transform: translateY(-50%);
-                        background-image: url('/angular-projects/dabubble/images/icons/tag.png');
+                        background-image: url('/images/icons/tag.png');
                     }
                     >input {
                         padding-left: 50px !important;
