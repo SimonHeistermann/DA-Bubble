@@ -7,6 +7,6 @@ import { Directive, HostListener } from '@angular/core';
 export class DefaultImgDirective {
   @HostListener('error', ['$event.target'])
   onError(img: HTMLImageElement) {
-    img.src = '/angular-projects/dabubble/images/icons/avatars/avatar_1.png';
+    img.src = '/images/icons/avatars/avatar_1.png';
   }
 }

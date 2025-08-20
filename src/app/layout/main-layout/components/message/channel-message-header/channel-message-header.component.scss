@@ -10,33 +10,33 @@
 
         @include displayFlex($g: 10px);
         .tag {
-            @include imgButton($wh: 32px, $url: '/angular-projects/dabubble/images/icons/tag.png');
+            @include imgButton($wh: 32px, $url: '/images/icons/tag.png');
         }
         .channel-name {
             font-size: 22px;
         }
         .arrow-down {
-            @include imgButton($wh: 30px, $url: '/angular-projects/dabubble/images/icons/arrow_down1.png');
+            @include imgButton($wh: 30px, $url: '/images/icons/arrow_down1.png');
         }
 
         &:hover {
             color: var(--purple-3);
             background-color: var(--bg-color);
             .tag {
-                background-image: url('/angular-projects/dabubble/images/icons/tag_hover.png');
+                background-image: url('/images/icons/tag_hover.png');
             }
             .arrow-down {
-                background-image: url('/angular-projects/dabubble/images/icons/arrow_down1_hover.png');
+                background-image: url('/images/icons/arrow_down1_hover.png');
             }
         }
         &:active, &.active {
             color: var(--purple-3);
             background-color: var(--bg-color);
             .tag {
-                background-image: url('/angular-projects/dabubble/images/icons/tag_click.png');
+                background-image: url('/images/icons/tag_click.png');
             }
             .arrow-down {
-                background-image: url('/angular-projects/dabubble/images/icons/arrow_down1_hover.png');
+                background-image: url('/images/icons/arrow_down1_hover.png');
             }
         }
     }   
@@ -77,12 +77,12 @@
 
         .add-member{
             border-radius: 50%;
-            @include imgButton($wh:40px, $url:'/angular-projects/dabubble/images/icons/add_member.png');
+            @include imgButton($wh:40px, $url:'/images/icons/add_member.png');
             &:hover {
-                background-image: url('/angular-projects/dabubble/images/icons/add_member_hover.png');
+                background-image: url('/images/icons/add_member_hover.png');
             }
             &:active, &.active {
-                background-image: url('/angular-projects/dabubble/images/icons/add_member_hover.png');
+                background-image: url('/images/icons/add_member_hover.png');
             }
         }
     }

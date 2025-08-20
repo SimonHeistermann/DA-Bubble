@@ -13,12 +13,12 @@ import { APP_CONSTANTS } from '../../constants/app.constants';
 })
 export class UserProfileService {
   private readonly availableAvatars = [
-    '/angular-projects/dabubble/images/icons/avatars/avatar_1.png',
-    '/angular-projects/dabubble/images/icons/avatars/avatar_2.png',
-    '/angular-projects/dabubble/images/icons/avatars/avatar_3.png',
-    '/angular-projects/dabubble/images/icons/avatars/avatar_4.png',
-    '/angular-projects/dabubble/images/icons/avatars/avatar_5.png',
-    '/angular-projects/dabubble/images/icons/avatars/avatar_6.png'
+    '/images/icons/avatars/avatar_1.png',
+    '/images/icons/avatars/avatar_2.png',
+    '/images/icons/avatars/avatar_3.png',
+    '/images/icons/avatars/avatar_4.png',
+    '/images/icons/avatars/avatar_5.png',
+    '/images/icons/avatars/avatar_6.png'
   ];
 
   constructor(private firebaseService: FirebaseService) {}
